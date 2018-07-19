@@ -1,0 +1,28 @@
+@startuml
+class FileComments {
+file : string
++getFile() : String
++getComments() : vector<comment>
+}
+
+class Comments {
++ acceptConsumer()
+}
+
+Comments "1.." o-- FileComments
+
+class Comment {
+comment : string
+line : string
+}
+
+interface CommentConsumer{
++consume(string file, string line, string comment)
+}
+
+class BitBucketPusher{
+}
+BitBucketPusher --|> CommentConsumer
+
+FileComments "1.." o-- Comment
+@enduml

@@ -1,0 +1,8 @@
+@startuml
+
+artifact mustard{
+}
+mustard ..> [git command]
+mustard ..> [bitbucket api]
+[commmand line] --> mustard
+@enduml

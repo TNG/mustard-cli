@@ -1,0 +1,13 @@
+@startuml
+title review start
+participant "Review Starter" as rs
+participant "git"
+participant "bitbucket" as bb
+rs -> git : query head commit
+git --> rs : head commit
+rs -> bb : query PRs for current head commit
+bb --> rs : return merge target
+rs -> git : reset to common root commit
+git --> rs : result
+@enduml
+
