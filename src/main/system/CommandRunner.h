@@ -7,6 +7,8 @@ class CommandRunner
 {
 public:
     virtual CommandResult run ( const string &command ) = 0;
+    virtual string pwd() const = 0;
+    virtual void cd ( const string &dir ) = 0;
     virtual ~CommandRunner() {}
 };
 

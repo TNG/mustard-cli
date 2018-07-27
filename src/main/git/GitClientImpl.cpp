@@ -10,3 +10,18 @@ Commitish GitClientImpl::getHeadCommit()
 {
     return commandRunner->run ( "git rev-parse HEAD" ).getOutputStripNewline();
 }
+
+bool GitClientImpl::workingDirectoryIsClean()
+{
+    return commandRunner->run ( "git status --porcelain" ).getOutput().length() == 0;
+}
+
+Commitish GitClientImpl::getMergeBase ( const Commitish &fromBranch, const Commitish &toBranch )
+{
+    return commandRunner->run ( "git merge-base " + fromBranch + " " + toBranch ).getOutputStripNewline();
+}
+
+void GitClientImpl::reset ( const Commitish &resetTo )
+{
+    commandRunner->run ( "git reset " + resetTo );
+}

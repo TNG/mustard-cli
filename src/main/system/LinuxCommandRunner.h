@@ -11,8 +11,11 @@ class LinuxCommandRunner: public CommandRunner
 {
 public:
     virtual CommandResult run ( const string &command );
-    virtual ~LinuxCommandRunner() {}
 
+    virtual string pwd() const;
+    void cd ( const string &dir ) override;
+
+    virtual ~LinuxCommandRunner() {}
 };
 
 
