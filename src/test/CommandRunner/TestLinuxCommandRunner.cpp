@@ -18,6 +18,14 @@ TEST_F ( TestLinuxCommandRunner, Unit_GivesOutputAsString )
     );
 }
 
+TEST_F ( TestLinuxCommandRunner, Unit_GivesOutputAsStringCanStripNewline )
+{
+    EXPECT_STREQ (
+        "Dies ist ein Test",
+        commandRunner.run ( "echo Dies ist ein Test" ).getOutputStripNewline().c_str()
+    );
+}
+
 TEST_F ( TestLinuxCommandRunner, Unit_GivesCorrectExitCode )
 {
     EXPECT_EQ (

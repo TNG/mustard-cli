@@ -2,10 +2,13 @@
 #include <sstream>
 #include <cstdio>
 #include <stdlib.h>
+#include <Provide.h>
 
 #include "LinuxCommandRunner.h"
 
 using namespace std;
+
+ProvideImplementationForDependency<LinuxCommandRunner, CommandRunner> commandRunnerDependency;
 
 CommandResult LinuxCommandRunner::run ( const string &command )
 {

@@ -1,6 +1,8 @@
 #ifndef MUSTARD_COMMANDRUNNER_H
 #define MUSTARD_COMMANDRUNNER_H
 
+#include "CommandResult.h"
+
 class CommandRunner
 {
 public:
