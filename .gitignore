@@ -1,0 +1,10 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+build/*
+cmake-build-debug/*
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
