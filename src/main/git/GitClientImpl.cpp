@@ -25,3 +25,8 @@ void GitClientImpl::reset ( const Commitish &resetTo )
 {
     commandRunner->run ( "git reset " + resetTo );
 }
+
+string GitClientImpl::getConfigValue ( const string &name )
+{
+    return commandRunner->run ( "git config --get " + name ).getOutputStripNewline();
+}

@@ -15,7 +15,7 @@ target_link_libraries(mustard pistache)
 
 set (TEST_SOURCES
         ${SOURCES}
-        src/test/CommandRunner/TestLinuxCommandRunner.cpp src/test/git/TestGitClientImpl.cpp src/test/git/GitTestEnvironment.cpp src/test/git/GitTestEnvironment.h)
+        src/test/CommandRunner/TestLinuxCommandRunner.cpp src/test/git/TestGitClientImpl.cpp src/test/git/GitTestEnvironment.cpp src/test/git/GitTestEnvironment.h src/main/bitbucket/BitBucketClient.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests pistache gtest)

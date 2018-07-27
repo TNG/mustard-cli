@@ -62,3 +62,14 @@ TEST_F ( TestGitClientImpl, Unit_GitReset )
     EXPECT_TRUE ( gitClient.workingDirectoryIsClean() );
 }
 
+TEST_F ( TestGitClientImpl, Unit_GetConfigValue )
+{
+    GitTestEnvironment testEnv;
+    const string expectedValue = "someValue";
+    const string keyPath = "category.key";
+    testEnv.run ( "git config --add " + keyPath + " " + expectedValue );
+
+    const string valueFromConfig = gitClient.getConfigValue ( keyPath );
+
+    EXPECT_STREQ ( expectedValue.c_str(), valueFromConfig.c_str() );
+}
