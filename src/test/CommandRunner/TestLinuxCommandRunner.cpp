@@ -1,16 +1,16 @@
 #include <gtest/gtest.h>
-#include "../../main/system/CommandRunner.h"
+#include "../../main/system/LinuxCommandRunner.h"
 
 using namespace testing;
 
-class TestCommandRunner : public Test
+class TestLinuxCommandRunner : public Test
 {
 public:
 
-    CommandRunner commandRunner;
+    LinuxCommandRunner commandRunner;
 };
 
-TEST_F ( TestCommandRunner, Unit_GivesOutputAsString )
+TEST_F ( TestLinuxCommandRunner, Unit_GivesOutputAsString )
 {
     EXPECT_STREQ (
         "Dies ist ein Test",
@@ -18,14 +18,14 @@ TEST_F ( TestCommandRunner, Unit_GivesOutputAsString )
     );
 }
 
-TEST_F ( TestCommandRunner, Unit_GivesCorrectExitCode )
+TEST_F ( TestLinuxCommandRunner, Unit_GivesCorrectExitCode )
 {
     EXPECT_EQ (
         42,
         commandRunner.run ( "exit 42" ).getReturnCode()
     );
 }
-TEST_F ( TestCommandRunner, Unit_DoNotAcceptDoubleQuotesAtTheMoment )
+TEST_F ( TestLinuxCommandRunner, Unit_DoNotAcceptDoubleQuotesAtTheMoment )
 {
     EXPECT_THROW ( commandRunner.run ( "echo Command With \" quote" ), exception );
 }

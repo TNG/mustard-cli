@@ -3,11 +3,11 @@
 #include <cstdio>
 #include <stdlib.h>
 
-#include "CommandRunner.h"
+#include "LinuxCommandRunner.h"
 
 using namespace std;
 
-CommandResult CommandRunner::run ( const string &command )
+CommandResult LinuxCommandRunner::run ( const string &command )
 {
     if ( command.find ( '"' ) != string::npos ) {
         throw exception();

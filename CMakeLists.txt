@@ -8,14 +8,14 @@ include_directories(lib/poorMansDi/src)
 add_subdirectory(lib/pistache)
 
 set (SOURCES
-        src/main/system/CommandRunner.cpp src/main/system/CommandRunner.h src/main/system/CommandResult.cpp src/main/system/CommandResult.h)
+        src/main/system/LinuxCommandRunner.cpp src/main/system/LinuxCommandRunner.h src/main/system/CommandResult.cpp src/main/system/CommandResult.h src/main/system/CommandRunner.h)
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard pistache)
 
 set (TEST_SOURCES
         ${SOURCES}
-        src/test/CommandRunner/TestCommandRunner.cpp)
+        src/test/CommandRunner/TestLinuxCommandRunner.cpp)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests pistache gtest)
