@@ -2,19 +2,17 @@
 #include <Depend.h>
 #include "BitBucketClientImpl.h"
 
-BitBucketClientImpl::BitBucketClientImpl ( AuthenticationProvider *authenticationProvider ) :
-    authenticationProvider ( DependentOn<AuthenticationProvider> ( authenticationProvider ) )
+BitBucketClientImpl::BitBucketClientImpl ( HttpClient *httpClient ) :
+    httpClient ( DependentOn<HttpClient> ( httpClient ) )
 {
 }
 
 Commitish BitBucketClientImpl::getPullRequestTargetFor ( const Commitish &commit )
 {
-    auto authentication = authenticationProvider->getAuthentication();
-    auto response = cpr::Get (
-                        cpr::Url ( "https://bitbucket.int.tngtech.com/users/imgrundm/repos/poormansdi/pull-requests" ),
-    cpr::Header{{"accept", "application/json"}},
-    authentication,
-    cpr::VerifySsl{false} );
-    printf ( "%d - %d - %s\n", response.error, response.status_code, response.text.c_str() );
+    const HttpResponse pullRequest = httpClient->get ( "https://bitbucket.int.tngtech.com/users/imgrundm/repos/poormansdi/pull-requests" );
+    if ( !pullRequest.successful ) {
+        printf ( "Could not determine pull requests\n" );
+    }
+    printf ( "%d - '%s'\n",  pullRequest.httpStatus, pullRequest.body.c_str() );
     return Commitish();
 }

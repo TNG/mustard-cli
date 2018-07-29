@@ -3,14 +3,15 @@
 
 #include "BitBucketClient.h"
 #include "../authentication/AuthenticationProvider.h"
+#include "../system/HttpClient.h"
 
 class BitBucketClientImpl : public BitBucketClient
 {
 public:
-    BitBucketClientImpl ( AuthenticationProvider *authenticationProvider = nullptr );
+    BitBucketClientImpl ( HttpClient *httpClient = nullptr );
     Commitish getPullRequestTargetFor ( const Commitish &commit ) override;
 private:
-    AuthenticationProvider *authenticationProvider;
+    HttpClient *httpClient;
 };
 
 

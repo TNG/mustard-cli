@@ -23,7 +23,7 @@ set(SOURCES
         src/main/system/CommandRunner.h
         src/main/system/LinuxCommandRunner.cpp
         src/main/system/LinuxCommandRunner.h
-        )
+        src/main/system/HttpClient.cpp src/main/system/HttpClient.h)
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr)
@@ -35,7 +35,7 @@ set(TEST_SOURCES
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp
         src/test/system/TestLinuxCommandRunner.cpp
-        src/main/authentication/AuthenticationProvider.h)
+        src/main/authentication/AuthenticationProvider.h src/main/system/HttpResponse.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest)
