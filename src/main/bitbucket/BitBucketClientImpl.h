@@ -2,21 +2,15 @@
 #define MUSTARD_BITBUCKETCLIENTIMPL_H
 
 #include "BitBucketClient.h"
-
-using namespace Pistache;
+#include "../authentication/AuthenticationProvider.h"
 
 class BitBucketClientImpl : public BitBucketClient
 {
 public:
-    BitBucketClientImpl();
+    BitBucketClientImpl ( AuthenticationProvider *authenticationProvider = nullptr );
     Commitish getPullRequestTargetFor ( const Commitish &commit ) override;
-    ~BitBucketClientImpl() {
-        client.shutdown();
-    }
 private:
-    Http::Client client;
-
-
+    AuthenticationProvider *authenticationProvider;
 };
 
 

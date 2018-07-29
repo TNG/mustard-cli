@@ -4,3 +4,6 @@
 [submodule "lib/pistache"]
 	path = lib/pistache
 	url = https://github.com/oktal/pistache.git
+[submodule "lib/cpr"]
+	path = lib/cpr
+	url = https://github.com/whoshuu/cpr.git

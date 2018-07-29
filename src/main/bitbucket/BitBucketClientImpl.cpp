@@ -1,25 +1,20 @@
+#include <cpr/cpr.h>
+#include <Depend.h>
 #include "BitBucketClientImpl.h"
-using  namespace Pistache;
 
-BitBucketClientImpl::BitBucketClientImpl()
+BitBucketClientImpl::BitBucketClientImpl ( AuthenticationProvider *authenticationProvider ) :
+    authenticationProvider ( DependentOn<AuthenticationProvider> ( authenticationProvider ) )
 {
-    auto opts = Http::Client::options()
-                .threads ( 1 )
-                .maxConnectionsPerHost ( 8 );
-    client.init ( opts );
 }
 
 Commitish BitBucketClientImpl::getPullRequestTargetFor ( const Commitish &commit )
 {
-    auto response = client.get ( "http://bitbucket.int.tngtech.com/users/imgrundm/repos/poormansdi/pull-requests" )
-                    .send();
-    response.then ( [&] ( Http::Response response ) {
-        std::cout << "Response code = " << response.code() << std::endl;
-        auto body = response.body();
-        if ( !body.empty() ) {
-            std::cout << "Response body = " << body << std::endl;
-        }
-    }, Async::IgnoreException );
-    Async::Barrier<Http::Response> ( response ).wait();
+    auto authentication = authenticationProvider->getAuthentication();
+    auto response = cpr::Get (
+                        cpr::Url ( "https://bitbucket.int.tngtech.com/users/imgrundm/repos/poormansdi/pull-requests" ),
+    cpr::Header{{"accept", "application/json"}},
+    authentication,
+    cpr::VerifySsl{false} );
+    printf ( "%d - %d - %s\n", response.error, response.status_code, response.text.c_str() );
     return Commitish();
 }
