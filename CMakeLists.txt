@@ -24,7 +24,7 @@ set(SOURCES
         src/main/system/CommandRunner.h
         src/main/system/LinuxCommandRunner.cpp
         src/main/system/LinuxCommandRunner.h
-        src/main/system/HttpClient.cpp src/main/system/HttpClient.h src/main/bitbucket/BitBucketConfiguration.cpp src/main/bitbucket/BitBucketConfiguration.h src/main/workflow/StartReviewWorkflow.cpp src/main/workflow/StartReviewWorkflow.h src/main/git/GitClientException.h)
+        src/main/system/HttpClient.cpp src/main/system/HttpClient.h src/main/bitbucket/BitBucketConfiguration.cpp src/main/bitbucket/BitBucketConfiguration.h src/main/workflow/StartReviewWorkflow.cpp src/main/workflow/StartReviewWorkflow.h src/main/git/GitClientException.h src/main/workflow/WorkflowFactory.cpp src/main/workflow/WorkflowFactory.h)
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr)
@@ -36,7 +36,7 @@ set(TEST_SOURCES
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp
         src/test/system/TestLinuxCommandRunner.cpp
-        src/main/authentication/AuthenticationProvider.h src/main/system/HttpResponse.h src/test/system/HttpClientForTest.h src/main/bitbucket/BitBucketClientException.h src/main/workflow/Workflow.h src/main/error/MustardException.h)
+        src/main/authentication/AuthenticationProvider.h src/main/system/HttpResponse.h src/test/system/HttpClientForTest.h src/main/bitbucket/BitBucketClientException.h src/main/workflow/Workflow.h src/main/error/MustardException.h src/main/workflow/WorkflowException.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock)
