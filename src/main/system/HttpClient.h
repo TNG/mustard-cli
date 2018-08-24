@@ -11,10 +11,10 @@ class HttpClient
 {
 public:
     HttpClient ( AuthenticationProvider *authenticationProvider = nullptr );
-    HttpResponse get ( const string &url );
+    virtual HttpResponse get ( const string &url );
+    virtual ~HttpClient() {}
 private:
     AuthenticationProvider *authenticationProvider;
-
 };
 
 

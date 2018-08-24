@@ -4,6 +4,7 @@ project(mustard)
 set(CMAKE_CXX_STANDARD 11)
 
 add_subdirectory(lib/cpr)
+add_subdirectory(lib/gmock-1.7.0)
 
 include_directories(${CPR_INCLUDE_DIRS})
 include_directories(lib/poorMansDi/src)
@@ -35,8 +36,8 @@ set(TEST_SOURCES
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp
         src/test/system/TestLinuxCommandRunner.cpp
-        src/main/authentication/AuthenticationProvider.h src/main/system/HttpResponse.h)
+        src/main/authentication/AuthenticationProvider.h src/main/system/HttpResponse.h src/test/system/HttpClientForTest.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
-target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest)
+target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock)
 
