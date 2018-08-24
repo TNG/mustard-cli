@@ -5,6 +5,7 @@
 
 class BitBucketClient
 {
+public:
     virtual Commitish getPullRequestTargetFor ( const Commitish &commit ) = 0;
 };
 

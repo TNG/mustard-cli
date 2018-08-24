@@ -10,7 +10,6 @@ ProvideImplementationForDependency<AuthenticationProviderImpl, AuthenticationPro
 
 cpr::Authentication AuthenticationProviderImpl::getAuthentication()
 {
-
     if ( !hasCredentials ) {
         askUserForCredentials();
     }

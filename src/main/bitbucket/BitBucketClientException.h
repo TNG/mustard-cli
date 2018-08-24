@@ -4,19 +4,14 @@
 
 #include <exception>
 #include <string>
+#include "../error/MustardException.h"
 
 using namespace std;
 
-class BitBucketClientException : public exception
+class BitBucketClientException : public MustardException
 {
 public:
-    BitBucketClientException ( const char *what ) : reason ( what ) {}
-    const char *what() const noexcept {
-        return reason.c_str();
-    }
-    ~BitBucketClientException() noexcept {}
-private:
-    const string reason;
+    BitBucketClientException ( const char *reason ) : MustardException ( reason ) {}
 };
 
 #endif //MUSTARD_BITBUCKETCLIENTEXCEPTION_H

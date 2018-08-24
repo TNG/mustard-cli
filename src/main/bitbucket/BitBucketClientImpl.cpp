@@ -1,13 +1,12 @@
-#include "BitBucketClientException.h"
-
-#define RAPIDJSON_ASSERT(x) if (!(x)) throw BitBucketClientException(RAPIDJSON_STRINGIFY(x))
-#include <rapidjson/document.h>
-
 #include <Depend.h>
+
+#include <Provide.h>
 #include "BitBucketClientImpl.h"
 #include "BitBucketConfiguration.h"
 
 using namespace rapidjson;
+
+ProvideImplementationForDependency<BitBucketClientImpl, BitBucketClient> bitBucketClientDependency;
 
 BitBucketClientImpl::BitBucketClientImpl ( HttpClient *httpClient, BitBucketConfiguration *bitBucketConfiguration ) :
     httpClient ( DependentOn<HttpClient> ( httpClient ) ),
@@ -34,6 +33,7 @@ BitBucketClientImpl::extractPullRequestTargetFrom ( const string &pullRequestsJs
 {
     Document document;
     document.Parse ( pullRequestsJson.c_str() );
+    checkForBitBucketErrors ( document );
     if ( !document.IsObject() ) {
         throw BitBucketClientException ( "Could not parse response json" );
     }
@@ -43,4 +43,12 @@ BitBucketClientImpl::extractPullRequestTargetFrom ( const string &pullRequestsJs
         };
     }
     throw BitBucketClientException ( "Could not find pullRequest target for feature committish" );
+}
+
+void BitBucketClientImpl::checkForBitBucketErrors ( const rapidjson::Document &document )
+{
+    if ( document.HasMember ( "errors" ) ) {
+        const string message = string ( ( *document["errors"].GetArray().Begin() ) ["message"].GetString() );
+        throw BitBucketClientException ( ( "BitBucket server responded with error: " + message ).c_str() );
+    }
 }
