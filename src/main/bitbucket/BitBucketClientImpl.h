@@ -10,12 +10,14 @@ class BitBucketClientImpl : public BitBucketClient
 {
 public:
     BitBucketClientImpl ( HttpClient *httpClient, BitBucketConfiguration *bitBucketConfiguration );
-    Commitish getPullRequestTargetFor ( const Commitish &commit ) override;
+    Commitish getPullRequestTargetFor ( const Commitish &featureCommittish ) override;
 private:
     HttpClient *httpClient;
     const string bitBucketEndpoint;
 
     const string determineBitBucketEndpoint ( BitBucketConfiguration *config );
+
+    Commitish extractPullRequestTargetFrom ( const string &pullRequestsJson, const Commitish &featureCommitish );
 };
 
 
