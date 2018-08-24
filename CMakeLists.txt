@@ -24,7 +24,7 @@ set(SOURCES
         src/main/system/CommandRunner.h
         src/main/system/LinuxCommandRunner.cpp
         src/main/system/LinuxCommandRunner.h
-        src/main/system/HttpClient.cpp src/main/system/HttpClient.h)
+        src/main/system/HttpClient.cpp src/main/system/HttpClient.h src/main/bitbucket/BitBucketConfiguration.cpp src/main/bitbucket/BitBucketConfiguration.h)
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr)
