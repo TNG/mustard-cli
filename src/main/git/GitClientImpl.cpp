@@ -38,3 +38,12 @@ string GitClientImpl::getConfigValue ( const string &name )
     }
     return commandResult.getOutputStripNewline();
 }
+
+string GitClientImpl::getDiff()
+{
+    CommandResult commandResult =  commandRunner->run ( "git diff -U0" );
+    if ( commandResult.getReturnCode() ) {
+        throw GitClientException ( ( "Could not get diff, git returned:" + commandResult.getOutput() ).c_str() );
+    }
+    return commandResult.getOutput();
+}

@@ -73,3 +73,24 @@ TEST_F ( TestGitClientImpl, Unit_GetConfigValue )
 
     EXPECT_STREQ ( expectedValue.c_str(), valueFromConfig.c_str() );
 }
+
+TEST_F ( TestGitClientImpl, Unit_GetDiff )
+{
+    GitTestEnvironment testEnv;
+    testEnv.createFileAndCommit ( "myFile" );
+    testEnv.run ( "echo someMoreContent >> myFile" );
+    testEnv.run ( "git commit -m 'some more stuff'" );
+    testEnv.run ( "echo lessContent >> myFile" );
+
+    const string diff = gitClient.getDiff();
+    const string expectedDiff = "diff --git a/myFile b/myFile\n"
+                                "index e69de29..6924897 100644\n"
+                                "--- a/myFile\n"
+                                "+++ b/myFile\n"
+                                "@@ -0,0 +1,2 @@\n"
+                                "+someMoreContent\n"
+                                "+lessContent\n"
+                                "";
+
+    EXPECT_STREQ ( expectedDiff.c_str(), diff.c_str() );
+}
