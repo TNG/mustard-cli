@@ -1,9 +1,6 @@
 [submodule "lib/poorMansDi"]
 	path = lib/poorMansDi
 	url = ssh://git@bitbucket.int.tngtech.com:122/~imgrundm/poormansdi.git
-[submodule "lib/pistache"]
-	path = lib/pistache
-	url = https://github.com/oktal/pistache.git
 [submodule "lib/cpr"]
 	path = lib/cpr
 	url = https://github.com/whoshuu/cpr.git
