@@ -10,6 +10,7 @@ public:
     virtual Commitish getHeadCommit() = 0;
     virtual bool workingDirectoryIsClean() = 0;
     virtual Commitish getMergeBase ( const Commitish &fromBranch, const Commitish &toBranch ) = 0;
+    virtual Commitish getFeatureBranchOnOrigin() = 0;
     virtual void reset ( const Commitish &resetTo ) = 0;
     virtual string getConfigValue ( const string &name ) = 0;
     virtual string getDiff() = 0;

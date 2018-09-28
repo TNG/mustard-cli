@@ -11,7 +11,7 @@ map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors =
         }
     }, {"stop", []()
         {
-            return new StopReviewWorkflow();
+            return new StopReviewWorkflow ( nullptr, nullptr, nullptr );
         }
     }
 };

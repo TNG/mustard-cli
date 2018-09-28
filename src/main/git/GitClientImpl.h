@@ -12,13 +12,13 @@ public:
     Commitish getHeadCommit() override;
     bool workingDirectoryIsClean() override;
     Commitish getMergeBase ( const Commitish &fromBranch, const Commitish &toBranch ) override;
+    Commitish getFeatureBranchOnOrigin() override;
     void reset ( const Commitish &resetTo ) override;
     string getConfigValue ( const string &name ) override ;
     string getDiff() override;
 
     GitClientImpl ( CommandRunner *commandRunner = nullptr );
 private:
-
     CommandRunner *commandRunner;
 };
 

@@ -1,14 +1,15 @@
 #include <regex>
 #include <Provide.h>
+#include <Depend.h>
 #include "CommentExtractorImpl.h"
 #include "../error/MustardException.h"
 
 
 using namespace std;
 
-ProvideImplementationForDependency <CommentExtractorImpl, CommentExtractor> commentExtractorDependency();
+ProvideImplementationForDependency <CommentExtractorImpl, CommentExtractor> commentExtractorDependency;
 
-CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient ) : gitClient ( gitClient ) {}
+CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient ) : gitClient ( DependentOn<GitClient> ( gitClient ) ) {}
 
 map<CommentExtractorImpl::LineType, regex> CommentExtractorImpl::lineTypeRegexes = {
     {FILEDEFINITION, regex ( "^diff.*" ) },
