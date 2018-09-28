@@ -19,6 +19,7 @@ set(SOURCES
         src/main/bitbucket/BitBucketClientImpl.h
         src/main/bitbucket/BitBucketConfiguration.cpp
         src/main/bitbucket/BitBucketConfiguration.h
+        src/main/bitbucket/PullRequest.h
         src/main/comments/CommenExtractor.h
         src/main/comments/CommentConsumer.h
         src/main/comments/CommentExtractorImpl.cpp

@@ -16,11 +16,31 @@ BitBucketClientImpl::BitBucketClientImpl ( HttpClient *httpClient, BitBucketConf
 
 Commitish BitBucketClientImpl::getPullRequestTargetFor ( const Commitish &featureCommittish )
 {
+    Document pullRequestsDocument = getPullRequestDocumentFor ( featureCommittish );
+    Commitish committish ( extractPullRequestDocument ( pullRequestsDocument, featureCommittish ) ["toRef"]["latestCommit"].GetString() );
+    return committish;
+}
+
+PullRequest BitBucketClientImpl::getPullRequestFor ( const Commitish &featureCommittish )
+{
+    Document pullRequestsDocument = getPullRequestDocumentFor ( featureCommittish );
+    const string href = ( extractPullRequestDocument ( pullRequestsDocument, featureCommittish ) ["links"]["self"][0]["href"].GetString() );
+    return {href};
+}
+
+rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commitish &basic_string )
+{
     const HttpResponse pullRequests = httpClient->get ( bitBucketEndpoint );
     if ( !pullRequests.successful ) {
         throw BitBucketClientException ( "Could not determine pull requests" );
     }
-    return extractPullRequestTargetFrom ( pullRequests.body, featureCommittish );
+    Document document;
+    document.Parse ( pullRequests.body.c_str() );
+    checkForBitBucketErrors ( document );
+    if ( !document.IsObject() ) {
+        throw BitBucketClientException ( "Could not parse response json" );
+    }
+    return document;
 }
 
 const string BitBucketClientImpl::determineBitBucketEndpoint ( BitBucketConfiguration *config )
@@ -28,18 +48,12 @@ const string BitBucketClientImpl::determineBitBucketEndpoint ( BitBucketConfigur
     return config->getBitBucketEndpoint();
 }
 
-Commitish
-BitBucketClientImpl::extractPullRequestTargetFrom ( const string &pullRequestsJson, const Commitish &featureCommitish )
+const Document::ValueType &
+BitBucketClientImpl::extractPullRequestDocument ( const Document &pullRequests, const Commitish &featureCommitish )
 {
-    Document document;
-    document.Parse ( pullRequestsJson.c_str() );
-    checkForBitBucketErrors ( document );
-    if ( !document.IsObject() ) {
-        throw BitBucketClientException ( "Could not parse response json" );
-    }
-    for ( const auto &pullRequest : document["values"].GetArray() ) {
+    for ( const auto &pullRequest : pullRequests["values"].GetArray() ) {
         if ( strcmp ( pullRequest["fromRef"]["latestCommit"].GetString(), featureCommitish.c_str() ) == 0 ) {
-            return Commitish ( pullRequest["toRef"]["latestCommit"].GetString() );
+            return pullRequest;
         };
     }
     throw BitBucketClientException ( "Could not find pullRequest target for feature committish" );

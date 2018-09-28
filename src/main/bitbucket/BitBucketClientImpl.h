@@ -10,20 +10,26 @@
 #include "../system/HttpClient.h"
 #include "BitBucketConfiguration.h"
 
+using namespace rapidjson;
+
 class BitBucketClientImpl : public BitBucketClient
 {
 public:
     BitBucketClientImpl ( HttpClient *httpClient = nullptr, BitBucketConfiguration *bitBucketConfiguration = nullptr );
     Commitish getPullRequestTargetFor ( const Commitish &featureCommittish ) override;
+    PullRequest getPullRequestFor ( const Commitish &featureCommittish ) override;
 private:
     HttpClient *httpClient;
     const string bitBucketEndpoint;
 
     const string determineBitBucketEndpoint ( BitBucketConfiguration *config );
 
-    Commitish extractPullRequestTargetFrom ( const string &pullRequestsJson, const Commitish &featureCommitish );
+    const Document::ValueType &
+    extractPullRequestDocument ( const rapidjson::Document &pullRequest, const Commitish &featureCommitish );
 
     void checkForBitBucketErrors ( const rapidjson::Document &document );
+
+    rapidjson::Document getPullRequestDocumentFor ( const Commitish &basic_string );
 };
 
 
