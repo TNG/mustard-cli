@@ -45,6 +45,8 @@ set(SOURCES
         src/main/system/LinuxCommandRunner.h
         src/main/workflow/StartReviewWorkflow.cpp
         src/main/workflow/StartReviewWorkflow.h
+        src/main/workflow/StopReviewWorkflow.cpp
+        src/main/workflow/StopReviewWorkflow.h
         src/main/workflow/WorkflowException.h
         src/main/workflow/WorkflowFactory.cpp
         src/main/workflow/WorkflowFactory.h
