@@ -10,7 +10,7 @@ ProvideImplementationForDependency<BitBucketClientImpl, BitBucketClient> bitBuck
 
 BitBucketClientImpl::BitBucketClientImpl ( HttpClient *httpClient, BitBucketConfiguration *bitBucketConfiguration ) :
     httpClient ( DependentOn<HttpClient> ( httpClient ) ),
-    bitBucketEndpoint ( determineBitBucketEndpoint ( DependentOn<BitBucketConfiguration> ( bitBucketConfiguration ) ) )
+    pullRequestEndpoint ( determinePullRequestEndpoint ( DependentOn<BitBucketConfiguration> ( bitBucketConfiguration ) ) )
 {
 }
 
@@ -25,12 +25,13 @@ PullRequest BitBucketClientImpl::getPullRequestFor ( const Commitish &featureCom
 {
     Document pullRequestsDocument = getPullRequestDocumentFor ( featureCommittish );
     const string href = ( extractPullRequestDocument ( pullRequestsDocument, featureCommittish ) ["links"]["self"][0]["href"].GetString() );
-    return {href};
+    const unsigned int id = ( extractPullRequestDocument ( pullRequestsDocument, featureCommittish ) ["id"].GetInt() );
+    return {href, id};
 }
 
 rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commitish &basic_string )
 {
-    const HttpResponse pullRequests = httpClient->get ( bitBucketEndpoint );
+    const HttpResponse pullRequests = httpClient->get ( pullRequestEndpoint );
     if ( !pullRequests.successful ) {
         throw BitBucketClientException ( "Could not determine pull requests" );
     }
@@ -43,7 +44,7 @@ rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commi
     return document;
 }
 
-const string BitBucketClientImpl::determineBitBucketEndpoint ( BitBucketConfiguration *config )
+const string BitBucketClientImpl::determinePullRequestEndpoint ( BitBucketConfiguration *config )
 {
     return config->getBitBucketEndpoint();
 }

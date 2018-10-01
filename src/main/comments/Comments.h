@@ -9,6 +9,7 @@ class Comments
 {
 public:
     Comments ( const vector<FileComments> &fileComments );
+    bool isEmpty() const;
     void accept ( CommentConsumer &consumer ) const;
 
 private:

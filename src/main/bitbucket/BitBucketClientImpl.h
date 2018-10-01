@@ -20,9 +20,9 @@ public:
     PullRequest getPullRequestFor ( const Commitish &featureCommittish ) override;
 private:
     HttpClient *httpClient;
-    const string bitBucketEndpoint;
+    const string pullRequestEndpoint;
 
-    const string determineBitBucketEndpoint ( BitBucketConfiguration *config );
+    const string determinePullRequestEndpoint ( BitBucketConfiguration *config );
 
     const Document::ValueType &
     extractPullRequestDocument ( const rapidjson::Document &pullRequest, const Commitish &featureCommitish );

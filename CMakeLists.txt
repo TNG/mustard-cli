@@ -52,7 +52,7 @@ set(SOURCES
         src/main/workflow/WorkflowFactory.cpp
         src/main/workflow/WorkflowFactory.h
         src/main/workflow/Workflow.h
-        )
+        src/main/bitbucket/BitBucketCommentUploader.cpp src/main/bitbucket/BitBucketCommentUploader.h)
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr)
@@ -67,7 +67,7 @@ set(TEST_SOURCES
         src/test/git/TestGitClientImpl.cpp
         src/test/system/HttpClientForTest.h
         src/test/system/TestLinuxCommandRunner.cpp
-        )
+        src/test/bitbucket/TestBitBucketCommentUploader.cpp)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock)

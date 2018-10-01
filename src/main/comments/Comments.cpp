@@ -11,3 +11,8 @@ void Comments::accept ( CommentConsumer &consumer ) const
         fileComments.accept ( consumer );
     }
 }
+
+bool Comments::isEmpty() const
+{
+    return comments.empty();
+}

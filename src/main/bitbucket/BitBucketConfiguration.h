@@ -13,6 +13,10 @@ public:
 private:
 
     GitClient *gitClient;
+
+    string getBitbucketUrl() const;
+
+    string buildBitBucketUrl() const;
 };
 
 

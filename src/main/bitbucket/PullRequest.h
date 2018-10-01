@@ -7,6 +7,7 @@ using namespace std;
 
 struct PullRequest {
     string url;
+    unsigned int id;
 };
 
 #endif //MUSTARD_PULLREQUEST_H

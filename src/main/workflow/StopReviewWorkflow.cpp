@@ -4,6 +4,7 @@
 #include "../git/GitClient.h"
 #include "../bitbucket/PullRequest.h"
 #include "../bitbucket/BitBucketClient.h"
+#include "../bitbucket/BitBucketCommentUploader.h"
 
 StopReviewWorkflow::StopReviewWorkflow ( CommentExtractor *commentExtractor, GitClient *gitClient,
         BitBucketClient *bitBucketClient ) :
@@ -16,10 +17,18 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
     const Commitish originFeatureHead = gitClient->getFeatureBranchOnOrigin();
     gitClient->reset ( originFeatureHead );
     const Comments comments = commentExtractor->extract();
+    if ( comments.isEmpty() ) {
+        printf ( "You did not make any comments.\n" );
+        return -1;
+    }
     printCommentSummary ( comments );
 
     const PullRequest pullRequest = bitBucketClient->getPullRequestFor ( originFeatureHead );
-    printf ( "Would upload to %s\n", pullRequest.url.c_str() );
+
+    BitBucketCommentUploader commentUploader ( pullRequest );
+    comments.accept ( commentUploader );
+
+    printf ( "Visit Bitbucket pull-request under:  %s\n", pullRequest.url.c_str() );
     return 0;
 }
 
