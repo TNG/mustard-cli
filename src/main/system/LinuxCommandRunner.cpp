@@ -16,7 +16,7 @@ CommandResult LinuxCommandRunner::run ( const string &command )
     if ( command.find ( '"' ) != string::npos ) {
         throw exception();
     }
-    const string shellCommmand = "/usr/bin/bash -c \"" + command + "\"";
+    const string shellCommmand = "env bash -c \"" + command + "\"";
     FILE *outputPipe = popen ( shellCommmand.c_str(), "r" );
     string outputString;
     char line[1024];
