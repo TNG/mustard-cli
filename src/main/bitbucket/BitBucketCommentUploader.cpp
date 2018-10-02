@@ -31,7 +31,7 @@ string BitBucketCommentUploader::buildCommentPostUrl() const
 {
     stringstream ss;
     ss << bitBucketConfiguration->getBitBucketEndpoint();
-    ss << "/pull-requests/" << pullRequest.id << "/comments";
+    ss << "/" << pullRequest.id << "/comments";
     return ss.str();
 }
 
@@ -44,7 +44,7 @@ string BitBucketCommentUploader::serializeComment ( const string &file, unsigned
     text.SetString ( comment.c_str(), jsonDocument.GetAllocator() );
     mLine.SetInt ( line );
     fileType.SetString ( "TO" );
-    lineType.SetString ( "ADD" );
+    lineType.SetString ( "ADDED" );
     path.SetString ( file.c_str(), jsonDocument.GetAllocator() );
 
     Value anchor;

@@ -30,9 +30,13 @@ HttpResponse HttpClient::post ( const string &url, const string &body )
     auto authentication = authenticationProvider->getAuthentication();
     auto response = cpr::Post (
                         cpr::Url ( url ),
-    cpr::Header{{"accept", "application/json"}},
+    cpr::Header{{"Content-Type",      "application/json"},
+        {"accept",            "application/json"},
+        {"X-Atlassian-Token", "no-check"}},
     authentication,
+    cpr::Body ( body ),
     cpr::VerifySsl{false} );
+    printf ( "%s\n", response.text.c_str() );
     return {
         response.text,
         response.status_code,

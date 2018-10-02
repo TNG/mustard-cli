@@ -35,7 +35,7 @@ public:
 TEST_F ( BitBucketCommentUpdaterTest, Unit_uploadsJson )
 {
     Comments comments ( {FileComments ( {"file", {LineComment ( 42, "the answer to everything" ) }} ) } );
-    const char *expectedPostJson = "{\"text\":\"the answer to everything\",\"anchor\":{\"line\":42,\"lineType\":\"ADD\",\"fileType\":\"TO\",\"path\":\"file\",\"srcPath\":\"file\"}}";
+    const char *expectedPostJson = "{\"text\":\"the answer to everything\",\"anchor\":{\"line\":42,\"lineType\":\"ADDED\",\"fileType\":\"TO\",\"path\":\"file\",\"srcPath\":\"file\"}}";
     EXPECT_CALL ( httpClient, post ( _, StrEq ( expectedPostJson ) ) ).WillOnce ( Return ( HttpResponse() ) );
     comments.accept ( commentUploader );
 }
@@ -43,7 +43,7 @@ TEST_F ( BitBucketCommentUpdaterTest, Unit_uploadsJson )
 TEST_F ( BitBucketCommentUpdaterTest, Unit_postsToCorrectUrl )
 {
     Comments comments ( {FileComments ( {"file", {LineComment ( 42, "the answer to everything" ) }} ) } );
-    const char *expectedUrl = "testUrl/pull-requests/1337/comments";
+    const char *expectedUrl = "testUrl/1337/comments";
     EXPECT_CALL ( httpClient, post ( StrEq ( expectedUrl ), _ ) ).WillOnce ( Return ( HttpResponse() ) );
     comments.accept ( commentUploader );
 }
