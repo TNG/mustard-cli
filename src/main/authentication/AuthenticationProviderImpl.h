@@ -3,25 +3,18 @@
 
 #include "AuthenticationProvider.h"
 #include "../credentials/CredentialProvider.h"
+#include "../bitbucket/BitBucketConfiguration.h"
 
 class AuthenticationProviderImpl : public AuthenticationProvider
 {
 public:
-    AuthenticationProviderImpl ( CredentialProvider *credentialProvider = nullptr );
+    AuthenticationProviderImpl ( BitBucketConfiguration *bitBucketConfiguration = nullptr );
 
     cpr::Authentication getAuthentication() override;
 
 private:
     std::string username, password;
-    bool hasCredentials = false;
-
-    void askUserForCredentials();
-
-    void toggleConsoleEcho();
-
-    CredentialProvider *credentialProvider;
-
-    void saveCredentials ( Credentials &credentials );
+    BitBucketConfiguration *bitBucketConfiguration;
 };
 
 

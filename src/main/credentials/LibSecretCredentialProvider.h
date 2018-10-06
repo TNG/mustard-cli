@@ -10,16 +10,14 @@
 class LibSecretCredentialProvider : public CredentialProvider
 {
 public:
-    LibSecretCredentialProvider ( BitBucketConfiguration *bitBucketConfiguration = nullptr );
-    Credentials getCredentialsFor ( const string &serverName ) override;
+    string getPasswordFor ( const string &serverName, const string &userName ) override;
 
-    bool saveCredentials ( const Credentials &credentials ) override;
+    bool saveCredentials ( const string &serverName, const Credentials &credentials ) override;
 
     bool isReady() override;
 
     ~LibSecretCredentialProvider() override;
 private:
-    BitBucketConfiguration *bitBucketConfiguration;
     static const SecretSchema secretSchema;
 };
 

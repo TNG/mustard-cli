@@ -10,7 +10,7 @@ using namespace testing;
 class BitBucketConfigurationForTest : public BitBucketConfiguration
 {
 public:
-    const string getBitBucketEndpoint() override {
+    const string getPullRequestEndpoint() override {
         return "testUrl";
     }
 

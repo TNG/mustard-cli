@@ -7,11 +7,11 @@
 class CredentialProvider
 {
 public:
-    virtual Credentials getCredentialsFor ( const string &serverName ) {
+    virtual string getPasswordFor ( const string &serverName, const string &userName ) {
         throw MustardException ( "Cannot get credentials as no CredentialProvider has been compiled" );
     }
 
-    virtual bool saveCredentials ( const Credentials &credentials ) {
+    virtual bool saveCredentials ( const string &serverName, const Credentials &credentials ) {
         return false;
     }
 

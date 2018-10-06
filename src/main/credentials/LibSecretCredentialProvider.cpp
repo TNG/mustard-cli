@@ -8,6 +8,7 @@ ProvideDepedendency<CredentialProvider> credentialProvider;
 #endif
 
 #ifdef WITH_LIBSECRET
+
 #include <libsecret/secret.h>
 #include <Depend.h>
 
@@ -16,16 +17,13 @@ ProvideImplementationForDependency<LibSecretCredentialProvider, CredentialProvid
 const SecretSchema LibSecretCredentialProvider::secretSchema = {
     "mustard.BitbucketPassword", SECRET_SCHEMA_NONE,
     {
-        {  "server", SECRET_SCHEMA_ATTRIBUTE_STRING },
-        {  "user", SECRET_SCHEMA_ATTRIBUTE_STRING },
-        {  NULL, SECRET_SCHEMA_ATTRIBUTE_STRING },
+        {"server", SECRET_SCHEMA_ATTRIBUTE_STRING},
+        {"user", SECRET_SCHEMA_ATTRIBUTE_STRING},
+        {NULL, SECRET_SCHEMA_ATTRIBUTE_STRING},
     }
 };
-LibSecretCredentialProvider::LibSecretCredentialProvider ( BitBucketConfiguration *bitBucketConfiguration ) :
-    bitBucketConfiguration ( DependentOn<BitBucketConfiguration> ( bitBucketConfiguration ) )
-{}
 
-Credentials LibSecretCredentialProvider::getCredentialsFor ( const string &serverName )
+string LibSecretCredentialProvider::getPasswordFor ( const string &serverName, const string &userName )
 {
     GError *gError = nullptr;
     gchar *password = secret_password_lookup_sync (
@@ -33,17 +31,23 @@ Credentials LibSecretCredentialProvider::getCredentialsFor ( const string &serve
                           nullptr,
                           &gError,
                           "user",
-                          "imgrundm",
+                          userName.c_str(),
                           "server",
-                          bitBucketConfiguration->getBitBucketEndpoint().c_str(),
+                          serverName.c_str(),
                           NULL
                       );
+    if ( !password ) {
+        return {"", ""};
+    }
+    if ( gError ) {
+        throw MustardException ( gError->message );
+    }
     string passwordCopy ( password );
     secret_password_free ( password );
-    return {"imgrundm", password};
+    return password;
 }
 
-bool LibSecretCredentialProvider::saveCredentials ( const Credentials &credentials )
+bool LibSecretCredentialProvider::saveCredentials ( const string &serverName, const Credentials &credentials )
 {
     GError *gError = nullptr;
     secret_password_store_sync (
@@ -56,7 +60,7 @@ bool LibSecretCredentialProvider::saveCredentials ( const Credentials &credentia
         "user",
         credentials.username.c_str(),
         "server",
-        bitBucketConfiguration->getBitBucketEndpoint().c_str(),
+        serverName.c_str(),
         nullptr
     );
 }

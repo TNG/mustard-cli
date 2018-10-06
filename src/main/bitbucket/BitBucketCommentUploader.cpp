@@ -30,7 +30,7 @@ string BitBucketCommentUploader::getCommentPostUrl() const
 string BitBucketCommentUploader::buildCommentPostUrl() const
 {
     stringstream ss;
-    ss << bitBucketConfiguration->getBitBucketEndpoint();
+    ss << bitBucketConfiguration->getPullRequestEndpoint();
     ss << "/" << pullRequest.id << "/comments";
     return ss.str();
 }

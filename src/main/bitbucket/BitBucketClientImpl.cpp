@@ -46,7 +46,7 @@ rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commi
 
 const string BitBucketClientImpl::determinePullRequestEndpoint ( BitBucketConfiguration *config )
 {
-    return config->getBitBucketEndpoint();
+    return config->getPullRequestEndpoint();
 }
 
 const Document::ValueType &
