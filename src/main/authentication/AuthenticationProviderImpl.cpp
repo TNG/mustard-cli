@@ -15,9 +15,15 @@ AuthenticationProviderImpl::AuthenticationProviderImpl ( CredentialProvider *cre
 cpr::Authentication AuthenticationProviderImpl::getAuthentication()
 {
     if ( !hasCredentials ) {
-        askUserForCredentials();
-        Credentials credentials = {username, password};
-        saveCredentials ( credentials );
+        Credentials savedCredentials = credentialProvider->getCredentialsFor ( "" );
+        if ( savedCredentials.password.empty() ) {
+            askUserForCredentials();
+            Credentials credentials = {username, password};
+            saveCredentials ( credentials );
+        } else {
+            return cpr::Authentication ( savedCredentials.username.c_str(), savedCredentials.password.c_str() );
+        }
+
     }
     return cpr::Authentication ( username.c_str(), password.c_str() );
 }

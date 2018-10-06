@@ -7,22 +7,16 @@ add_subdirectory(lib/cpr)
 add_subdirectory(lib/gmock-1.7.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
-find_package(GnomeKeyring)
-find_package(Glib2)
-if (GNOME-KEYRING_FOUND)
-    if (GLIB2_FOUND)
-        message("Gnome-Keyring has been found and will persist credentials")
-        add_definitions(-DWITH_GNOME_KEYRING)
-    else ()
-        message("Foung gnome-keyring, but not required glib2. Will not persist credentials")
-    endif ()
+find_package(LibSecret)
+if (LIBSECRET_FOUND)
+        message("libsecret has been found and will persist credentials")
+        add_definitions(-DWITH_LIBSECRET)
 else ()
-    message("gnome-keyring libraries not found - will not persist credentials")
+    message("libsecret not found - will not persist credentials")
 endif ()
 
 include_directories(${CPR_INCLUDE_DIRS})
-include_directories(${GNOME-KEYRING_INCLUDE_DIRS})
-include_directories(${GLIB2_INCLUDE_DIRS})
+include_directories(${LIBSECRET_INCLUDE_DIRS})
 include_directories(lib/poorMansDi/src)
 
 set(SOURCES
@@ -49,8 +43,8 @@ set(SOURCES
         src/main/comments/LineComment.cpp
         src/main/comments/LineComment.h
         src/main/credentials/CredentialProvider.h
-        src/main/credentials/GnomeKeyringCredentialProvider.cpp
-        src/main/credentials/GnomeKeyringCredentialProvider.h
+        src/main/credentials/LibSecretCredentialProvider.cpp
+        src/main/credentials/LibSecretCredentialProvider.h
         src/main/error/MustardException.h
         src/main/git/Commitish.h
         src/main/git/GitClient.h
@@ -76,7 +70,7 @@ set(SOURCES
         )
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
-target_link_libraries(mustard cpr ${GNOME-KEYRING_LIBRARIES}  )
+target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES}  )
 
 set(TEST_SOURCES
         ${SOURCES}
@@ -91,5 +85,5 @@ set(TEST_SOURCES
         src/test/bitbucket/TestBitBucketCommentUploader.cpp)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
-target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${GNOME-KEYRING_LIBRARIES})
+target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})
 
