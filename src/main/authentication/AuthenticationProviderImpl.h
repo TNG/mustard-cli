@@ -2,10 +2,13 @@
 #define MUSTARD_AUTHENTICATIONPROVIDERIMPL_H
 
 #include "AuthenticationProvider.h"
+#include "../credentials/CredentialProvider.h"
 
 class AuthenticationProviderImpl : public AuthenticationProvider
 {
 public:
+    AuthenticationProviderImpl ( CredentialProvider *credentialProvider = nullptr );
+
     cpr::Authentication getAuthentication() override;
 
 private:
@@ -15,6 +18,10 @@ private:
     void askUserForCredentials();
 
     void toggleConsoleEcho();
+
+    CredentialProvider *credentialProvider;
+
+    void saveCredentials ( Credentials &credentials );
 };
 
 

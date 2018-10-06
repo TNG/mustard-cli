@@ -6,17 +6,35 @@ set(CMAKE_CXX_STANDARD 11)
 add_subdirectory(lib/cpr)
 add_subdirectory(lib/gmock-1.7.0)
 
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
+find_package(GnomeKeyring)
+find_package(Glib2)
+if (GNOME-KEYRING_FOUND)
+    if (GLIB2_FOUND)
+        message("Gnome-Keyring has been found and will persist credentials")
+        add_definitions(-DWITH_GNOME_KEYRING)
+    else ()
+        message("Foung gnome-keyring, but not required glib2. Will not persist credentials")
+    endif ()
+else ()
+    message("gnome-keyring libraries not found - will not persist credentials")
+endif ()
+
 include_directories(${CPR_INCLUDE_DIRS})
+include_directories(${GNOME-KEYRING_INCLUDE_DIRS})
+include_directories(${GLIB2_INCLUDE_DIRS})
 include_directories(lib/poorMansDi/src)
 
 set(SOURCES
         src/main/authentication/AuthenticationProvider.h
         src/main/authentication/AuthenticationProviderImpl.cpp
         src/main/authentication/AuthenticationProviderImpl.h
-        src/main/bitbucket/BitBucketClientException.h
         src/main/bitbucket/BitBucketClient.h
+        src/main/bitbucket/BitBucketClientException.h
         src/main/bitbucket/BitBucketClientImpl.cpp
         src/main/bitbucket/BitBucketClientImpl.h
+        src/main/bitbucket/BitBucketCommentUploader.cpp
+        src/main/bitbucket/BitBucketCommentUploader.h
         src/main/bitbucket/BitBucketConfiguration.cpp
         src/main/bitbucket/BitBucketConfiguration.h
         src/main/bitbucket/PullRequest.h
@@ -30,10 +48,13 @@ set(SOURCES
         src/main/comments/FileComments.h
         src/main/comments/LineComment.cpp
         src/main/comments/LineComment.h
+        src/main/credentials/CredentialProvider.h
+        src/main/credentials/GnomeKeyringCredentialProvider.cpp
+        src/main/credentials/GnomeKeyringCredentialProvider.h
         src/main/error/MustardException.h
         src/main/git/Commitish.h
-        src/main/git/GitClientException.h
         src/main/git/GitClient.h
+        src/main/git/GitClientException.h
         src/main/git/GitClientImpl.cpp
         src/main/git/GitClientImpl.h
         src/main/system/CommandResult.cpp
@@ -48,14 +69,14 @@ set(SOURCES
         src/main/workflow/StartReviewWorkflow.h
         src/main/workflow/StopReviewWorkflow.cpp
         src/main/workflow/StopReviewWorkflow.h
+        src/main/workflow/Workflow.h
         src/main/workflow/WorkflowException.h
         src/main/workflow/WorkflowFactory.cpp
         src/main/workflow/WorkflowFactory.h
-        src/main/workflow/Workflow.h
-        src/main/bitbucket/BitBucketCommentUploader.cpp src/main/bitbucket/BitBucketCommentUploader.h)
+        )
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
-target_link_libraries(mustard cpr)
+target_link_libraries(mustard cpr ${GNOME-KEYRING_LIBRARIES}  )
 
 set(TEST_SOURCES
         ${SOURCES}
@@ -70,5 +91,5 @@ set(TEST_SOURCES
         src/test/bitbucket/TestBitBucketCommentUploader.cpp)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
-target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock)
+target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${GNOME-KEYRING_LIBRARIES})
 
