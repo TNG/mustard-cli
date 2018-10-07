@@ -70,7 +70,7 @@ set(SOURCES
         src/main/workflow/WorkflowException.h
         src/main/workflow/WorkflowFactory.cpp
         src/main/workflow/WorkflowFactory.h
-        )
+        src/main/bitbucket/PullRequestFormatter.cpp src/main/bitbucket/PullRequestFormatter.h)
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES}  )

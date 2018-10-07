@@ -2,6 +2,7 @@
 #define MUSTARD_PULLREQUEST_H
 
 #include <string>
+#include <vector>
 #include "User.h"
 #include "Reviewer.h"
 

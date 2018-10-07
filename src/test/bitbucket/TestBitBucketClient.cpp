@@ -3,6 +3,7 @@
 #include "../system/HttpClientForTest.h"
 #include "../../main/bitbucket/BitBucketClientException.h"
 #include "../../main/bitbucket/model/PullRequest.h"
+#include "../../main/bitbucket/PullRequestFormatter.h"
 
 using namespace testing;
 
@@ -55,6 +56,9 @@ TEST_F ( TestBitBucketClientImpl, Unit_getPullRequest_FurtherInformationCorrect 
     PullRequest pullRequest = client.getPullRequestFor ( latestCommit );
     EXPECT_STREQ ( "some change", pullRequest.title.c_str() );
     EXPECT_STREQ ( "Ignore this, its only testing", pullRequest.description.c_str() );
+    EXPECT_STREQ ( "Maximilian Imgrund", pullRequest.author.displayName.c_str() );
+    EXPECT_STREQ ( "maximilian.imgrund@tngtech.com", pullRequest.author.eMail.c_str() );
+
 }
 
 TEST_F ( TestBitBucketClientImpl, Unit_ViewPullRequests_InvalidJson_Throws )

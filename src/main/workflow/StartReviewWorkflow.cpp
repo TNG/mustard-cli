@@ -1,6 +1,7 @@
 #include <Depend.h>
 #include "StartReviewWorkflow.h"
 #include "../error/MustardException.h"
+#include "../bitbucket/PullRequestFormatter.h"
 
 StartReviewWorkflow::StartReviewWorkflow ( BitBucketClient *bitBucketClient, GitClient *gitClient ) :
     bitBucketClient ( DependentOn<BitBucketClient> ( bitBucketClient ) ),
@@ -8,10 +9,14 @@ StartReviewWorkflow::StartReviewWorkflow ( BitBucketClient *bitBucketClient, Git
 
 int StartReviewWorkflow::run ( int argc, const char **argv )
 {
-    Commitish headCommit = gitClient->getHeadCommit();
+    Commitish headCommit = gitClient->getFeatureBranchOnOrigin();
+    PullRequest pullRequest = bitBucketClient->getPullRequestFor ( headCommit );
+    cout << PullRequestFormatter::format ( pullRequest );
+
     Commitish pullRequestTarget = bitBucketClient->getPullRequestTargetFor ( headCommit );
     Commitish baseCommit = gitClient->getMergeBase ( headCommit, pullRequestTarget );
     gitClient->reset ( baseCommit );
+
     printf ( "Successfully prepared working directory for review.\n" );
     return 0;
 }
