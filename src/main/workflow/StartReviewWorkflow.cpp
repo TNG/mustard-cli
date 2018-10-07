@@ -12,6 +12,7 @@ int StartReviewWorkflow::run ( int argc, const char **argv )
     Commitish pullRequestTarget = bitBucketClient->getPullRequestTargetFor ( headCommit );
     Commitish baseCommit = gitClient->getMergeBase ( headCommit, pullRequestTarget );
     gitClient->reset ( baseCommit );
+    printf ( "Successfully prepared working directory for review.\n" );
     return 0;
 }
 

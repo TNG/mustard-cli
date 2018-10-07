@@ -15,9 +15,15 @@ BitBucketCommentUploader::BitBucketCommentUploader ( PullRequest pullRequest,
 
 void BitBucketCommentUploader::consume ( const string &file, unsigned int line, const string &comment )
 {
+    ++seen;
     const string postUrl = getCommentPostUrl();
     const string json = serializeComment ( file, line, comment );
-    httpClient->post ( postUrl, json );
+    auto respone = httpClient->post ( postUrl, json );
+    if ( respone.successful ) {
+        ++uploaded;
+    } else {
+        printf ( "Could not upload comment '%s'\n", comment.c_str() );
+    }
 }
 
 string BitBucketCommentUploader::getCommentPostUrl() const

@@ -36,7 +36,6 @@ HttpResponse HttpClient::post ( const string &url, const string &body )
     authentication,
     cpr::Body ( body ),
     cpr::VerifySsl{false} );
-    printf ( "%s\n", response.text.c_str() );
     return {
         response.text,
         response.status_code,

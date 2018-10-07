@@ -25,9 +25,12 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
 
     const PullRequest pullRequest = bitBucketClient->getPullRequestFor ( originFeatureHead );
 
+    printf ( "Posting comments...\n" );
     BitBucketCommentUploader commentUploader ( pullRequest );
     comments.accept ( commentUploader );
-
+    printf ( "Uploaded %u of %u comments\n",
+             commentUploader.getUploadedCommentNumber(),
+             commentUploader.getSeenCommentNumber() );
     printf ( "Visit Bitbucket pull-request under:  %s\n", pullRequest.url.c_str() );
     return 0;
 }
