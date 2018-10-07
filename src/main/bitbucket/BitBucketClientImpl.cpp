@@ -24,9 +24,30 @@ Commitish BitBucketClientImpl::getPullRequestTargetFor ( const Commitish &featur
 PullRequest BitBucketClientImpl::getPullRequestFor ( const Commitish &featureCommittish )
 {
     Document pullRequestsDocument = getPullRequestDocumentFor ( featureCommittish );
-    const string href = ( extractPullRequestDocument ( pullRequestsDocument, featureCommittish ) ["links"]["self"][0]["href"].GetString() );
-    const unsigned int id = ( extractPullRequestDocument ( pullRequestsDocument, featureCommittish ) ["id"].GetInt() );
-    return {href, id};
+    auto &pullRequestDocument =  extractPullRequestDocument ( pullRequestsDocument, featureCommittish );
+    const string href ( pullRequestDocument ["links"]["self"][0]["href"].GetString() );
+    const unsigned int id = pullRequestDocument ["id"].GetInt();
+    const string title ( pullRequestDocument ["title"].GetString() );
+    const string description ( pullRequestDocument ["description"].GetString() );
+    return {href,
+            id,
+            title,
+            description,
+            User::from ( pullRequestDocument["author"]["user"] ),
+            extractReviewersFrom ( pullRequestDocument["reviewers"] )
+           };
+}
+
+vector<Reviewer> BitBucketClientImpl::extractReviewersFrom ( const Document::ValueType &reviewersArray )
+{
+    vector<Reviewer> reviewers;
+    for ( const auto &reviewer : reviewersArray.GetArray() ) {
+        reviewers.push_back ( Reviewer::from (
+                                  User::from ( reviewer["user"] ),
+                                  reviewer["status"].GetString()
+                              ) );
+    }
+    return reviewers;
 }
 
 rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commitish &basic_string )

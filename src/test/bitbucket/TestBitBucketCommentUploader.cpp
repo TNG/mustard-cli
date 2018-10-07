@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include "../system/HttpClientForTest.h"
 #include "../../main/bitbucket/BitBucketCommentUploader.h"
-#include "../../main/bitbucket/PullRequest.h"
+#include "../../main/bitbucket/model/PullRequest.h"
 #include "../../main/comments/Comments.h"
 
 

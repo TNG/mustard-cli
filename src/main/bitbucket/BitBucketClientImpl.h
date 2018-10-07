@@ -30,6 +30,8 @@ private:
     void checkForBitBucketErrors ( const rapidjson::Document &document );
 
     rapidjson::Document getPullRequestDocumentFor ( const Commitish &basic_string );
+
+    vector<Reviewer> extractReviewersFrom ( const Document::ValueType &reviewersArray );
 };
 
 

@@ -2,7 +2,7 @@
 #define MUSTARD_BITBUCKETCLIENT_H
 
 #include "../git/Commitish.h"
-#include "PullRequest.h"
+#include "model/PullRequest.h"
 
 class BitBucketClient
 {

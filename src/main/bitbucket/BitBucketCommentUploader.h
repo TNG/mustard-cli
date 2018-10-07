@@ -5,7 +5,7 @@
 #include "../comments/CommentConsumer.h"
 #include "../system/HttpClient.h"
 #include "BitBucketConfiguration.h"
-#include "PullRequest.h"
+#include "model/PullRequest.h"
 
 class BitBucketCommentUploader : public CommentConsumer
 {

@@ -31,7 +31,10 @@ set(SOURCES
         src/main/bitbucket/BitBucketCommentUploader.h
         src/main/bitbucket/BitBucketConfiguration.cpp
         src/main/bitbucket/BitBucketConfiguration.h
-        src/main/bitbucket/PullRequest.h
+        src/main/bitbucket/model/PullRequest.h
+        src/main/bitbucket/model/ReviewStatus.h
+        src/main/bitbucket/model/Reviewer.h
+        src/main/bitbucket/model/User.h
         src/main/comments/CommenExtractor.h
         src/main/comments/CommentConsumer.h
         src/main/comments/CommentExtractorImpl.cpp

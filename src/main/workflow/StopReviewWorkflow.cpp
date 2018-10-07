@@ -2,7 +2,7 @@
 #include "StopReviewWorkflow.h"
 #include "../comments/CommentConsumer.h"
 #include "../git/GitClient.h"
-#include "../bitbucket/PullRequest.h"
+#include "../bitbucket/model/PullRequest.h"
 #include "../bitbucket/BitBucketClient.h"
 #include "../bitbucket/BitBucketCommentUploader.h"
 
