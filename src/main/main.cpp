@@ -24,5 +24,5 @@ int main ( const int argc, const char **argv )
 
 void printUsage()
 {
-    printf ( "Usage: mustard start\n" );
+    printf ( "Usage: mustard [start|info|stop]\n" );
 }
