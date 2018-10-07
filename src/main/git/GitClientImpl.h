@@ -15,6 +15,7 @@ public:
     Commitish getFeatureBranchOnOrigin() override;
     void reset ( const Commitish &resetTo ) override;
     string getConfigValue ( const string &name ) override ;
+    void setConfigValue ( const string &name, const string &value ) override ;
     string getDiff() override;
 
     GitClientImpl ( CommandRunner *commandRunner = nullptr );

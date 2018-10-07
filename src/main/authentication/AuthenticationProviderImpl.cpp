@@ -13,5 +13,5 @@ AuthenticationProviderImpl::AuthenticationProviderImpl ( BitBucketConfiguration 
 cpr::Authentication AuthenticationProviderImpl::getAuthentication()
 {
     Credentials savedCredentials = bitBucketConfiguration->getCredentials();
-    return cpr::Authentication ( username.c_str(), password.c_str() );
+    return cpr::Authentication ( savedCredentials.username.c_str(), savedCredentials.password.c_str() );
 }

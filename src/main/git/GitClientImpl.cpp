@@ -39,6 +39,14 @@ string GitClientImpl::getConfigValue ( const string &name )
     return commandResult.getOutputStripNewline();
 }
 
+void GitClientImpl::setConfigValue ( const string &name, const string &value )
+{
+    CommandResult commandResult =  commandRunner->run ( "git config " + name + " " + value );
+    if ( commandResult.getReturnCode() ) {
+        throw GitClientException ( ( "Could not get config value for " + name ).c_str() );
+    }
+}
+
 string GitClientImpl::getDiff()
 {
     CommandResult commandResult =  commandRunner->run ( "git diff -U0" );

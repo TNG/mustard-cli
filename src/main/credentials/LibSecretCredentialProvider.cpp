@@ -44,7 +44,7 @@ string LibSecretCredentialProvider::getPasswordFor ( const string &serverName, c
     }
     string passwordCopy ( password );
     secret_password_free ( password );
-    return password;
+    return passwordCopy;
 }
 
 bool LibSecretCredentialProvider::saveCredentials ( const string &serverName, const Credentials &credentials )
@@ -63,6 +63,11 @@ bool LibSecretCredentialProvider::saveCredentials ( const string &serverName, co
         serverName.c_str(),
         nullptr
     );
+    if ( gError ) {
+        printf ( "Had problems storing password: %s\n", gError->message );
+        return false;
+    }
+    return true;
 }
 
 bool LibSecretCredentialProvider::isReady()

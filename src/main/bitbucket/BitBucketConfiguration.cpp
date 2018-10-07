@@ -34,7 +34,7 @@ string BitBucketConfiguration::getBitbucketUrl() const
 
 string BitBucketConfiguration::buildBitBucketUrl() const
 {
-    const string bitbucketUrl = gitClient->getConfigValue ( "mustard.bitbucket" );
+    string bitbucketUrl = getBitBucketServer();
     const string repositorySlug = gitClient->getConfigValue ( "mustard.repositorySlug" );
     const string projectKey = gitClient->getConfigValue ( "mustard.projectKey" );
 
@@ -43,12 +43,25 @@ string BitBucketConfiguration::buildBitBucketUrl() const
     return ss.str();
 }
 
+string BitBucketConfiguration::getBitBucketServer() const
+{
+    static const string bitbucketUrl = gitClient->getConfigValue ( "mustard.bitbucket" );
+    return bitbucketUrl;
+}
+
 Credentials BitBucketConfiguration::getCredentials()
 {
-    const string userName = gitClient->getConfigValue ( "mustard.userName" );
-    const string password = credentialProvider->getPasswordFor ( getBitbucketUrl(), userName );
+    string userName;
+    try {
+        userName = gitClient->getConfigValue ( "mustard.userName" );
+    } catch ( GitClientException &e ) {
+        Credentials newCredentials = askPersistAndReturnNewCredentials();
+        return newCredentials;
+    }
+    const string password = credentialProvider->getPasswordFor ( getBitBucketServer(), userName );
     if ( password.empty() ) {
-        return askPersistAndReturnNewCredentials();
+        Credentials newCredentials = askPersistAndReturnNewCredentials();
+        return newCredentials;
     }
     return {userName, password};
 }
@@ -56,7 +69,8 @@ Credentials BitBucketConfiguration::getCredentials()
 Credentials BitBucketConfiguration::askPersistAndReturnNewCredentials()
 {
     Credentials toPersist = askUserForCredentials();
-    credentialProvider->saveCredentials ( getBitbucketUrl(), toPersist );
+    gitClient->setConfigValue ( "mustard.userName", toPersist.username );
+    credentialProvider->saveCredentials ( getBitBucketServer(), toPersist );
     return toPersist;
 }
 

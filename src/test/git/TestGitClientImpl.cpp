@@ -94,8 +94,3 @@ TEST_F ( TestGitClientImpl, Unit_GetDiff )
 
     EXPECT_STREQ ( expectedDiff.c_str(), diff.c_str() );
 }
-
-TEST_F ( TestGitClientImpl, Unit_GetFeatureBranchOnOrigin )
-{
-    gitClient.getFeatureBranchOnOrigin();
-}

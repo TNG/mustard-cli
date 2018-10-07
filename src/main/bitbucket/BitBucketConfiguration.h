@@ -27,6 +27,8 @@ private:
     void toggleConsoleEcho();
 
     Credentials askUserForCredentials();
+
+    string getBitBucketServer() const;
 };
 
 

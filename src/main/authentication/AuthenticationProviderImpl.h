@@ -13,7 +13,6 @@ public:
     cpr::Authentication getAuthentication() override;
 
 private:
-    std::string username, password;
     BitBucketConfiguration *bitBucketConfiguration;
 };
 
