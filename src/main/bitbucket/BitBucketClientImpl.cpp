@@ -78,7 +78,8 @@ BitBucketClientImpl::extractPullRequestDocument ( const Document &pullRequests, 
             return pullRequest;
         };
     }
-    throw BitBucketClientException ( "Could not find pullRequest target for feature committish" );
+    throw BitBucketClientException ( "Could not find pullRequest for given feature branch.\n"
+                                     "Maybe feature branch is outdated?" );
 }
 
 void BitBucketClientImpl::checkForBitBucketErrors ( const rapidjson::Document &document )

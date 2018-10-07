@@ -2,6 +2,7 @@
 #include "WorkflowException.h"
 #include "StartReviewWorkflow.h"
 #include "StopReviewWorkflow.h"
+#include "InfoWorkflow.h"
 
 map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors = {
     {
@@ -11,7 +12,11 @@ map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors =
         }
     }, {"stop", []()
         {
-            return new StopReviewWorkflow ( nullptr, nullptr, nullptr );
+            return new StopReviewWorkflow();
+        }
+    }, {"info", []()
+        {
+            return new InfoWorkflow();
         }
     }
 };

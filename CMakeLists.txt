@@ -31,6 +31,8 @@ set(SOURCES
         src/main/bitbucket/BitBucketCommentUploader.h
         src/main/bitbucket/BitBucketConfiguration.cpp
         src/main/bitbucket/BitBucketConfiguration.h
+        src/main/bitbucket/PullRequestFormatter.cpp
+        src/main/bitbucket/PullRequestFormatter.h
         src/main/bitbucket/model/PullRequest.h
         src/main/bitbucket/model/ReviewStatus.h
         src/main/bitbucket/model/Reviewer.h
@@ -62,6 +64,8 @@ set(SOURCES
         src/main/system/HttpResponse.h
         src/main/system/LinuxCommandRunner.cpp
         src/main/system/LinuxCommandRunner.h
+        src/main/workflow/InfoWorkflow.cpp
+        src/main/workflow/InfoWorkflow.h
         src/main/workflow/StartReviewWorkflow.cpp
         src/main/workflow/StartReviewWorkflow.h
         src/main/workflow/StopReviewWorkflow.cpp
@@ -70,7 +74,7 @@ set(SOURCES
         src/main/workflow/WorkflowException.h
         src/main/workflow/WorkflowFactory.cpp
         src/main/workflow/WorkflowFactory.h
-        src/main/bitbucket/PullRequestFormatter.cpp src/main/bitbucket/PullRequestFormatter.h)
+        )
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES}  )
