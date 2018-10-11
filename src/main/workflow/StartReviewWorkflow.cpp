@@ -1,6 +1,5 @@
 #include <Depend.h>
 #include "StartReviewWorkflow.h"
-#include "../error/MustardException.h"
 #include "../bitbucket/PullRequestFormatter.h"
 
 StartReviewWorkflow::StartReviewWorkflow ( BitBucketClient *bitBucketClient, GitClient *gitClient ) :

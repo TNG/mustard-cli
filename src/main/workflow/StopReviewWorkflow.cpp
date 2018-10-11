@@ -5,6 +5,7 @@
 #include "../bitbucket/model/PullRequest.h"
 #include "../bitbucket/BitBucketClient.h"
 #include "../bitbucket/BitBucketCommentUploader.h"
+#include "../system/UserConfirmation.h"
 
 StopReviewWorkflow::StopReviewWorkflow ( CommentExtractor *commentExtractor, GitClient *gitClient,
         BitBucketClient *bitBucketClient ) :
@@ -22,6 +23,11 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
         return -1;
     }
     printCommentSummary ( comments );
+
+    if ( UserConfirmation ( "Do you want to upload these comments now?" ).askUser() == NO ) {
+        cout << "leaving without uploading" << endl;
+        return -1;
+    }
 
     const PullRequest pullRequest = bitBucketClient->getPullRequestFor ( originFeatureHead );
 

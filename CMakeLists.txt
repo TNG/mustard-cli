@@ -64,6 +64,8 @@ set(SOURCES
         src/main/system/HttpResponse.h
         src/main/system/LinuxCommandRunner.cpp
         src/main/system/LinuxCommandRunner.h
+        src/main/system/UserChoice.h
+        src/main/system/UserConfirmation.h
         src/main/workflow/InfoWorkflow.cpp
         src/main/workflow/InfoWorkflow.h
         src/main/workflow/StartReviewWorkflow.cpp
