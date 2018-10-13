@@ -34,7 +34,7 @@ string GitClientImpl::getConfigValue ( const string &name )
 {
     CommandResult commandResult =  commandRunner->run ( "git config --get " + name );
     if ( commandResult.getReturnCode() ) {
-        throw GitClientException ( ( "Could not get config value for " + name ).c_str() );
+        throw GitClientException ( ( "Could not get config value for " + name + ". Maybe run 'mustard autoconf ?'" ).c_str() );
     }
     return commandResult.getOutputStripNewline();
 }
@@ -43,7 +43,7 @@ void GitClientImpl::setConfigValue ( const string &name, const string &value )
 {
     CommandResult commandResult =  commandRunner->run ( "git config " + name + " " + value );
     if ( commandResult.getReturnCode() ) {
-        throw GitClientException ( ( "Could not get config value for " + name ).c_str() );
+        throw GitClientException ( ( "Could not set config value for " + name ).c_str() );
     }
 }
 

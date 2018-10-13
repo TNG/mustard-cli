@@ -33,6 +33,8 @@ set(SOURCES
         src/main/bitbucket/BitBucketConfiguration.h
         src/main/bitbucket/PullRequestFormatter.cpp
         src/main/bitbucket/PullRequestFormatter.h
+        src/main/bitbucket/BitBucketConfigGuesser.cpp
+        src/main/bitbucket/BitBucketConfigGuesser.h
         src/main/bitbucket/model/PullRequest.h
         src/main/bitbucket/model/ReviewStatus.h
         src/main/bitbucket/model/Reviewer.h
@@ -66,6 +68,8 @@ set(SOURCES
         src/main/system/LinuxCommandRunner.h
         src/main/system/UserChoice.h
         src/main/system/UserConfirmation.h
+        src/main/workflow/AutoconfWorkflow.cpp
+        src/main/workflow/AutoconfWorkflow.h
         src/main/workflow/InfoWorkflow.cpp
         src/main/workflow/InfoWorkflow.h
         src/main/workflow/StartReviewWorkflow.cpp
@@ -91,7 +95,7 @@ set(TEST_SOURCES
         src/test/git/TestGitClientImpl.cpp
         src/test/system/HttpClientForTest.h
         src/test/system/TestLinuxCommandRunner.cpp
-        src/test/bitbucket/TestBitBucketCommentUploader.cpp)
+        src/test/bitbucket/TestBitBucketCommentUploader.cpp src/test/bitbucket/TestBitbucketConfigGuesser.cpp)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})

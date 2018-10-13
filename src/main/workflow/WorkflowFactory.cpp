@@ -3,6 +3,7 @@
 #include "StartReviewWorkflow.h"
 #include "StopReviewWorkflow.h"
 #include "InfoWorkflow.h"
+#include "AutoconfWorkflow.h"
 
 map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors = {
     {
@@ -17,6 +18,10 @@ map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors =
     }, {"info", []()
         {
             return new InfoWorkflow();
+        }
+    }, {"autoconf", []()
+        {
+            return new AutoconfWorkflow();
         }
     }
 };
