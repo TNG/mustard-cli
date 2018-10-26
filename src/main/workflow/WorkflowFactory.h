@@ -13,7 +13,7 @@ class WorkflowFactory
 {
 public:
     Workflow &getWorkflowFor ( int argc, const char **argv );
-
+    vector<string> availableCommands();
     ~WorkflowFactory();
 
 private:

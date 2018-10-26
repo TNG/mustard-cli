@@ -47,3 +47,13 @@ WorkflowFactory::~WorkflowFactory()
         delete workflow;
     }
 }
+
+vector<string> WorkflowFactory::availableCommands()
+{
+    vector<string> availableCommands;
+    for ( auto workflow : workflowConstructors ) {
+        availableCommands.push_back ( workflow.first );
+    }
+    sort ( availableCommands.begin(), availableCommands.end() );
+    return availableCommands;
+}

@@ -4,7 +4,7 @@
 #include "workflow/WorkflowFactory.h"
 #include "workflow/WorkflowException.h"
 
-void printUsage();
+void printUsage ( WorkflowFactory &factory );
 
 int main ( const int argc, const char **argv )
 {
@@ -14,7 +14,7 @@ int main ( const int argc, const char **argv )
         return workflow.run ( argc, argv );
     } catch ( WorkflowException exception ) {
         printf ( "%s\n", exception.what() );
-        printUsage();
+        printUsage ( workflowFactory );
         return -1;
     } catch ( MustardException exception ) {
         printf ( "Error: %s\n", exception.what() );
@@ -22,7 +22,17 @@ int main ( const int argc, const char **argv )
     }
 }
 
-void printUsage()
+void printUsage ( WorkflowFactory &factory )
 {
-    printf ( "Usage: mustard [start|info|stop]\n" );
+    cout << "Usage: mustard [" ;
+    bool notFirst = false;
+    for ( auto availableCommand : factory.availableCommands() ) {
+        if ( notFirst ) {
+            cout << "|";
+
+        }
+        notFirst = true;
+        cout << availableCommand;
+    }
+    cout << "]\n";
 }
