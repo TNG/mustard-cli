@@ -9,6 +9,7 @@
 #include "../authentication/AuthenticationProvider.h"
 #include "../system/HttpClient.h"
 #include "BitBucketConfiguration.h"
+#include "../comments/Comments.h"
 
 using namespace rapidjson;
 
@@ -18,6 +19,7 @@ public:
     BitBucketClientImpl ( HttpClient *httpClient = nullptr, BitBucketConfiguration *bitBucketConfiguration = nullptr );
     Commitish getPullRequestTargetFor ( const Commitish &featureCommittish ) override;
     PullRequest getPullRequestFor ( const Commitish &featureCommittish ) override;
+    Comments getCommentsFor ( const PullRequest &pullRequest ) override;
 private:
     HttpClient *httpClient;
     const string pullRequestEndpoint;
@@ -32,6 +34,10 @@ private:
     rapidjson::Document getPullRequestDocumentFor ( const Commitish &basic_string );
 
     vector<Reviewer> extractReviewersFrom ( const Document::ValueType &reviewersArray );
+
+    Document getDocument ( const HttpResponse &pullRequests );
+
+    Comments extractCommentsFrom ( Document &document );
 };
 
 

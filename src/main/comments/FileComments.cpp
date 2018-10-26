@@ -3,7 +3,7 @@
 void FileComments::accept ( CommentConsumer &consumer ) const
 {
     for ( const auto &lineComment : lineComments ) {
-        consumer.consume ( file, lineComment.getLine(), lineComment.getComment() );
+        consumer.consume ( file, lineComment );
     }
 }
 

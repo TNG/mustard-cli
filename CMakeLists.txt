@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(mustard)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_BUILD_TYPE DEBUG)
 
 add_subdirectory(lib/cpr)
 add_subdirectory(lib/gmock-1.7.0)
@@ -40,6 +41,8 @@ set(SOURCES
         src/main/bitbucket/model/Reviewer.h
         src/main/bitbucket/model/User.h
         src/main/comments/CommenExtractor.h
+        src/main/comments/CommentAppender.cpp
+        src/main/comments/CommentAppender.h
         src/main/comments/CommentConsumer.h
         src/main/comments/CommentExtractorImpl.cpp
         src/main/comments/CommentExtractorImpl.h
@@ -88,14 +91,17 @@ target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES}  )
 set(TEST_SOURCES
         ${SOURCES}
         src/test/bitbucket/TestBitBucketClient.cpp
+        src/test/bitbucket/TestBitBucketCommentUploader.cpp
+        src/test/bitbucket/TestBitbucketConfigGuesser.cpp
         src/test/comments/GitClientForTest.h
+        src/test/comments/TestCommentAppender.cpp
         src/test/comments/TestCommentExtractor.cpp
         src/test/git/GitTestEnvironment.cpp
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp
         src/test/system/HttpClientForTest.h
         src/test/system/TestLinuxCommandRunner.cpp
-        src/test/bitbucket/TestBitBucketCommentUploader.cpp src/test/bitbucket/TestBitbucketConfigGuesser.cpp)
+        src/test/comments/CommentMatcher.cpp src/test/comments/CommentMatcher.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})

@@ -58,6 +58,11 @@ rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commi
     if ( !pullRequests.successful ) {
         throw BitBucketClientException ( "Could not determine pull requests" );
     }
+    return getDocument ( pullRequests );
+}
+
+Document BitBucketClientImpl::getDocument ( const HttpResponse &pullRequests )
+{
     Document document;
     document.Parse ( pullRequests.body.c_str() );
     checkForBitBucketErrors ( document );
@@ -90,4 +95,44 @@ void BitBucketClientImpl::checkForBitBucketErrors ( const rapidjson::Document &d
         const string message = string ( ( *document["errors"].GetArray().Begin() ) ["message"].GetString() );
         throw BitBucketClientException ( ( "BitBucket server responded with error: " + message ).c_str() );
     }
+}
+
+Comments BitBucketClientImpl::getCommentsFor ( const PullRequest &pullRequest )
+{
+    stringstream activitiesUrl;
+    activitiesUrl << pullRequestEndpoint << "/" << pullRequest.id << "/activities?limit=1000" ;
+    const string url = activitiesUrl.str();
+
+    const HttpResponse activitiesResponse = httpClient->get ( url );
+    if ( !activitiesResponse.successful ) {
+        throw BitBucketClientException ( "Could not retrieve activities for pullRequest." );
+    }
+
+    Document activities = getDocument ( activitiesResponse );
+    return extractCommentsFrom ( activities );
+}
+
+Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
+{
+    map<string, vector<LineComment>> commentsFromBitBucket;
+    for ( const auto &value : document["values"].GetArray() ) {
+        if ( value["action"].GetString() != string ( "COMMENTED" ) || value["commentAction"].GetString() != string ( "ADDED" ) ) {
+            continue;
+        }
+        const auto &comment = value["comment"];
+        const string author = comment["author"]["name"].GetString();
+        const string text =  comment["text"].GetString();
+        const auto &commentAnchor = value["commentAnchor"];
+        if ( commentAnchor["lineType"].GetString() != string ( "ADDED" ) ) {
+            continue;
+        }
+        const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
+        const string path = commentAnchor["path"].GetString();
+        commentsFromBitBucket[path].push_back ( {line, text, author} );
+    }
+    vector<FileComments> fileComments;
+    for ( const auto &commentFromBitBucket : commentsFromBitBucket ) {
+        fileComments.push_back ( {commentFromBitBucket.first, commentFromBitBucket.second} );
+    }
+    return Comments ( fileComments );
 }

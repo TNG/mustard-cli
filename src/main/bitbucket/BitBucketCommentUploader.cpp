@@ -2,6 +2,7 @@
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include "BitBucketCommentUploader.h"
+#include "../comments/LineComment.h"
 
 using namespace rapidjson;
 
@@ -13,16 +14,16 @@ BitBucketCommentUploader::BitBucketCommentUploader ( PullRequest pullRequest,
     bitBucketConfiguration ( DependentOn<BitBucketConfiguration> ( bitBucketConfiguration ) )
 {}
 
-void BitBucketCommentUploader::consume ( const string &file, unsigned int line, const string &comment )
+void BitBucketCommentUploader::consume ( const string &file, const LineComment &lineComment )
 {
     ++seen;
     const string postUrl = getCommentPostUrl();
-    const string json = serializeComment ( file, line, comment );
+    const string json = serializeComment ( file, lineComment.getLine(), lineComment.getComment() );
     auto respone = httpClient->post ( postUrl, json );
     if ( respone.successful ) {
         ++uploaded;
     } else {
-        printf ( "Could not upload comment '%s'\n", comment.c_str() );
+        printf ( "Could not upload comment '%s'\n", lineComment.getComment().c_str() );
     }
 }
 

@@ -8,8 +8,8 @@ using namespace std;
 class LineComment
 {
 public:
-    LineComment ( const unsigned int line, const string &comment )
-        : line ( line ), comment ( comment ) {}
+    LineComment ( const unsigned int line, const string &comment, const string &author = "" )
+        : line ( line ), comment ( comment ), author ( author ) {}
 
     unsigned int getLine() const {
         return line;
@@ -19,9 +19,14 @@ public:
         return comment;
     }
 
+    const string &getAuthor() const  {
+        return author;
+    }
+
 private:
     const unsigned int line;
     const string comment;
+    const string author;
 };
 
 

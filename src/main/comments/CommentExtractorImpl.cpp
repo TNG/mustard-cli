@@ -50,10 +50,10 @@ Comments CommentExtractorImpl::extract()
             break;
         case ADDLINE:
             if ( file.length() != 0 ) {
-                static regex extractor ( R"(^\+.*//(.*)$)" );
-                const string comment = getSingleCaptureIn ( line, extractor );
+                static regex commentExtractor ( R"(^\+.*//([^~]*)$)" );
+                const string comment = getSingleCaptureIn ( line, commentExtractor );
                 if ( comment.length() > 0 ) {
-                    comments.push_back ( LineComment ( lineNumber, comment ) );
+                    comments.emplace_back ( LineComment ( lineNumber, comment ) );
                 }
             }
             break;
@@ -63,7 +63,7 @@ Comments CommentExtractorImpl::extract()
         }
         ++lineNumber;
     }
-    if ( file.length() != 0 ) {
+    if ( file.length() != 0 && comments.size() != 0 ) {
         addFoundCommentsTo ( fileComments, comments, file );
     }
     return Comments ( fileComments );

@@ -5,6 +5,7 @@
 #include "../../main/comments/CommentExtractorImpl.h"
 #include "../../main/comments/CommentConsumer.h"
 #include "../../main/comments/Comments.h"
+#include "CommentMatcher.h"
 
 using namespace testing;
 
@@ -15,25 +16,6 @@ public:
 
     GitClientForTest gitClient;
     CommentExtractorImpl commentExtractor;
-};
-
-class CommentMatcher : public CommentConsumer
-{
-public:
-    CommentMatcher ( std::function<bool ( const string &file, unsigned int line, const string &comment ) > predicate ) :
-        predicate ( std::move ( predicate ) ) {};
-
-    void consume ( const string &file, unsigned int line, const string &comment ) override {
-        matched |= predicate ( file, line, comment );
-    }
-
-    bool isMatching() {
-        return matched ;
-    };
-
-private:
-    std::function<bool ( const string &file, unsigned int line, const string &comment ) > predicate;
-    bool matched = false;
 };
 
 TEST_F ( CommentExtractorTest, Unit_TestSimpleExtraction )
@@ -52,18 +34,61 @@ TEST_F ( CommentExtractorTest, Unit_TestSimpleExtraction )
 
     Comments resultingComments = commentExtractor.extract();
 
-    CommentMatcher commentInLineFour ( [] ( const string & file, unsigned int line, const string & comment ) {
-        return ( comment == "Nice line" )
-               && ( line == 4 )
+    CommentMatcher commentInLineFour ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getComment() == "Nice line" )
+               && ( lineComment.getLine() == 4 )
                && ( file == "subdir/subsubdir/file.txt" );
     } );
-    CommentMatcher commentInLineEightteen ( [] ( const string & file, unsigned int line, const string & comment ) {
-        return ( comment == "Not so good" )
-               && ( line == 18 )
+    CommentMatcher commentInLineEightteen ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getComment() == "Not so good" )
+               && ( lineComment.getLine() == 18 )
                && ( file == "subdir/subsubdir/file.txt" );
     } );
     resultingComments.accept ( commentInLineFour );
     resultingComments.accept ( commentInLineEightteen );
     EXPECT_TRUE ( commentInLineFour.isMatching() );
     EXPECT_TRUE ( commentInLineEightteen.isMatching() );
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoNotCaptureAutoInsertedComments )
+{
+    const string diff = "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+                        "index 7f8b793..0101eb2 100644\n"
+                        "--- a/subdir/subsubdir/file.txt\n"
+                        "+++ b/subdir/subsubdir/file.txt\n"
+                        "@@ -4 +4 @@ File with line 3\n"
+                        "-File with line 4\n"
+                        "+File with line 4 //~imgrundm - Nice line\n";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLineFour ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 4 )
+               && ( file == "subdir/subsubdir/file.txt" );
+    } );
+    resultingComments.accept ( commentInLineFour );
+    EXPECT_FALSE ( commentInLineFour.isMatching() );
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoCaptureCommentsAfterAutoinsertedComments )
+{
+    const string diff = "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+                        "index 7f8b793..0101eb2 100644\n"
+                        "--- a/subdir/subsubdir/file.txt\n"
+                        "+++ b/subdir/subsubdir/file.txt\n"
+                        "@@ -4 +4 @@ File with line 3\n"
+                        "-File with line 4\n"
+                        "+File with line 4 //~imgrundm - Nice line//indeed!\n";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLineFour ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 4 )
+               && ( file == "subdir/subsubdir/file.txt" )
+               && ( lineComment.getComment() == "indeed!" );
+    } );
+    resultingComments.accept ( commentInLineFour );
+    EXPECT_TRUE ( commentInLineFour.isMatching() );
 }

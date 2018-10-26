@@ -20,13 +20,19 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
     const Comments comments = commentExtractor->extract();
     if ( comments.isEmpty() ) {
         printf ( "You did not make any comments.\n" );
-        return -1;
+    } else {
+        handleCommentUpload ( originFeatureHead, comments );
     }
+    return 0;
+}
+
+void StopReviewWorkflow::handleCommentUpload ( const Commitish &originFeatureHead, const Comments &comments ) const
+{
     printCommentSummary ( comments );
 
     if ( UserConfirmation ( "Do you want to upload these comments now?" ).askUser() == NO ) {
-        cout << "leaving without uploading" << endl;
-        return -1;
+        cout << "will not upload comments" << endl;
+        return;
     }
 
     const PullRequest pullRequest = bitBucketClient->getPullRequestFor ( originFeatureHead );
@@ -38,19 +44,18 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
              commentUploader.getUploadedCommentNumber(),
              commentUploader.getSeenCommentNumber() );
     printf ( "Visit Bitbucket pull-request under:  %s\n", pullRequest.url.c_str() );
-    return 0;
 }
 
 void StopReviewWorkflow::printCommentSummary ( const Comments &comments ) const
 {
     class : public CommentConsumer
     {
-        void consume ( const string &file, unsigned int line, const string &comment ) {
+        void consume ( const string &file, const LineComment &lineComment ) {
             if ( lastFile != file ) {
                 lastFile = file;
                 printf ( "---- %s ----\n", file.c_str() );
             }
-            printf ( "%6.u\t%s\n", line, comment.c_str() );
+            printf ( "%6.u\t%s\n", lineComment.getLine(), lineComment.getComment().c_str() );
         }
 
     private:

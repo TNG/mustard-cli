@@ -6,13 +6,14 @@
 #include "../system/HttpClient.h"
 #include "BitBucketConfiguration.h"
 #include "model/PullRequest.h"
+#include "../comments/LineComment.h"
 
 class BitBucketCommentUploader : public CommentConsumer
 {
 public:
     BitBucketCommentUploader ( PullRequest pullRequest, HttpClient *httpClient = nullptr,  BitBucketConfiguration *bitBucketConfiguration = nullptr );
 
-    void consume ( const string &file, unsigned int line, const string &comment ) override;
+    void consume ( const string &file, const LineComment &lineComment ) override;
     unsigned int getUploadedCommentNumber() {
         return uploaded;
     }
