@@ -56,9 +56,11 @@ string GitClientImpl::getDiff()
     return commandResult.getOutput();
 }
 
+//CommandResult commandResult = commandRunner->run ( "git rev-parse $(git branch -vv|grep \\*|sed -r 's/^[^[]*\\[([^]:]*)[]:].*/\\1/')" );
 Commitish GitClientImpl::getFeatureBranchOnOrigin()
 {
-    CommandResult commandResult = commandRunner->run ( "git rev-parse $(git branch -vv|grep \\*|sed -r 's/.*\\[([^ :]*).*\\].*/\\1/')" );
+    CommandResult commandResult = commandRunner->run (
+                                      R"(git rev-parse $(git branch -vv|grep \*|sed -r 's/[^[]*\[([^] :]*).*/\1/'))" );
     if ( commandResult.getReturnCode() != 0 ) {
         throw GitClientException ( "Could not determine feature branch head - maybe you are on a non tracking branch?" );
     }

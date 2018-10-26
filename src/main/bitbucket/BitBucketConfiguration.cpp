@@ -39,7 +39,7 @@ string BitBucketConfiguration::buildBitBucketUrl() const
     const string projectKey = gitClient->getConfigValue ( "mustard.projectKey" );
 
     stringstream ss;
-    ss << bitbucketUrl << "/rest/api/1.0/projects/" << projectKey << "/repos/" << repositorySlug;
+    ss << "https://" << bitbucketUrl << "/rest/api/1.0/projects/" << projectKey << "/repos/" << repositorySlug;
     return ss.str();
 }
 

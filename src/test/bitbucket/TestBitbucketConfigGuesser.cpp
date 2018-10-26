@@ -30,7 +30,7 @@ TEST_F ( TestBitbucketConfigGuesser, Unit_Http_ProjectKey )
         Return ( https_url ) );
 
     guesser.guess();
-    EXPECT_STREQ ( "poormansdi", guesser.getProjectKey().c_str() );
+    EXPECT_STREQ ( "~imgrundm", guesser.getProjectKey().c_str() );
 }
 
 TEST_F ( TestBitbucketConfigGuesser, Unit_Http_RepositorySlug )
@@ -39,7 +39,7 @@ TEST_F ( TestBitbucketConfigGuesser, Unit_Http_RepositorySlug )
         Return ( https_url ) );
 
     guesser.guess();
-    EXPECT_STREQ ( "~imgrundm", guesser.getRepositorySlug().c_str() );
+    EXPECT_STREQ ( "poormansdi", guesser.getRepositorySlug().c_str() );
 }
 
 TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_ServerName )
@@ -57,7 +57,7 @@ TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_ProjectKey )
         Return ( ssh_url ) );
 
     guesser.guess();
-    EXPECT_STREQ ( "poormansdi", guesser.getProjectKey().c_str() );
+    EXPECT_STREQ ( "~imgrundm", guesser.getProjectKey().c_str() );
 }
 
 TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_RepositorySlug )
@@ -66,5 +66,5 @@ TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_RepositorySlug )
         Return ( ssh_url ) );
 
     guesser.guess();
-    EXPECT_STREQ ( "~imgrundm", guesser.getRepositorySlug().c_str() );
+    EXPECT_STREQ ( "poormansdi", guesser.getRepositorySlug().c_str() );
 }

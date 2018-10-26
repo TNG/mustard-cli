@@ -12,8 +12,8 @@ void BitBucketConfigGuesser::guess()
 {
     string cloneUrl = gitClient->getConfigValue ( "remote.origin.url" );
     static regex server ( "^.*(?:://|@)([^/@:]*)(?::\\d*)?/.*$" );
-    static regex repoSlug ( "^.*/([^/]*)/[^/]*\\.git$" );
-    static regex projectKey ( "^.*/([^/]*)\\.git$" );
+    static regex projectKey ( "^.*/([^/]*)/[^/]*\\.git$" );
+    static regex repoSlug ( "^.*/([^/]*)\\.git$" );
     this->server = getSingleCaptureIn ( cloneUrl, server );
     this->repositorySlug = getSingleCaptureIn ( cloneUrl, repoSlug );
     this->projectKey = getSingleCaptureIn ( cloneUrl, projectKey );

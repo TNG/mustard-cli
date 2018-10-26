@@ -94,3 +94,33 @@ TEST_F ( TestGitClientImpl, Unit_GetDiff )
 
     EXPECT_STREQ ( expectedDiff.c_str(), diff.c_str() );
 }
+
+TEST_F ( TestGitClientImpl, Unit_getFeatureBranchOnOrigin )
+{
+    GitTestEnvironment testEnv;
+    GitTestEnvironment remoteEnv ( "/tmp/remoteTestEnv" );
+    testEnv.run ( "git remote add origin /tmp/remoteTestEnv" );
+    testEnv.createFileAndCommit ( "testFile" );
+    testEnv.run ( "git checkout -b feature 2>/dev/null" );
+    testEnv.createFileAndCommit ( "anotherTestFile" );
+    testEnv.run ( "git push -u origin HEAD 2>/dev/null" );
+    const Commitish featureCommit ( gitClient.getHeadCommit() );
+    testEnv.createFileAndCommit ( "yetAnotherTestFile" );
+    ASSERT_EQ ( featureCommit, gitClient.getFeatureBranchOnOrigin() );
+    ASSERT_NE ( featureCommit, gitClient.getHeadCommit() );
+}
+
+TEST_F ( TestGitClientImpl, Unit_getFeatureBranchOnOrigin_CommitMessageWithBrackets )
+{
+    GitTestEnvironment testEnv;
+    GitTestEnvironment remoteEnv ( "/tmp/remoteTestEnv" );
+    testEnv.run ( "git remote add origin /tmp/remoteTestEnv" );
+    testEnv.createFileAndCommit ( "testFile" );
+    testEnv.run ( "git checkout -b feature 2>/dev/null" );
+    testEnv.run ( "touch anotherTestFile" );
+    testEnv.run ( "git add anotherTestFile" );
+    testEnv.run ( "git commit -m '[log] Another test file has been created [blah]'" );
+    testEnv.run ( "git push -u origin HEAD 2>/dev/null" );
+    const Commitish featureCommit ( gitClient.getHeadCommit() );
+    ASSERT_EQ ( featureCommit, gitClient.getFeatureBranchOnOrigin() );
+}

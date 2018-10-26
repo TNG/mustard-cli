@@ -27,8 +27,10 @@ PullRequest BitBucketClientImpl::getPullRequestFor ( const Commitish &featureCom
     auto &pullRequestDocument =  extractPullRequestDocument ( pullRequestsDocument, featureCommittish );
     const string href ( pullRequestDocument ["links"]["self"][0]["href"].GetString() );
     const unsigned int id = pullRequestDocument ["id"].GetInt();
-    const string title ( pullRequestDocument ["title"].GetString() );
-    const string description ( pullRequestDocument ["description"].GetString() );
+    const string title ( pullRequestDocument["title"].GetString() );
+    const string description ( pullRequestDocument.HasMember ( "description" )
+                               ? pullRequestDocument["description"].GetString()
+                               : "" );
     return {href,
             id,
             title,
