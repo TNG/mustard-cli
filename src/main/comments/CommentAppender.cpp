@@ -21,6 +21,9 @@ void CommentAppender::finish()
 
 void CommentAppender::finishFile()
 {
+    if ( openFileName.empty() ) {
+        return;
+    }
     ifstream file;
     file.open ( openFileName.c_str() );
     string currentLine;
