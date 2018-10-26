@@ -23,6 +23,11 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
     } else {
         handleCommentUpload ( originFeatureHead, comments );
     }
+
+    if ( UserConfirmation ( "Should I reset the feature branch and discard all of your review changes?" ).askUser() == YES ) {
+        gitClient->reset ( originFeatureHead, true );
+    }
+
     return 0;
 }
 

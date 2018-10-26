@@ -22,9 +22,9 @@ Commitish GitClientImpl::getMergeBase ( const Commitish &fromBranch, const Commi
     return commandRunner->run ( "git merge-base " + fromBranch + " " + toBranch ).getOutputStripNewline();
 }
 
-void GitClientImpl::reset ( const Commitish &resetTo )
+void GitClientImpl::reset ( const Commitish &resetTo, bool hard )
 {
-    CommandResult resetResult = commandRunner->run ( "git reset " + resetTo );
+    CommandResult resetResult = commandRunner->run ( "git reset " + resetTo + ( hard ? " --hard" : "" ) );
     if ( resetResult.getReturnCode() ) {
         throw GitClientException ( resetResult.getOutput().c_str() );
     }
