@@ -11,6 +11,7 @@ public:
     virtual Commitish getPullRequestTargetFor ( const Commitish &commit ) = 0;
     virtual PullRequest getPullRequestFor ( const Commitish &commit ) = 0;
     virtual Comments getCommentsFor ( const PullRequest &pullRequest ) = 0;
+    virtual void approve ( const PullRequest &pullRequest, ReviewStatus reviewStatus ) = 0;
 };
 
 #endif //MUSTARD_BITBUCKETCLIENT_H

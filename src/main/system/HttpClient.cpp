@@ -42,3 +42,21 @@ HttpResponse HttpClient::post ( const string &url, const string &body )
         response.error.code == cpr::ErrorCode::OK
     };
 }
+
+HttpResponse HttpClient::put ( const string &url, const string &body )
+{
+    auto authentication = authenticationProvider->getAuthentication();
+    auto response = cpr::Put (
+                        cpr::Url ( url ),
+    cpr::Header{{"Content-Type",      "application/json"},
+        {"accept",            "application/json"},
+        {"X-Atlassian-Token", "no-check"}},
+    authentication,
+    cpr::Body ( body ),
+    cpr::VerifySsl{false} );
+    return {
+        response.text,
+        response.status_code,
+        response.error.code == cpr::ErrorCode::OK
+    };
+}

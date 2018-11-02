@@ -20,9 +20,11 @@ public:
     Commitish getPullRequestTargetFor ( const Commitish &featureCommittish ) override;
     PullRequest getPullRequestFor ( const Commitish &featureCommittish ) override;
     Comments getCommentsFor ( const PullRequest &pullRequest ) override;
+    void approve ( const PullRequest &pullRequest, ReviewStatus reviewStatus ) override;
 private:
     HttpClient *httpClient;
-    const string pullRequestEndpoint;
+    string pullRequestEndpoint;
+    string userSlug;
 
     const string determinePullRequestEndpoint ( BitBucketConfiguration *config );
 

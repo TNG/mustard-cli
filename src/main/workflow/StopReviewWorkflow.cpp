@@ -24,10 +24,26 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
         handleCommentUpload ( originFeatureHead, comments );
     }
 
-    if ( UserConfirmation ( "Should I reset the feature branch and discard all of your review changes?" ).askUser() == YES ) {
+    if ( UserConfirmation ( "Should I reset the feature branch and discard all of your review changes?" ).askUser() ==
+            YES ) {
         gitClient->reset ( originFeatureHead, true );
     }
 
+    UserChoice<ReviewStatus> reviewStatusChoice (
+    "Should I [a]pprove the pullrequest, does it [n]eed work, or just [q]uit", {
+        {'a', APPROVED},
+        {'q', UNAPPROVED},
+        {'n', NEEDS_WORK},
+    } );
+
+    const ReviewStatus userChoice = reviewStatusChoice.askUser();
+    switch ( userChoice ) {
+    case UNAPPROVED:
+        break;
+    default:
+        PullRequest pullRequest = bitBucketClient->getPullRequestFor ( originFeatureHead );
+        bitBucketClient->approve ( pullRequest, userChoice );
+    }
     return 0;
 }
 

@@ -10,6 +10,7 @@ class HttpClientForTest : public HttpClient
 public:
     MOCK_METHOD1 ( get, HttpResponse ( const string & ) );
     MOCK_METHOD2 ( post, HttpResponse ( const string &, const string & ) );
+    MOCK_METHOD2 ( put, HttpResponse ( const string &, const string & ) );
 };
 
 #endif //MUSTARD_HTTPCLIENTFORTEST_H
