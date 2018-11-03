@@ -11,6 +11,9 @@ using namespace testing;
 class BitBucketConfigurationForTest : public BitBucketConfiguration
 {
 public:
+    Credentials getCredentials() override {
+        return {"username", "pass"};
+    }
     const string getPullRequestEndpoint() override {
         return "testUrl";
     }
@@ -339,4 +342,169 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments )
     } );
     comments.accept ( commentFromBitBucket );
     EXPECT_TRUE ( commentFromBitBucket.isMatching() );
+}
+
+TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotFailOnGeneralRemarks )
+{
+    HttpResponse response = {"{\n"
+                             "    \"size\": 2,\n"
+                             "    \"limit\": 25,\n"
+                             "    \"isLastPage\": true,\n"
+                             "    \"values\": [\n"
+                             "        {\n"
+                             "            \"id\": 164514,\n"
+                             "            \"createdDate\": 1538897102243,\n"
+                             "            \"user\": {\n"
+                             "                \"name\": \"imgrundm\",\n"
+                             "                \"emailAddress\": \"maximilian.imgrund@tngtech.com\",\n"
+                             "                \"id\": 1913,\n"
+                             "                \"displayName\": \"Maximilian Imgrund\",\n"
+                             "                \"active\": true,\n"
+                             "                \"slug\": \"imgrundm\",\n"
+                             "                \"type\": \"NORMAL\",\n"
+                             "                \"links\": {\n"
+                             "                    \"self\": [\n"
+                             "                        {\n"
+                             "                            \"href\": \"https://bitbucket.int.tngtech.com/users/imgrundm\"\n"
+                             "                        }\n"
+                             "                    ]\n"
+                             "                }\n"
+                             "            },\n"
+                             "            \"action\": \"COMMENTED\",\n"
+                             "            \"commentAction\": \"ADDED\",\n"
+                             "            \"comment\": {\n"
+                             "                \"properties\": {\n"
+                             "                    \"repositoryId\": 1267\n"
+                             "                },\n"
+                             "                \"id\": 16388,\n"
+                             "                \"version\": 2,\n"
+                             "                \"text\": \"This comment neither.\",\n"
+                             "                \"author\": {\n"
+                             "                    \"name\": \"imgrundm\",\n"
+                             "                    \"emailAddress\": \"maximilian.imgrund@tngtech.com\",\n"
+                             "                    \"id\": 1913,\n"
+                             "                    \"displayName\": \"Maximilian Imgrund\",\n"
+                             "                    \"active\": true,\n"
+                             "                    \"slug\": \"imgrundm\",\n"
+                             "                    \"type\": \"NORMAL\",\n"
+                             "                    \"links\": {\n"
+                             "                        \"self\": [\n"
+                             "                            {\n"
+                             "                                \"href\": \"https://bitbucket.int.tngtech.com/users/imgrundm\"\n"
+                             "                            }\n"
+                             "                        ]\n"
+                             "                    }\n"
+                             "                },\n"
+                             "                \"createdDate\": 1538897102243,\n"
+                             "                \"updatedDate\": 1540543026906,\n"
+                             "                \"comments\": [],\n"
+                             "                \"tasks\": [],\n"
+                             "                \"permittedOperations\": {\n"
+                             "                    \"editable\": true,\n"
+                             "                    \"deletable\": true\n"
+                             "                }\n"
+                             "            }\n"
+                             "        }\n"
+                             "    ],\n"
+                             "    \"start\": 0\n"
+                             "}", 200, true
+                            };
+    EXPECT_CALL ( httpClient, get ( StrEq ( "testUrl/42/activities?limit=1000" ) ) ).WillOnce ( Return ( response ) );
+    PullRequest pullRequest = {"", 42, "", "", {"", ""}, {}};
+
+    Comments comments ( client.getCommentsFor ( pullRequest ) );
+
+    CommentMatcher commentFromBitBucket ( [] ( const string & file,  const LineComment & comment ) {
+        return true;
+    } );
+    comments.accept ( commentFromBitBucket );
+    EXPECT_FALSE ( commentFromBitBucket.isMatching() );
+}
+
+TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotExtractOrphanedComments )
+{
+    HttpResponse response = {"{\n"
+                             "    \"size\": 2,\n"
+                             "    \"limit\": 25,\n"
+                             "    \"isLastPage\": true,\n"
+                             "    \"values\": [\n"
+                             "        {\n"
+                             "            \"id\": 164514,\n"
+                             "            \"createdDate\": 1538897102243,\n"
+                             "            \"user\": {\n"
+                             "                \"name\": \"imgrundm\",\n"
+                             "                \"emailAddress\": \"maximilian.imgrund@tngtech.com\",\n"
+                             "                \"id\": 1913,\n"
+                             "                \"displayName\": \"Maximilian Imgrund\",\n"
+                             "                \"active\": true,\n"
+                             "                \"slug\": \"imgrundm\",\n"
+                             "                \"type\": \"NORMAL\",\n"
+                             "                \"links\": {\n"
+                             "                    \"self\": [\n"
+                             "                        {\n"
+                             "                            \"href\": \"https://bitbucket.int.tngtech.com/users/imgrundm\"\n"
+                             "                        }\n"
+                             "                    ]\n"
+                             "                }\n"
+                             "            },\n"
+                             "            \"action\": \"COMMENTED\",\n"
+                             "            \"commentAction\": \"ADDED\",\n"
+                             "            \"comment\": {\n"
+                             "                \"properties\": {\n"
+                             "                    \"repositoryId\": 1267\n"
+                             "                },\n"
+                             "                \"id\": 16388,\n"
+                             "                \"version\": 2,\n"
+                             "                \"text\": \"This comment neither.\",\n"
+                             "                \"author\": {\n"
+                             "                    \"name\": \"imgrundm\",\n"
+                             "                    \"emailAddress\": \"maximilian.imgrund@tngtech.com\",\n"
+                             "                    \"id\": 1913,\n"
+                             "                    \"displayName\": \"Maximilian Imgrund\",\n"
+                             "                    \"active\": true,\n"
+                             "                    \"slug\": \"imgrundm\",\n"
+                             "                    \"type\": \"NORMAL\",\n"
+                             "                    \"links\": {\n"
+                             "                        \"self\": [\n"
+                             "                            {\n"
+                             "                                \"href\": \"https://bitbucket.int.tngtech.com/users/imgrundm\"\n"
+                             "                            }\n"
+                             "                        ]\n"
+                             "                    }\n"
+                             "                },\n"
+                             "                \"createdDate\": 1538897102243,\n"
+                             "                \"updatedDate\": 1540543026906,\n"
+                             "                \"comments\": [],\n"
+                             "                \"tasks\": [],\n"
+                             "                \"permittedOperations\": {\n"
+                             "                    \"editable\": true,\n"
+                             "                    \"deletable\": true\n"
+                             "                }\n"
+                             "            },\n"
+                             "            \"commentAnchor\": {\n"
+                             "                \"fromHash\": \"3fec5abb7b2f1d03f9a947ea71429b6bd151485a\",\n"
+                             "                \"toHash\": \"25fc8f32b14d0e6d22aa702a1b08435d84e0e51e\",\n"
+                             "                \"line\": 2,\n"
+                             "                \"lineType\": \"ADDED\",\n"
+                             "                \"fileType\": \"TO\",\n"
+                             "                \"path\": \"CMakeLists.txt\",\n"
+                             "                \"srcPath\": \"CMakeLists.txt\",\n"
+                             "                \"diffType\": \"EFFECTIVE\",\n"
+                             "                \"orphaned\": true\n"
+                             "            }\n"
+                             "        }\n"
+                             "    ],\n"
+                             "    \"start\": 0\n"
+                             "}", 200, true
+                            };
+    EXPECT_CALL ( httpClient, get ( StrEq ( "testUrl/42/activities?limit=1000" ) ) ).WillOnce ( Return ( response ) );
+    PullRequest pullRequest = {"", 42, "", "", {"", ""}, {}};
+
+    Comments comments ( client.getCommentsFor ( pullRequest ) );
+
+    CommentMatcher commentFromBitBucket ( [] ( const string & file,  const LineComment & comment ) {
+        return true;
+    } );
+    comments.accept ( commentFromBitBucket );
+    EXPECT_FALSE ( commentFromBitBucket.isMatching() );
 }

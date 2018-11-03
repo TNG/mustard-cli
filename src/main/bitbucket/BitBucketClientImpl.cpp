@@ -126,6 +126,9 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
         const auto &comment = value["comment"];
         const string author = comment["author"]["name"].GetString();
         const string text = comment["text"].GetString();
+        if ( !value.HasMember ( "commentAnchor" ) || value["commentAnchor"]["orphaned"].GetBool() ) {
+            continue;
+        }
         const auto &commentAnchor = value["commentAnchor"];
         if ( commentAnchor["lineType"].GetString() != string ( "ADDED" ) ) {
             continue;
