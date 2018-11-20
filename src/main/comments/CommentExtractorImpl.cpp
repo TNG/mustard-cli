@@ -30,7 +30,7 @@ Comments CommentExtractorImpl::extract()
     for ( const auto &line : diffLines ) {
         switch ( LineType type = getLineType ( line ) ) {
         case FILEDEFINITION:
-            if ( file.length() != 0 ) {
+            if ( file.length() != 0 && comments.size() != 0 ) {
                 addFoundCommentsTo ( fileComments, comments, file );
             }
             comments.clear();
