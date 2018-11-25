@@ -1,5 +1,5 @@
-#ifndef MUSTARD_COMMENTEXTRACTOR_H
-#define MUSTARD_COMMENTEXTRACTOR_H
+#ifndef MUSTARD_COMMENTEXTRACTORIMPL_H
+#define MUSTARD_COMMENTEXTRACTORIMPL_H
 #include <map>
 #include <regex>
 
@@ -8,29 +8,32 @@ using namespace std;
 #include "../git/GitClient.h"
 #include "Comments.h"
 #include "CommenExtractor.h"
+#include "commentState/CommentStateListener.h"
+#include "commentState/LineClassifier.h"
 
-class CommentExtractorImpl : public CommentExtractor
+class CommentExtractorImpl : public CommentExtractor, CommentStateListener
 {
 public:
-    CommentExtractorImpl ( GitClient *gitClient = nullptr );
+    CommentExtractorImpl ( GitClient *gitClient = nullptr, LineClassifier *lineClassifier = nullptr );
     virtual Comments extract();
     virtual ~CommentExtractorImpl() {}
+
 private:
+
+    void newFile ( const string &fileName ) override;
+    void newLine() override;
+    void newComment ( const string &author, const string &comment ) override;
+    void setLine ( int lineNumber ) override;
+
     vector<string> getDiffLines();
 
     GitClient *gitClient;
-    enum LineType { UNKNOWN, FILEDEFINITION, CONTEXTDEFINITION, ADDFILE, ADDLINE, DELLINE};
-    static map<LineType, regex> lineTypeRegexes;
+    LineClassifier *lineClassifier;
 
-    LineType getLineType ( const string &line );
-
-    void addFoundCommentsTo ( vector<FileComments> &fileComments, vector<LineComment> comments, string file );
-
-    string extractAddedFileFrom ( const string &line );
-
-    int extractContextLineNumber ( const string &line );
-
-    string getSingleCaptureIn ( const string &text, const regex &extractor ) const;
+    string currentFile;
+    unsigned int currentLine;
+    vector<LineComment> currentLineComments;
+    vector<FileComments> fileComments;
 };
 
 

@@ -3,69 +3,34 @@
 #include <Depend.h>
 #include "CommentExtractorImpl.h"
 #include "../error/MustardException.h"
+#include "commentState/CommentState.h"
+#include "commentState/states/DiffHeaderState.h"
 
 
 using namespace std;
 
-ProvideImplementationForDependency <CommentExtractorImpl, CommentExtractor> commentExtractorDependency;
+ProvideImplementationForDependency<CommentExtractorImpl, CommentExtractor> commentExtractorDependency;
 
-CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient ) : gitClient ( DependentOn<GitClient> ( gitClient ) ) {}
-
-map<CommentExtractorImpl::LineType, regex> CommentExtractorImpl::lineTypeRegexes = {
-    {FILEDEFINITION, regex ( "^diff.*" ) },
-    {CONTEXTDEFINITION, regex ( "^@@.*" ) },
-    {ADDFILE, regex ( "^\\+\\+\\+.*" ) },
-    {ADDLINE, regex ( "^\\+.*" ) },
-    {DELLINE, regex ( "^\\-.*" ) }
-};
+CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient, LineClassifier *lineClassifier ) :
+    gitClient ( DependentOn<GitClient> ( gitClient ) ),
+    lineClassifier ( DependentOn<LineClassifier> ( lineClassifier ) )
+{}
 
 Comments CommentExtractorImpl::extract()
 {
-    string file = "";
-    std::vector<LineComment> comments;
-    std::vector<FileComments> fileComments;
-
     std::vector<string> diffLines = getDiffLines();
-    unsigned int lineNumber = 0;
+    CommentState *commentState = new DiffHeaderState ( this );
+
     for ( const auto &line : diffLines ) {
-        switch ( LineType type = getLineType ( line ) ) {
-        case FILEDEFINITION:
-            if ( file.length() != 0 && comments.size() != 0 ) {
-                addFoundCommentsTo ( fileComments, comments, file );
-            }
-            comments.clear();
-            file = "";
-            break;
-        case ADDFILE:
-            if ( file.length() != 0 ) {
-                break;
-            }
-            file = extractAddedFileFrom ( line );
-            break;
-        case CONTEXTDEFINITION:
-            if ( file.length() == 0 ) {
-                throw MustardException ( "Malformed diff: Context definition not preceded by file add line" );
-            }
-            lineNumber = extractContextLineNumber ( line ) - 1;
-            break;
-        case ADDLINE:
-            if ( file.length() != 0 ) {
-                static regex commentExtractor ( R"(^\+.*//([^~]*)$)" );
-                const string comment = getSingleCaptureIn ( line, commentExtractor );
-                if ( comment.length() > 0 ) {
-                    comments.emplace_back ( LineComment ( lineNumber, comment ) );
-                }
-            }
-            break;
-        case DELLINE:
-            lineNumber--;
-            break;
+        CommentState *nextCommentState = commentState->traverse ( lineClassifier->classifyLine ( line ) );
+        if ( nextCommentState != commentState ) {
+            delete commentState;
+            commentState = nextCommentState;
         }
-        ++lineNumber;
+        commentState->consume ( line );
     }
-    if ( file.length() != 0 && comments.size() != 0 ) {
-        addFoundCommentsTo ( fileComments, comments, file );
-    }
+    delete commentState;
+    newFile ( "" );
     return Comments ( fileComments );
 }
 
@@ -81,41 +46,31 @@ vector<string> CommentExtractorImpl::getDiffLines()
     return move ( lines );
 }
 
-CommentExtractorImpl::LineType CommentExtractorImpl::getLineType ( const string &line )
+void CommentExtractorImpl::newFile ( const string &fileName )
 {
-    for ( auto lineTypeRegex : lineTypeRegexes ) {
-        if ( regex_match ( line, lineTypeRegex.second ) ) {
-            return lineTypeRegex.first;
-        };
+    if ( !currentFile.empty() && currentLineComments.size() != 0 ) {
+        fileComments.push_back ( {
+            currentFile,
+            currentLineComments
+        } );
     }
-    return UNKNOWN;
+    currentFile = fileName;
+    currentLineComments.clear();
+    currentLine = 1;
 }
 
-void
-CommentExtractorImpl::addFoundCommentsTo ( vector<FileComments> &fileComments, vector<LineComment> comments, string file )
+
+void CommentExtractorImpl::newLine()
 {
-    fileComments.emplace_back ( FileComments ( file, comments ) );
+    ++currentLine;
 }
 
-string CommentExtractorImpl::extractAddedFileFrom ( const string &line )
+void CommentExtractorImpl::setLine ( int lineNumber )
 {
-    static regex extractor ( R"(^\+\+\+ b/(.*)$)" );
-    return getSingleCaptureIn ( line, extractor );
+    currentLine = lineNumber;
 }
 
-string CommentExtractorImpl::getSingleCaptureIn ( const string &text, const regex &extractor ) const
+void CommentExtractorImpl::newComment ( const string &author, const string &comment )
 {
-    smatch matches;
-    regex_match ( text, matches, extractor );
-    if ( matches.size() != 2 ) {
-        return "";
-    }
-    return matches[1];
-}
-
-int CommentExtractorImpl::extractContextLineNumber ( const string &line )
-{
-    static regex extractor ( R"(^@@ -\d* \+(\d*) @@.*)" );
-    const string stringNumber = getSingleCaptureIn ( line, extractor );
-    return atoi ( stringNumber.c_str() );
+    currentLineComments.push_back ( {currentLine, comment, author} );
 }

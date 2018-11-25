@@ -1,0 +1,29 @@
+@startuml
+[*] --> diffHeader
+diffHeader --> fileDeclaration
+fileDeclaration --> contextDefinition
+contextDefinition --> context
+contextDefinition --> addLine
+contextDefinition --> delLine
+addLine --> delLine
+addLine --> contextDefinition
+addLine --> context
+addLine --> fileDeclaration
+delLine --> contextDefinition
+delLine --> addLine
+delLine --> context
+delLine --> fileDeclaration
+context --> delLine
+context --> fileDeclaration
+context --> addLine
+context --> delLine
+
+addLine --> multiLineComment
+multiLineComment --> multiLineCommentEnd
+multiLineCommentEnd --> addLine
+multiLineCommentEnd --> delLine
+multiLineCommentEnd --> context
+
+
+
+@enduml

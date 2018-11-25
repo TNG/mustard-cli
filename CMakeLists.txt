@@ -48,6 +48,19 @@ set(SOURCES
         src/main/comments/CommentExtractorImpl.h
         src/main/comments/Comments.cpp
         src/main/comments/Comments.h
+        src/main/comments/commentState/states/FileDiffState.cpp
+        src/main/comments/commentState/states/FileDiffState.h
+        src/main/comments/commentState/states/ContextDefinitionState.cpp
+        src/main/comments/commentState/states/ContextDefinitionState.h
+        src/main/comments/commentState/states/FileDefinitionState.cpp
+        src/main/comments/commentState/states/FileDefinitionState.h
+        src/main/comments/commentState/states/DiffHeaderState.cpp
+        src/main/comments/commentState/states/DiffHeaderState.h
+        src/main/comments/commentState/CommentState.h
+        src/main/comments/commentState/CommentStateListener.h
+        src/main/comments/commentState/LineClassifier.cpp
+        src/main/comments/commentState/LineClassifier.h
+        src/main/comments/commentState/RegexMatcher.h
         src/main/comments/FileComments.cpp
         src/main/comments/FileComments.h
         src/main/comments/LineComment.cpp
