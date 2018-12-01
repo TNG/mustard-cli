@@ -8,7 +8,7 @@ ContextDefinitionState::ContextDefinitionState ( CommentStateListener *commentSt
 
 void ContextDefinitionState::consume ( const string &line )
 {
-    static RegexMatcher lineNumberMatcher ( R"(^@@ -\d* \+(\d*) @@.*)" );
+    static RegexMatcher lineNumberMatcher ( R"(^@@ -\d*(?:,\d*)? \+(\d*)(?:,\d*)? @@.*)" );
     string lineNumberString = lineNumberMatcher.getSingleCaptureIn ( line );
     if ( !lineNumberString.empty() ) {
         listener->setLine ( atoi ( lineNumberString.c_str() ) - 1 );
@@ -17,7 +17,7 @@ void ContextDefinitionState::consume ( const string &line )
 
 CommentState *ContextDefinitionState::traverse ( LineClassifier::LineType lineType )
 {
-    return new FileDiffState ( listener, lineClassifier );
+    return ( new FileDiffState ( listener, lineClassifier ) )->traverse ( lineType );
 }
 
 

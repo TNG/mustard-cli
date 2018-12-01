@@ -2,6 +2,7 @@
 #include "ContextDefinitionState.h"
 #include "FileDefinitionState.h"
 #include "../RegexMatcher.h"
+#include "MultiLineCommentState.h"
 
 FileDiffState::FileDiffState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier ) : CommentState (
         commentStateListener, lineClassifier ) {}
@@ -24,6 +25,8 @@ CommentState *FileDiffState::traverse ( LineClassifier::LineType lineType )
         return new ContextDefinitionState ( listener, lineClassifier );
     case LineClassifier::FILEDEFINITION:
         return new FileDefinitionState ( listener, lineClassifier );
+    case LineClassifier::MULTILINECOMMENT_START:
+        return new MultiLineCommentState ( listener, lineClassifier );
     default:
         listener->newLine();
         return this;

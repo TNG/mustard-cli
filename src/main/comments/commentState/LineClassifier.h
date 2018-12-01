@@ -9,7 +9,16 @@ using namespace std;
 class LineClassifier
 {
 public:
-    enum LineType { UNKNOWN, FILEDEFINITION, CONTEXTDEFINITION, ADDFILE, ADDLINE, DELLINE, MULTILINECOMMENT_START, MULTILINECOMMENT_END};
+    enum LineType {
+        UNKNOWN,
+        FILEDEFINITION,
+        CONTEXTDEFINITION,
+        MULTILINECOMMENT_START,
+        MULTILINECOMMENT_END,
+        ADDFILE,
+        ADDLINE,
+        DELLINE
+    };
     bool isLineOfType ( LineType lineType, const string &line );
 
     LineType classifyLine ( const string &line );

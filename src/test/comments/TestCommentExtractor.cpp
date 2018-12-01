@@ -92,3 +92,34 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoCaptureCommentsAfterAutoins
     resultingComments.accept ( commentInLineFour );
     EXPECT_TRUE ( commentInLineFour.isMatching() );
 }
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanCopeWithMultiLineComments )
+{
+    const string diffWithMultiLineComment = "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+                                            "index 7f8b793..280de3e 100644\n"
+                                            "--- a/subdir/subsubdir/file.txt\n"
+                                            "+++ b/subdir/subsubdir/file.txt\n"
+                                            "@@ -8,6 +8,9 @@ File with line 7\n"
+                                            " File with line 8\n"
+                                            " File with line 9\n"
+                                            " File with line 10\n"
+                                            "+/*~ This line ten is wrong for two reasons:\n"
+                                            "+ * it should have been 9\n"
+                                            "+ * it should not have been 11-1*/\n"
+                                            " File with line 11\n"
+                                            " File with line 12\n"
+                                            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLineFour ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 10 )
+               && ( file == "subdir/subsubdir/file.txt" )
+               && ( lineComment.getComment() == "This line ten is wrong for two reasons:\n"
+                    "it should have been 9\n"
+                    "it should not have been 11-1" );
+    } );
+    resultingComments.accept ( commentInLineFour );
+    EXPECT_TRUE ( commentInLineFour.isMatching() );
+}
