@@ -18,7 +18,7 @@ CommentState *MultiLineCommentState::traverse ( LineClassifier::LineType lineTyp
 {
     if ( lastLine ) {
         listener->newComment ( "", comment );
-        return new FileDiffState ( listener, lineClassifier );
+        return ( new FileDiffState ( listener, lineClassifier ) )->traverse ( lineType );
     }
     switch ( lineType ) {
     case LineClassifier::MULTILINECOMMENT_END:
