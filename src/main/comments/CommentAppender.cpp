@@ -1,4 +1,6 @@
 #include <fstream>
+#include <algorithm>
+#include <regex>
 #include "CommentAppender.h"
 #include "../error/MustardException.h"
 
@@ -41,8 +43,11 @@ void CommentAppender::finishFile()
         if ( lineComment.getLine() > fileLines.size() ) {
             throw MustardException ( "Could not append a comment past the last line of a file" );
         }
-        string &originalLine = fileLines[lineComment.getLine() - 1];
-        originalLine += "//~" + lineComment.getAuthor() + " - " + lineComment.getComment();
+        if ( lineComment.getComment().size() > 30 || lineComment.getComment().find ( '\n' ) != string::npos ) {
+            insertMultiLineComment ( fileLines, lineComment );
+        } else {
+            insertSingleLineComment ( fileLines, lineComment );
+        };
     }
     file.close();
 
@@ -52,4 +57,20 @@ void CommentAppender::finishFile()
         outfile << line << endl;
     }
     outfile.close();
+}
+
+void CommentAppender::insertMultiLineComment ( vector<string> &fileLines, const LineComment &comment )
+{
+    string &originalLine = fileLines[comment.getLine() - 1];
+    static regex newline ( "\n" );
+    const string replacedNewLines = regex_replace ( comment.getComment(), newline, "\n * " );
+    stringstream ss;
+    ss << endl << "/*~" << comment.getAuthor() << "~ " << replacedNewLines << " */";
+    fileLines[comment.getLine() - 1] += ss.str();
+}
+
+void CommentAppender::insertSingleLineComment ( vector<string> &fileLines, const LineComment &comment )
+{
+    string &originalLine = fileLines[comment.getLine() - 1];
+    originalLine += "//~" + comment.getAuthor() + "~ " + comment.getComment();
 }

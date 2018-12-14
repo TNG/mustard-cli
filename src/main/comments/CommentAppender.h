@@ -15,6 +15,10 @@ private:
     void finishFile();
     string openFileName = "";
     vector<LineComment> openFileComments;
+
+    void insertMultiLineComment ( vector<string> &fileLines, const LineComment &comment );
+
+    void insertSingleLineComment ( vector<string> &vector, const LineComment &comment );
 };
 
 

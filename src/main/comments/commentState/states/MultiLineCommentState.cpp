@@ -7,6 +7,11 @@ MultiLineCommentState::MultiLineCommentState ( CommentStateListener *commentStat
 
 void MultiLineCommentState::consume ( const string &line )
 {
+    static regex foreignCommentRegex ( R"(^\+\s*/\*~.*~.*)" );
+    if ( foreignComment ||  regex_match ( line, foreignCommentRegex ) ) {
+        foreignComment = true;
+        return;
+    }
     if ( !comment.empty() ) {
         comment += "\n";
     }
@@ -17,7 +22,9 @@ void MultiLineCommentState::consume ( const string &line )
 CommentState *MultiLineCommentState::traverse ( LineClassifier::LineType lineType )
 {
     if ( lastLine ) {
-        listener->newComment ( "", comment );
+        if ( !foreignComment ) {
+            listener->newComment ( "", comment );
+        }
         return ( new FileDiffState ( listener, lineClassifier ) )->traverse ( lineType );
     }
     switch ( lineType ) {

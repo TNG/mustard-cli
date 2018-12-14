@@ -15,6 +15,7 @@ public:
 private:
     string comment;
     bool lastLine = false;
+    bool foreignComment = false;
 };
 
 

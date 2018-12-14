@@ -282,3 +282,34 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CommentsAtEndOfDiffFileWithou
     EXPECT_TRUE ( anotherCommentInLineTen.isMatching() );
 }
 
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignMultilineComments )
+{
+    const string diffWithMultiLineComment =
+        "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+        "index 7f8b793..8fff734 100644\n"
+        "--- a/subdir/subsubdir/file.txt\n"
+        "+++ b/subdir/subsubdir/file.txt\n"
+        "@@ -10,0 +11,2 @@ File with line 10\n"
+        "+/*~author~ This comment\n"
+        "+ * has been made by someone else */";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+    EXPECT_TRUE ( resultingComments.isEmpty() );
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignSinglelineComments )
+{
+    const string diffWithMultiLineComment =
+        "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+        "index 7f8b793..194ef41 100644\n"
+        "--- a/subdir/subsubdir/file.txt\n"
+        "+++ b/subdir/subsubdir/file.txt\n"
+        "@@ -10 +10 @@ File with line 9\n"
+        "-File with line 10\n"
+        "+File with line 10//~author~ foreign comment";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+    EXPECT_TRUE ( resultingComments.isEmpty() );
+}
