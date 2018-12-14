@@ -164,5 +164,8 @@ void BitBucketClientImpl::approve ( const PullRequest &pullRequest, ReviewStatus
     stringstream approvalUrl;
     approvalUrl << pullRequestEndpoint << "/" << pullRequest.id << "/participants/" << userSlug;
 
-    httpClient->put ( approvalUrl.str(), body.str() );
+    const auto response = httpClient->put ( approvalUrl.str(), body.str() );
+    if ( !response.successful ) {
+        throw BitBucketClientException ( ( "Could not set approval status: " + response.body ).c_str() );
+    }
 }

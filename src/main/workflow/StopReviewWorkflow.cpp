@@ -1,4 +1,5 @@
 #include <Depend.h>
+#include <regex>
 #include "StopReviewWorkflow.h"
 #include "../comments/CommentConsumer.h"
 #include "../git/GitClient.h"
@@ -76,7 +77,10 @@ void StopReviewWorkflow::printCommentSummary ( const Comments &comments ) const
                 lastFile = file;
                 printf ( "---- %s ----\n", file.c_str() );
             }
-            printf ( "%6.u\t%s\n", lineComment.getLine(), lineComment.getComment().c_str() );
+
+            static regex newline ( "\n" );
+            const string commentIndented = regex_replace ( lineComment.getComment(), newline, "\n\t" );
+            printf ( "%6.u\t%s\n", lineComment.getLine(), commentIndented.c_str() );
         }
 
     private:
