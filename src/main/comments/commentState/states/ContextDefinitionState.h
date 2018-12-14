@@ -10,8 +10,6 @@ public:
     ContextDefinitionState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier );
 
     CommentState *traverse ( LineClassifier::LineType lineType ) override;
-
-    void consume ( const string &line ) override;
 };
 
 

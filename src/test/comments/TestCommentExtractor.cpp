@@ -68,7 +68,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoNotCaptureAutoInsertedComme
                && ( file == "subdir/subsubdir/file.txt" );
     } );
     resultingComments.accept ( commentInLineFour );
-    EXPECT_FALSE ( commentInLineFour.isMatching() );
+    EXPECT_TRUE ( commentInLineFour.isNotMatching() );
 }
 
 TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoCaptureCommentsAfterAutoinsertedComments )

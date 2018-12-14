@@ -3,18 +3,11 @@
 #include "FileDefinitionState.h"
 #include "../RegexMatcher.h"
 #include "MultiLineCommentState.h"
+#include "../lineConsumers/FileDiffLineConsumer.h"
 
 FileDiffState::FileDiffState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier ) : CommentState (
-        commentStateListener, lineClassifier ) {}
-
-void FileDiffState::consume ( const string &line )
-{
-    static RegexMatcher commentMatcher ( R"(^\+.*//([^~]*)$)" );
-    const string matchedComment = commentMatcher.getSingleCaptureIn ( line );
-    if ( !matchedComment.empty() ) {
-        listener->newComment ( "", matchedComment );
-    }
-}
+        commentStateListener,
+        new FileDiffLineConsumer ( commentStateListener ), lineClassifier ) {}
 
 CommentState *FileDiffState::traverse ( LineClassifier::LineType lineType )
 {
@@ -28,7 +21,6 @@ CommentState *FileDiffState::traverse ( LineClassifier::LineType lineType )
     case LineClassifier::MULTILINECOMMENT_START:
         return ( new MultiLineCommentState ( listener, lineClassifier ) )->traverse ( lineType );
     default:
-        listener->newLine();
         return this;
     }
 }

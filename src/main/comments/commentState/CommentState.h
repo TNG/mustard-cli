@@ -5,28 +5,37 @@
 #include <Depend.h>
 #include "CommentStateListener.h"
 #include "LineClassifier.h"
+#include "LineConsumer.h"
 
 using namespace std;
 
 class CommentState
 {
 public:
-    CommentState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier = nullptr ) :
-        listener ( commentStateListener ),
-        lineClassifier ( DependentOn<LineClassifier> ( lineClassifier ) )
-    {}
+    CommentState ( CommentStateListener *listener, LineConsumer *consumer, LineClassifier *lineClassifier = nullptr ) :
+        listener ( listener ),
+        lineClassifier ( DependentOn<LineClassifier> ( lineClassifier ) ),
+        consumer ( consumer ) {}
 
-    virtual void consume ( const string &line ) {}
+    virtual void consume ( const string &line ) {
+        consumer->consume ( line );
+    }
+    void scopeChange() {
+        consumer->scopeChange();
+    }
     virtual CommentState *traverse ( LineClassifier::LineType lineType ) {
         return this;
     }
 
-    virtual ~CommentState() = default;
+    virtual ~CommentState() {
+        delete consumer;
+    };
+private:
 
 protected:
     CommentStateListener *listener;
+    LineConsumer *consumer;
     LineClassifier *lineClassifier;
-
 };
 
 

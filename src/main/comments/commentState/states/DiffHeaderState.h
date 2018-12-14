@@ -10,6 +10,8 @@ public:
     DiffHeaderState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier = nullptr );
 
     CommentState *traverse ( LineClassifier::LineType lineType ) override;
+private:
+    CommentStateListener *listener;
 };
 
 

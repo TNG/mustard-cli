@@ -10,6 +10,7 @@ using namespace std;
 #include "CommenExtractor.h"
 #include "commentState/CommentStateListener.h"
 #include "commentState/LineClassifier.h"
+#include "commentState/CommentState.h"
 
 class CommentExtractorImpl : public CommentExtractor, CommentStateListener
 {
@@ -26,6 +27,10 @@ private:
     void setLine ( int lineNumber ) override;
 
     vector<string> getDiffLines();
+    vector<pair<CommentState *, const string *>> classifyLines ( const vector<string> &diffLines );
+    void consumeLineContent ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const;
+    void deleteStates ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const;
+    void finishOwnState();
 
     GitClient *gitClient;
     LineClassifier *lineClassifier;

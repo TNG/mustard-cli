@@ -10,8 +10,8 @@ add_subdirectory(lib/gmock-1.7.0)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 find_package(LibSecret)
 if (LIBSECRET_FOUND)
-        message("libsecret has been found and will persist credentials")
-        add_definitions(-DWITH_LIBSECRET)
+    message("libsecret has been found and will persist credentials")
+    add_definitions(-DWITH_LIBSECRET)
 else ()
     message("libsecret not found - will not persist credentials")
 endif ()
@@ -30,12 +30,12 @@ set(SOURCES
         src/main/bitbucket/BitBucketClientImpl.h
         src/main/bitbucket/BitBucketCommentUploader.cpp
         src/main/bitbucket/BitBucketCommentUploader.h
+        src/main/bitbucket/BitBucketConfigGuesser.cpp
+        src/main/bitbucket/BitBucketConfigGuesser.h
         src/main/bitbucket/BitBucketConfiguration.cpp
         src/main/bitbucket/BitBucketConfiguration.h
         src/main/bitbucket/PullRequestFormatter.cpp
         src/main/bitbucket/PullRequestFormatter.h
-        src/main/bitbucket/BitBucketConfigGuesser.cpp
-        src/main/bitbucket/BitBucketConfigGuesser.h
         src/main/bitbucket/model/PullRequest.h
         src/main/bitbucket/model/ReviewStatus.h
         src/main/bitbucket/model/Reviewer.h
@@ -48,9 +48,25 @@ set(SOURCES
         src/main/comments/CommentExtractorImpl.h
         src/main/comments/Comments.cpp
         src/main/comments/Comments.h
+        src/main/comments/FileComments.cpp
+        src/main/comments/FileComments.h
+        src/main/comments/LineComment.cpp
+        src/main/comments/LineComment.h
         src/main/comments/commentState/CommentState.h
         src/main/comments/commentState/CommentStateListener.h
         src/main/comments/commentState/LineClassifier.cpp
+        src/main/comments/commentState/LineClassifier.h
+        src/main/comments/commentState/LineConsumer.cpp
+        src/main/comments/commentState/LineConsumer.h
+        src/main/comments/commentState/RegexMatcher.h
+        src/main/comments/commentState/lineConsumers/ContextDefinitionConsumer.cpp
+        src/main/comments/commentState/lineConsumers/ContextDefinitionConsumer.h
+        src/main/comments/commentState/lineConsumers/FileDefinitionConsumer.cpp
+        src/main/comments/commentState/lineConsumers/FileDefinitionConsumer.h
+        src/main/comments/commentState/lineConsumers/FileDiffLineConsumer.cpp
+        src/main/comments/commentState/lineConsumers/FileDiffLineConsumer.h
+        src/main/comments/commentState/lineConsumers/MultiLineCommentConsumer.cpp
+        src/main/comments/commentState/lineConsumers/MultiLineCommentConsumer.h
         src/main/comments/commentState/states/ContextDefinitionState.cpp
         src/main/comments/commentState/states/ContextDefinitionState.h
         src/main/comments/commentState/states/DiffHeaderState.cpp
@@ -61,12 +77,6 @@ set(SOURCES
         src/main/comments/commentState/states/FileDiffState.h
         src/main/comments/commentState/states/MultiLineCommentState.cpp
         src/main/comments/commentState/states/MultiLineCommentState.h
-        src/main/comments/commentState/LineClassifier.h
-        src/main/comments/commentState/RegexMatcher.h
-        src/main/comments/FileComments.cpp
-        src/main/comments/FileComments.h
-        src/main/comments/LineComment.cpp
-        src/main/comments/LineComment.h
         src/main/credentials/CredentialProvider.h
         src/main/credentials/LibSecretCredentialProvider.cpp
         src/main/credentials/LibSecretCredentialProvider.h
@@ -101,7 +111,7 @@ set(SOURCES
         )
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
-target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES}  )
+target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES})
 
 set(TEST_SOURCES
         ${SOURCES}

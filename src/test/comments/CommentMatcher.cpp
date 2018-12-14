@@ -1,5 +1,6 @@
 #include <functional>
 #include <iostream>
+#include <gtest/gtest.h>
 #include "../../main/comments/CommentConsumer.h"
 #include "CommentMatcher.h"
 
@@ -29,10 +30,15 @@ bool CommentMatcher::isMatching()
             }
         }
     }
-    return matched ;
+    return matched;
 }
 
 void CommentMatcher::check ( const string &explanation, function<bool ( const string &, const LineComment & ) > predicate )
 {
     predicates.push_back ( {false, explanation, predicate} );
+}
+
+bool  CommentMatcher::isNotMatching()
+{
+    return !matched ;
 }

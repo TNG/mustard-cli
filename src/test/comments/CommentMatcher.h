@@ -17,6 +17,7 @@ public:
     void consume ( const string &file, const LineComment &lineComment ) override;
 
     bool isMatching();
+    bool isNotMatching();
 
 private:
     struct predicateMatchedExplanation {

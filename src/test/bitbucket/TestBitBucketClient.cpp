@@ -418,7 +418,7 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotFailOnGeneralRemarks
         return true;
     } );
     comments.accept ( commentFromBitBucket );
-    EXPECT_FALSE ( commentFromBitBucket.isMatching() );
+    EXPECT_TRUE ( commentFromBitBucket.isNotMatching() );
 }
 
 TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotExtractOrphanedComments )
@@ -506,5 +506,5 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotExtractOrphanedComme
         return true;
     } );
     comments.accept ( commentFromBitBucket );
-    EXPECT_FALSE ( commentFromBitBucket.isMatching() );
+    EXPECT_TRUE ( commentFromBitBucket.isNotMatching() );
 }

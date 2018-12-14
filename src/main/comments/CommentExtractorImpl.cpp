@@ -13,27 +13,65 @@ ProvideImplementationForDependency<CommentExtractorImpl, CommentExtractor> comme
 
 CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient, LineClassifier *lineClassifier ) :
     gitClient ( DependentOn<GitClient> ( gitClient ) ),
-    lineClassifier ( DependentOn<LineClassifier> ( lineClassifier ) )
-{}
+    lineClassifier ( DependentOn<LineClassifier> ( lineClassifier ) ) {}
 
 Comments CommentExtractorImpl::extract()
 {
     std::vector<string> diffLines = getDiffLines();
+    vector<pair<CommentState *, const string *>> classifiedLines = classifyLines ( diffLines );
+
+    consumeLineContent ( classifiedLines );
+
+    deleteStates ( classifiedLines );
+
+    finishOwnState();
+    return Comments ( fileComments );
+}
+
+void CommentExtractorImpl::finishOwnState()
+{
+    newFile ( "" );
+}
+
+void CommentExtractorImpl::deleteStates ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const
+{
+    set<CommentState *> commentStates;
+    for ( auto &lineState : classifiedLines ) {
+        commentStates.insert ( lineState.first );
+    }
+
+    for ( auto currentCommentState : commentStates ) {
+        delete currentCommentState;
+    }
+}
+
+void CommentExtractorImpl::consumeLineContent ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const
+{
+    CommentState *precedingState = nullptr;
+    for ( auto &lineState : classifiedLines ) {
+        if ( precedingState != nullptr && precedingState != lineState.first ) {
+            precedingState->scopeChange();
+        }
+        lineState.first->consume ( *lineState.second );
+        precedingState = lineState.first;
+    }
+
+    if ( precedingState ) {
+        precedingState->scopeChange();
+    }
+}
+
+vector<pair<CommentState *, const string *>> CommentExtractorImpl::classifyLines ( const vector<string> &diffLines )
+{
     CommentState *commentState = new DiffHeaderState ( this );
 
+    vector<pair<CommentState *, const string *>> lineStates;
     for ( const auto &line : diffLines ) {
-        CommentState *nextCommentState = commentState->traverse ( lineClassifier->classifyLine ( line ) );
-        if ( nextCommentState != commentState ) {
-            delete commentState;
-            commentState = nextCommentState;
-        }
-        commentState->consume ( line );
+        commentState = commentState->traverse ( lineClassifier->classifyLine ( line ) );
+        lineStates.emplace_back ( commentState, &line );
     }
     commentState->traverse ( LineClassifier::ENDOFFILE );
-
-    delete commentState;
-    newFile ( "" );
-    return Comments ( fileComments );
+    return lineStates;
 }
 
 vector<string> CommentExtractorImpl::getDiffLines()
