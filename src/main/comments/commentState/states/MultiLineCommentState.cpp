@@ -27,10 +27,8 @@ CommentState *MultiLineCommentState::traverse ( LineClassifier::LineType lineTyp
         }
         return ( new FileDiffState ( listener, lineClassifier ) )->traverse ( lineType );
     }
-    switch ( lineType ) {
-    case LineClassifier::MULTILINECOMMENT_END:
+    if ( lineType == LineClassifier::MULTILINECOMMENT_END ) {
         lastLine = true;
-    default:
-        return this;
     }
+    return this;
 }
