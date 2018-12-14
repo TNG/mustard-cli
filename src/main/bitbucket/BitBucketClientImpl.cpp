@@ -130,7 +130,9 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
             continue;
         }
         const auto &commentAnchor = value["commentAnchor"];
-        if ( commentAnchor["lineType"].GetString() != string ( "ADDED" ) ) {
+        const string &lineType ( commentAnchor["lineType"].GetString() );
+        if ( lineType != string ( "ADDED" ) &&
+                lineType != string ( "CONTEXT" ) ) {
             continue;
         }
         const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
