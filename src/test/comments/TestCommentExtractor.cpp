@@ -136,9 +136,9 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultiLineCommentsMixedWithNor
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~ This line ten is wrong for two reasons:\n"
-        "+ * it should have been 9\n"
-        "+ * it should not have been 11-1*/\n"
+        "+      /*~ This line ten is wrong for two reasons:\n"
+        "+    * it should have been 9\n"
+        "+    * it should not have been 11-1*/\n"
         " File with line 11\n"
         " File with line 12\n"
         "-File with line 13\n"
@@ -221,6 +221,60 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_TwoMultinlineCommentsOnSameLi
                && ( file == "subdir/subsubdir/file.txt" )
                && ( lineComment.getComment() == "Additionally,\n"
                     "we do not like comments." );
+    } );
+    resultingComments.accept ( commentInLineTen );
+    resultingComments.accept ( anotherCommentInLineTen );
+    EXPECT_TRUE ( commentInLineTen.isMatching() );
+    EXPECT_TRUE ( anotherCommentInLineTen.isMatching() );
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_CommentsAtEndOfDiffFileWithoutContext )
+{
+    const string diffWithMultiLineComment =
+        "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+        "index 7f8b793..64adcc1 100644\n"
+        "--- a/subdir/subsubdir/file.txt\n"
+        "+++ b/subdir/subsubdir/file.txt\n"
+        "@@ -10,0 +11,5 @@ File with line 10\n"
+        "+/*~ This line ten is wrong for two reasons:\n"
+        "+ * it should have been 9\n"
+        "+ * it should not have been 11-1*/\n"
+        "+/*~ Additionally,\n"
+        "+ * we do not like Comments.*/";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLineTen;
+    commentInLineTen.check ( "line number is 10",
+    [] ( const auto & file, const auto & lineComment ) {
+        return lineComment.getLine() == 10;
+    } );
+    commentInLineTen.check ( "file is correct",
+    [] ( const auto & file, const auto & lineComment ) {
+        return file == "subdir/subsubdir/file.txt";
+    } );
+    commentInLineTen.check ( "comment is correct",
+    [] ( const auto & file, const auto & lineComment ) {
+        return lineComment.getComment() == "This line ten is wrong for two reasons:\n"
+               "it should have been 9\n"
+               "it should not have been 11-1";
+    } );
+
+
+    CommentMatcher anotherCommentInLineTen;
+    anotherCommentInLineTen.check ( "line number is 10",
+    [] ( const auto & file, const auto & lineComment ) {
+        return lineComment.getLine() == 10;
+    } );
+    anotherCommentInLineTen.check ( "file is correct",
+    [] ( const auto & file, const auto & lineComment ) {
+        return file == "subdir/subsubdir/file.txt";
+    } );
+    anotherCommentInLineTen.check ( "comment is correct",
+    [] ( const auto & file, const auto & lineComment ) {
+        return lineComment.getComment() == "Additionally,\n"
+               "we do not like Comments.";
     } );
     resultingComments.accept ( commentInLineTen );
     resultingComments.accept ( anotherCommentInLineTen );

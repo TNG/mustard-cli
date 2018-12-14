@@ -26,7 +26,7 @@ CommentState *FileDiffState::traverse ( LineClassifier::LineType lineType )
     case LineClassifier::FILEDEFINITION:
         return new FileDefinitionState ( listener, lineClassifier );
     case LineClassifier::MULTILINECOMMENT_START:
-        return new MultiLineCommentState ( listener, lineClassifier );
+        return ( new MultiLineCommentState ( listener, lineClassifier ) )->traverse ( lineType );
     default:
         listener->newLine();
         return this;

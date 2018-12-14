@@ -17,7 +17,8 @@ public:
         MULTILINECOMMENT_END,
         ADDFILE,
         ADDLINE,
-        DELLINE
+        DELLINE,
+        ENDOFFILE
     };
     bool isLineOfType ( LineType lineType, const string &line );
 

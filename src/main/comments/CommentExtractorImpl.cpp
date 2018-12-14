@@ -29,6 +29,8 @@ Comments CommentExtractorImpl::extract()
         }
         commentState->consume ( line );
     }
+    commentState->traverse ( LineClassifier::ENDOFFILE );
+
     delete commentState;
     newFile ( "" );
     return Comments ( fileComments );
