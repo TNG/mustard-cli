@@ -1,10 +1,7 @@
 #include "MultiLineCommentConsumer.h"
 #include "../RegexMatcher.h"
 
-MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *listener ) : listener ( listener )
-{
-
-}
+MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *listener ) : listener ( listener ) {}
 
 void MultiLineCommentConsumer::consume ( const string &line )
 {
