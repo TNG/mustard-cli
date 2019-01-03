@@ -115,7 +115,8 @@ TEST_F(CommentAppenderTest, Unit_AppendsLongCommentMultilined){
 Zeile 2
 Zeile 3
 Zeile 4
-/*~imgrundm~ Dies ist ein langer Kommentar mit mehr als 30 Zeichen */
+/*~imgrundm~
+ * Dies ist ein langer Kommentar mit mehr als 30 Zeichen */
 Zeile 5
 )");
     Comments comments({{"datei", {
@@ -137,12 +138,30 @@ TEST_F(CommentAppenderTest, Unit_AppendsCommentsWithNewlineMultilined){
 Zeile 2
 Zeile 3
 Zeile 4
-/*~imgrundm~ Dies ist ein
+/*~imgrundm~
+ * Dies ist ein
  * doofer Reim. */
 Zeile 5
 )");
     Comments comments({{"datei", {
                                          {4,"Dies ist ein\ndoofer Reim.","imgrundm"}
+                                 }}});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+}
+
+TEST_F(CommentAppenderTest, Unit_AppendsCommentsBreaksLongLines){
+    testEnv.run("echo Zeile 1 >> datei");
+    testEnv.run("echo Zeile 2 >> datei");
+    const string datei(
+            "Zeile 1\n"
+            "/*~imgrundm~\n"
+            " * 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789\n"
+            " * 123456789 123456789 123456789 123456789 123456789 123456789 */\n"
+            "Zeile 2\n");
+    Comments comments({{"datei", {{1,
+                                   "123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789","imgrundm"}
                                  }}});
     comments.accept(commentAppender);
     commentAppender.finish();

@@ -62,10 +62,10 @@ void CommentAppender::finishFile()
 void CommentAppender::insertMultiLineComment ( vector<string> &fileLines, const LineComment &comment )
 {
     string &originalLine = fileLines[comment.getLine() - 1];
-    static regex newline ( "\n" );
-    const string replacedNewLines = regex_replace ( comment.getComment(), newline, "\n * " );
+    static regex newline ( "([^\n]{1,110})(?:( )|\n|$)" );
+    const string replacedNewLines = regex_replace ( comment.getComment(), newline, "\n * $1" );
     stringstream ss;
-    ss << endl << "/*~" << comment.getAuthor() << "~ " << replacedNewLines << " */";
+    ss << endl << "/*~" << comment.getAuthor() << "~" << replacedNewLines << " */";
     fileLines[comment.getLine() - 1] += ss.str();
 }
 
