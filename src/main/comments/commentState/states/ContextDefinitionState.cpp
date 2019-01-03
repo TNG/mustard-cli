@@ -10,9 +10,9 @@ ContextDefinitionState::ContextDefinitionState ( CommentStateListener *commentSt
                        commentStateListener ),
                    lineClassifier ) {}
 
-CommentState *ContextDefinitionState::traverse ( LineClassifier::LineType lineType )
+shared_ptr<CommentState> ContextDefinitionState::traverse ( LineClassifier::LineType lineType )
 {
-    return ( new FileDiffState ( listener, lineClassifier ) )->traverse ( lineType );
+    return make_shared<FileDiffState> ( listener, lineClassifier )->traverse ( lineType );
 }
 
 

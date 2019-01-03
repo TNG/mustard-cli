@@ -27,9 +27,9 @@ private:
     void setLine ( int lineNumber ) override;
 
     vector<string> getDiffLines();
-    vector<pair<CommentState *, const string *>> classifyLines ( const vector<string> &diffLines );
-    void consumeLineContent ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const;
-    void deleteStates ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const;
+    vector<pair<shared_ptr<CommentState>, const string *>> classifyLines ( const vector<string> &diffLines );
+    void consumeLineContent ( const vector<pair<shared_ptr<CommentState>, const string *>> &classifiedLines ) const;
+
     void finishOwnState();
 
     GitClient *gitClient;

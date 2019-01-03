@@ -18,11 +18,9 @@ CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient, LineClassifie
 Comments CommentExtractorImpl::extract()
 {
     std::vector<string> diffLines = getDiffLines();
-    vector<pair<CommentState *, const string *>> classifiedLines = classifyLines ( diffLines );
 
+    const auto classifiedLines = classifyLines ( diffLines );
     consumeLineContent ( classifiedLines );
-
-    deleteStates ( classifiedLines );
 
     finishOwnState();
     return Comments ( fileComments );
@@ -33,21 +31,10 @@ void CommentExtractorImpl::finishOwnState()
     newFile ( "" );
 }
 
-void CommentExtractorImpl::deleteStates ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const
+void CommentExtractorImpl::consumeLineContent (
+    const vector<pair<shared_ptr<CommentState>, const string *>> &classifiedLines ) const
 {
-    set<CommentState *> commentStates;
-    for ( auto &lineState : classifiedLines ) {
-        commentStates.insert ( lineState.first );
-    }
-
-    for ( auto currentCommentState : commentStates ) {
-        delete currentCommentState;
-    }
-}
-
-void CommentExtractorImpl::consumeLineContent ( const vector<pair<CommentState *, const string *>> &classifiedLines ) const
-{
-    CommentState *precedingState = nullptr;
+    shared_ptr<CommentState> precedingState;
     for ( auto &lineState : classifiedLines ) {
         if ( precedingState != nullptr && precedingState != lineState.first ) {
             precedingState->scopeChange();
@@ -61,11 +48,12 @@ void CommentExtractorImpl::consumeLineContent ( const vector<pair<CommentState *
     }
 }
 
-vector<pair<CommentState *, const string *>> CommentExtractorImpl::classifyLines ( const vector<string> &diffLines )
+vector<pair<shared_ptr<CommentState>, const string *>> CommentExtractorImpl::classifyLines (
+            const vector<string> &diffLines )
 {
-    CommentState *commentState = new DiffHeaderState ( this );
+    shared_ptr<CommentState> commentState = shared_ptr<DiffHeaderState> ( new DiffHeaderState ( this ) );
 
-    vector<pair<CommentState *, const string *>> lineStates;
+    vector<pair<shared_ptr<CommentState>, const string *>> lineStates;
     for ( const auto &line : diffLines ) {
         commentState = commentState->traverse ( lineClassifier->classifyLine ( line ) );
         lineStates.emplace_back ( commentState, &line );

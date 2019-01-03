@@ -290,7 +290,8 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignMultilineCo
         "--- a/subdir/subsubdir/file.txt\n"
         "+++ b/subdir/subsubdir/file.txt\n"
         "@@ -10,0 +11,2 @@ File with line 10\n"
-        "+/*~author~ This comment\n"
+        "+/*~author~"
+        "+ * This comment\n"
         "+ * has been made by someone else */";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
 

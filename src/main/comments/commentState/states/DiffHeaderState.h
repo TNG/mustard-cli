@@ -9,7 +9,7 @@ class DiffHeaderState : public CommentState
 public:
     DiffHeaderState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier = nullptr );
 
-    CommentState *traverse ( LineClassifier::LineType lineType ) override;
+    shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
 private:
     CommentStateListener *listener;
 };

@@ -9,7 +9,7 @@ class FileDiffState : public CommentState
 public:
     FileDiffState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier );
 
-    CommentState *traverse ( LineClassifier::LineType lineType ) override;
+    shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
 };
 
 

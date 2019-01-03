@@ -9,7 +9,7 @@ class ContextDefinitionState : public CommentState
 public:
     ContextDefinitionState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier );
 
-    CommentState *traverse ( LineClassifier::LineType lineType ) override;
+    shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
 };
 
 

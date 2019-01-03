@@ -4,11 +4,11 @@
 DiffHeaderState::DiffHeaderState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier )
     : listener ( commentStateListener ), CommentState ( commentStateListener, new LineConsumer, lineClassifier ) {}
 
-CommentState *DiffHeaderState::traverse ( LineClassifier::LineType lineType )
+shared_ptr<CommentState> DiffHeaderState::traverse ( LineClassifier::LineType lineType )
 {
     if ( lineType == LineClassifier::LineType::FILEDEFINITION ) {
-        return new FileDefinitionState ( this->listener, this->lineClassifier );
+        return make_shared<FileDefinitionState> ( this->listener, this->lineClassifier );
     }
-    return this;
+    return shared_from_this();
 }
 

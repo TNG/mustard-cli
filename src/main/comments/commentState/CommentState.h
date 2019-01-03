@@ -9,7 +9,7 @@
 
 using namespace std;
 
-class CommentState
+class CommentState : public enable_shared_from_this<CommentState>
 {
 public:
     CommentState ( CommentStateListener *listener, LineConsumer *consumer, LineClassifier *lineClassifier = nullptr ) :
@@ -23,8 +23,8 @@ public:
     void scopeChange() {
         consumer->scopeChange();
     }
-    virtual CommentState *traverse ( LineClassifier::LineType lineType ) {
-        return this;
+    virtual shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) {
+        return shared_from_this();
     }
 
     virtual ~CommentState() {

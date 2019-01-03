@@ -8,7 +8,7 @@ class FileDefinitionState : public CommentState
 public:
     FileDefinitionState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier );
 
-    CommentState *traverse ( LineClassifier::LineType lineType ) override;
+    shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
 
 private:
     CommentStateListener *listener;

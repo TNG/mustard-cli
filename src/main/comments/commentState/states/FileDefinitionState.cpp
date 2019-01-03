@@ -7,10 +7,10 @@ FileDefinitionState::FileDefinitionState ( CommentStateListener *commentStateLis
     : listener ( commentStateListener ),
       CommentState ( commentStateListener, new FileDefinitionConsumer ( commentStateListener ), lineClassifier ) {}
 
-CommentState *FileDefinitionState::traverse ( LineClassifier::LineType lineType )
+shared_ptr<CommentState> FileDefinitionState::traverse ( LineClassifier::LineType lineType )
 {
     if ( lineType == LineClassifier::LineType::CONTEXTDEFINITION ) {
-        return new ContextDefinitionState ( listener, lineClassifier );
+        return make_shared<ContextDefinitionState> ( listener, lineClassifier );
     }
-    return this;
+    return shared_from_this();
 }
