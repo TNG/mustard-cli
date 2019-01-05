@@ -1,0 +1,70 @@
+@startuml
+package workflow {
+rectangle InfoWorkflow
+rectangle AutoconfWorkflow
+rectangle StopReviewWorkflow
+rectangle StartReviewWorkflow
+}
+component domain {
+package comments {
+rectangle CommentExtractor
+rectangle CommentExtractorImpl
+rectangle LineClassifier
+}
+
+package bitbucket {
+rectangle BitBucketConfigGuesser
+rectangle BitBucketConfiguration
+rectangle BitBucketClient
+rectangle BitBucketClientImpl
+}
+}
+component infra{
+package git{
+rectangle GitClient
+rectangle GitClientImpl
+rectangle GitClientException
+}
+package system {
+rectangle CommandRunner
+rectangle HttpClient
+rectangle LinuxCommandRunner
+}
+package authentication{
+rectangle AuthenticationProviderImpl
+rectangle AuthenticationProvider
+}
+package credentials{
+ rectangle LibSecretCredentialProvider
+ rectangle CredentialProvider
+}
+}
+
+AuthenticationProviderImpl --> BitBucketConfiguration
+BitBucketClientImpl --> BitBucketConfiguration
+BitBucketClientImpl ---> HttpClient
+BitBucketCommentUploader ---> BitBucketConfiguration
+BitBucketCommentUploader ---> HttpClient
+BitBucketConfigGuesser ---> GitClient
+BitBucketConfiguration ---> CredentialProvider
+BitBucketConfiguration ---> GitClient
+CommentExtractorImpl ---> GitClient
+CommentExtractorImpl ---> LineClassifier
+GitClientImpl ---> CommandRunner
+HttpClient ---> AuthenticationProvider
+AutoconfWorkflow ---> BitBucketConfigGuesser
+AutoconfWorkflow ---> GitClient
+InfoWorkflow ---> BitBucketClient
+InfoWorkflow ---> GitClient
+StartReviewWorkflow ---> BitBucketClient
+StartReviewWorkflow ---> GitClient
+StopReviewWorkflow ---> BitBucketClient
+StopReviewWorkflow ---> CommentExtractor
+StopReviewWorkflow ---> GitClient
+LinuxCommandRunner ..>  CommandRunner
+AuthenticationProviderImpl ..>  AuthenticationProvider
+LibSecretCredentialProvider ..>  CredentialProvider
+GitClientImpl ..>  GitClient
+CommentExtractorImpl ..>  CommentExtractor
+BitBucketClientImpl ..>  BitBucketClient
+@enduml
