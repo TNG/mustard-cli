@@ -4,6 +4,7 @@
 
 #include "../CommentStateListener.h"
 #include "../LineConsumer.h"
+#include "../RegexMatcher.h"
 
 class FileDiffLineConsumer : public LineConsumer
 {
@@ -13,9 +14,9 @@ public:
 private:
     CommentStateListener *listener;
 
-    void consumeInlineComment ( const string &line ) const;
-
     void consumeLineNumberIncrease ( const string &line );
+
+    void addCommentIfMatching ( const string &line, const RegexMatcher &commentMatcher ) const;
 };
 
 

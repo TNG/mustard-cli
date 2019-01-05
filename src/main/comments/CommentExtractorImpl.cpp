@@ -17,7 +17,7 @@ CommentExtractorImpl::CommentExtractorImpl ( GitClient *gitClient, LineClassifie
 
 Comments CommentExtractorImpl::extract()
 {
-    std::vector<string> diffLines = getDiffLines();
+    const auto diffLines = getDiffLines();
 
     const auto classifiedLines = classifyLines ( diffLines );
     consumeLineContent ( classifiedLines );
@@ -35,7 +35,7 @@ void CommentExtractorImpl::consumeLineContent (
     const vector<pair<shared_ptr<CommentState>, const string *>> &classifiedLines ) const
 {
     shared_ptr<CommentState> precedingState;
-    for ( auto &lineState : classifiedLines ) {
+    for ( const auto &lineState : classifiedLines ) {
         if ( precedingState != nullptr && precedingState != lineState.first ) {
             precedingState->scopeChange();
         }

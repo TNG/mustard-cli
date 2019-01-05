@@ -7,6 +7,7 @@ map <LineClassifier::LineType, regex> LineClassifier::lineTypeRegexes = {
     {FILEDEFINITION,    regex ( "^diff.*" ) },
     {CONTEXTDEFINITION, regex ( "^@@.*" ) },
     {ADDFILE,           regex ( "^\\+\\+\\+.*" ) },
+    {C_STYLE_SINGLE_LINE_COMMENT, regex ( R"(^\+\s*/\*~.*\\*/)" ) },
     {MULTILINECOMMENT_START, regex ( R"(^\+\s*/\*~.*)" ) },
     {MULTILINECOMMENT_END, regex ( "^\\+.*\\*/" ) },
     {ADDLINE,           regex ( "^\\+.*" ) },

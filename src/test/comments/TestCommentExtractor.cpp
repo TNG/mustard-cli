@@ -26,10 +26,10 @@ TEST_F ( CommentExtractorTest, Unit_TestSimpleExtraction )
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //Nice line\n"
+                        "+File with line 4 //~Nice line\n"
                         "@@ -18 +18 @@ File with line 17\n"
                         "-File with line 18\n"
-                        "+File with line 18 //Not so good";
+                        "+File with line 18 //~ Not so good";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -58,7 +58,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoNotCaptureAutoInsertedComme
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //~imgrundm - Nice line\n";
+                        "+File with line 4 //~imgrundm~ - Nice line\n";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -79,7 +79,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoCaptureCommentsAfterAutoins
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //~imgrundm - Nice line//indeed!\n";
+                        "+File with line 4 //~imgrundm~ Nice line//~indeed!\n";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -124,6 +124,33 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanCopeWithMultiLineComments 
     EXPECT_TRUE ( commentInLineFour.isMatching() );
 }
 
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanCopeWithIndentedMultiLineComments )
+{
+    const string diffWithMultiLineComment = "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+                                            "index 7f8b793..280de3e 100644\n"
+                                            "--- a/subdir/subsubdir/file.txt\n"
+                                            "+++ b/subdir/subsubdir/file.txt\n"
+                                            "@@ -8,6 +8,9 @@ File with line 7\n"
+                                            " File with line 8\n"
+                                            " File with line 9\n"
+                                            " File with line 10\n"
+                                            "+    /*~ This line ten is wrong for two reasons:*/\n"
+                                            " File with line 11\n"
+                                            " File with line 12\n"
+                                            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLineFour ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 10 )
+               && ( file == "subdir/subsubdir/file.txt" )
+               && ( lineComment.getComment() == "This line ten is wrong for two reasons:" );
+    } );
+    resultingComments.accept ( commentInLineFour );
+    EXPECT_TRUE ( commentInLineFour.isMatching() );
+}
+
 
 TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultiLineCommentsMixedWithNormalCommentsAreFine )
 {
@@ -142,7 +169,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultiLineCommentsMixedWithNor
         " File with line 11\n"
         " File with line 12\n"
         "-File with line 13\n"
-        "+File with line 13 //Comment on line 13\n"
+        "+File with line 13 //~Comment on line 13\n"
         " File with line 14\n"
         " File with line 15\n"
         "+/*~ line 15 is\n"

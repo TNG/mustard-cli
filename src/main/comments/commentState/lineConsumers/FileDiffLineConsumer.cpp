@@ -9,8 +9,15 @@ FileDiffLineConsumer::FileDiffLineConsumer ( CommentStateListener *listener ) :
 
 void FileDiffLineConsumer::consume ( const string &line )
 {
+    static RegexMatcher commentMatcher ( R"(^\+.*//~\s*([^~]*)$)" );
+    static RegexMatcher cStyleCommentMatcher ( R"(^\+.*/\*~\s*([^~]*)\*/$)" );
+
+    if ( cStyleCommentMatcher.isMatching ( line ) ) {
+        addCommentIfMatching ( line, cStyleCommentMatcher );
+        return;
+    }
     consumeLineNumberIncrease ( line );
-    consumeInlineComment ( line );
+    addCommentIfMatching ( line, commentMatcher );
 }
 
 void FileDiffLineConsumer::consumeLineNumberIncrease ( const string &line )
@@ -21,9 +28,8 @@ void FileDiffLineConsumer::consumeLineNumberIncrease ( const string &line )
     }
 }
 
-void FileDiffLineConsumer::consumeInlineComment ( const string &line ) const
+void FileDiffLineConsumer::addCommentIfMatching ( const string &line, const RegexMatcher &commentMatcher ) const
 {
-    static RegexMatcher commentMatcher ( R"(^\+.*//([^~]*)$)" );
     const string matchedComment = commentMatcher.getSingleCaptureIn ( line );
     if ( !matchedComment.empty() ) {
         listener->newComment ( "", matchedComment );

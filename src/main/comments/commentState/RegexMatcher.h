@@ -20,6 +20,10 @@ public:
         return matches[1];
     }
 
+    bool isMatching ( const string &text ) const {
+        return regex_match ( text, extractor );
+    }
+
 private:
     regex extractor;
 };
