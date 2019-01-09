@@ -1,28 +1,29 @@
 @startuml
 class FileComments {
 file : string
-+getFile() : String
-+getComments() : vector<comment>
++ accept( CommentConsumer)
 }
 
 class Comments {
-+ acceptConsumer()
++ accept( CommentConsumer)
 }
 
 Comments "1.." o-- FileComments
 
-class Comment {
+class LineComment {
 comment : string
 line : string
+author : string
+...
 }
 
 interface CommentConsumer{
 +consume(string file, string line, string comment)
 }
 
-class BitBucketPusher{
+class BitBucketCommentUploader{
 }
-BitBucketPusher --|> CommentConsumer
+BitBucketCommentUploader --|> CommentConsumer
 
-FileComments "1.." o-- Comment
+FileComments "1.." o-- LineComment
 @enduml

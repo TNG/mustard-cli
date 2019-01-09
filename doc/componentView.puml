@@ -4,26 +4,30 @@ rectangle git [
  Git Control
 ]
 rectangle cli [
- CommandLineInterpretor
+ CommandLineInterpreter / Workflow Factory
 ]
-rectangle "Review Starter" as rstart
-rectangle  "Review submitter" as rsub
+rectangle "Start Review Workflow" as rstart
+rectangle  "Stop Review Workflow" as rsub
 rectangle "CommentExtractor" as ce
+rectangle "Configuration System" as cs
 
 rectangle bb [
   bitbucket client
 ]
 
 }
-cli ..> rstart : triggger
-cli ..> rsub : trigger
-cli ..> bb: credentials
+
+circle "git cli" as gitcli
+cli ..> rstart : creates
+cli ..> rsub : creates
 rstart ..> bb : find PR
 rstart  ..> git : checkout & reset
 rsub ..> git : 1) reset state
 rsub ..> ce : 2) extract comments
 rsub ..> bb : 3) push comments
 
-git --() "git cli"
-bb --() bitbucket
+git --( gitcli
+bb --( bitbucket
+cs ..> git
+bb ..> cs
 @enduml

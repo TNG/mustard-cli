@@ -5,7 +5,6 @@ rectangle AutoconfWorkflow
 rectangle StopReviewWorkflow
 rectangle StartReviewWorkflow
 }
-component domain {
 package comments {
 rectangle CommentExtractor
 rectangle CommentExtractorImpl
@@ -17,7 +16,6 @@ rectangle BitBucketConfigGuesser
 rectangle BitBucketConfiguration
 rectangle BitBucketClient
 rectangle BitBucketClientImpl
-}
 }
 component infra{
 package git{

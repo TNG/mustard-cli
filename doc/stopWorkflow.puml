@@ -1,0 +1,24 @@
+@startuml
+title stop review
+actor User as u
+participant "Stop Review Workflow" as rs
+participant "Change Extractor" as ce
+participant "git"
+participant "bitbucket" as bb
+
+rs -> git : reset to origin/branch
+rs -> ce : extract comments
+ce -> git : get diff
+git -->ce : diff
+ce -> rs : extracted comments
+rs -> u : ask for comment push
+u -> rs : ok
+rs -> bb : push comments to bb
+rs -> u : ask for reset
+u -> rs : ok
+rs -> git : reset branch to origin state
+rs -> u : ask for approve action
+u -> rs : ok
+rs -> bb : approve/needs work
+
+@enduml
