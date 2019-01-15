@@ -36,6 +36,7 @@ private:
     rapidjson::Document getPullRequestDocumentFor ( const Commitish &basic_string );
 
     vector<Reviewer> extractReviewersFrom ( const Document::ValueType &reviewersArray );
+    vector<LineComment> extractReplies ( const Document::ValueType &comment );
 
     Document getDocument ( const HttpResponse &pullRequests );
 

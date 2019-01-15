@@ -138,15 +138,38 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
                 lineType != string ( "CONTEXT" ) ) {
             continue;
         }
+
+        vector<LineComment> replies = extractReplies ( comment );
+
         const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
         const string path = commentAnchor["path"].GetString();
-        commentsFromBitBucket[path].push_back ( {line, text, author} );
+        commentsFromBitBucket[path].push_back ( {line, text, author, replies} );
     }
     vector<FileComments> fileComments;
     for ( const auto &commentFromBitBucket : commentsFromBitBucket ) {
         fileComments.push_back ( {commentFromBitBucket.first, commentFromBitBucket.second} );
     }
     return Comments ( fileComments );
+}
+
+vector<LineComment> BitBucketClientImpl::extractReplies ( const Document::ValueType &comment )
+{
+    if ( !comment.HasMember ( "comments" ) ) {
+        return {};
+    }
+    vector<LineComment> replies = {};
+    for ( const auto &reply : comment["comments"].GetArray() ) {
+        if ( !reply.HasMember ( "author" ) || !reply.HasMember ( "text" ) ) {
+            continue;
+        }
+        replies.emplace_back ( LineComment (
+                                   0,
+                                   reply["text"].GetString(),
+                                   reply["author"]["name"].GetString(),
+                                   extractReplies ( reply )
+                               ) );
+    }
+    return replies;
 }
 
 void BitBucketClientImpl::approve ( const PullRequest &pullRequest, ReviewStatus reviewStatus )

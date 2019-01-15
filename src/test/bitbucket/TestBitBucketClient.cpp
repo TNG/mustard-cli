@@ -14,9 +14,11 @@ public:
     Credentials getCredentials() override {
         return {"username", "pass"};
     }
+
     const string getPullRequestEndpoint() override {
         return "testUrl";
     }
+
     virtual ~BitBucketConfigurationForTest() {}
 };
 
@@ -48,7 +50,8 @@ TEST_F ( TestBitBucketClientImpl, Unit_getPullRequest )
     HttpResponse response = {responseJson, 200, true};
     EXPECT_CALL ( httpClient, get ( StrEq ( "testUrl" ) ) ).WillOnce ( Return ( response ) );
     PullRequest pullRequest = client.getPullRequestFor ( latestCommit );
-    EXPECT_STREQ ( "https://bitbucket.int.tngtech.com/users/imgrundm/repos/poormansdi/pull-requests/1", pullRequest.url.c_str() );
+    EXPECT_STREQ ( "https://bitbucket.int.tngtech.com/users/imgrundm/repos/poormansdi/pull-requests/1",
+                   pullRequest.url.c_str() );
 }
 
 TEST_F ( TestBitBucketClientImpl, Unit_getPullRequest_FurtherInformationCorrect )
@@ -334,7 +337,7 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments )
 
     Comments comments ( client.getCommentsFor ( pullRequest ) );
 
-    CommentMatcher commentFromBitBucket ( [] ( const string & file,  const LineComment & comment ) {
+    CommentMatcher commentFromBitBucket ( [] ( const string & file, const LineComment & comment ) {
         return ( comment.getComment() == "This comment neither." )
                && ( comment.getLine() == 2 )
                && ( file == "CMakeLists.txt" )
@@ -414,7 +417,7 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotFailOnGeneralRemarks
 
     Comments comments ( client.getCommentsFor ( pullRequest ) );
 
-    CommentMatcher commentFromBitBucket ( [] ( const string & file,  const LineComment & comment ) {
+    CommentMatcher commentFromBitBucket ( [] ( const string & file, const LineComment & comment ) {
         return true;
     } );
     comments.accept ( commentFromBitBucket );
@@ -502,9 +505,32 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments_DoNotExtractOrphanedComme
 
     Comments comments ( client.getCommentsFor ( pullRequest ) );
 
-    CommentMatcher commentFromBitBucket ( [] ( const string & file,  const LineComment & comment ) {
+    CommentMatcher commentFromBitBucket ( [] ( const string & file, const LineComment & comment ) {
         return true;
     } );
     comments.accept ( commentFromBitBucket );
     EXPECT_TRUE ( commentFromBitBucket.isNotMatching() );
+}
+
+TEST_F ( TestBitBucketClientImpl, Unit_canProcessNestedComments )
+{
+    const string commentWithReply = "{\"size\":5,\"limit\":500,\"isLastPage\":true,\"values\":[{\"id\":178600,\"createdDate\":1547308569065,\"user\":{\"name\":\"imgrundm\",\"emailAddress\":\"maximilian.imgrund@tngtech.com\",\"id\":1913,\"displayName\":\"Maximilian Imgrund\",\"active\":true,\"slug\":\"imgrundm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/imgrundm\"}]}},\"action\":\"REVIEWED\"},{\"id\":167734,\"createdDate\":1540563061056,\"user\":{\"name\":\"imgrundm\",\"emailAddress\":\"maximilian.imgrund@tngtech.com\",\"id\":1913,\"displayName\":\"Maximilian Imgrund\",\"active\":true,\"slug\":\"imgrundm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/imgrundm\"}]}},\"action\":\"COMMENTED\",\"commentAction\":\"ADDED\",\"comment\":{\"properties\":{\"repositoryId\":2376},\"id\":16633,\"version\":0,\"text\":\"Fürwahr!\",\"author\":{\"name\":\"imgrundm\",\"emailAddress\":\"maximilian.imgrund@tngtech.com\",\"id\":1913,\"displayName\":\"Maximilian Imgrund\",\"active\":true,\"slug\":\"imgrundm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/imgrundm\"}]}},\"createdDate\":1540563061056,\"updatedDate\":1540563061056,\"comments\":[{\"properties\":{\"repositoryId\":2376},\"id\":17330,\"version\":0,\"text\":\"Das glauben ja auch nur die Hühner \",\"author\":{\"name\":\"replyMan\",\"emailAddress\":\"maximilian.imgrund@tngtech.com\",\"id\":1913,\"displayName\":\"Maximilian Imgrund\",\"active\":true,\"slug\":\"imgrundm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/imgrundm\"}]}},\"createdDate\":1547308538694,\"updatedDate\":1547308538694,\"comments\":[],\"tasks\":[],\"permittedOperations\":{\"editable\":true,\"deletable\":true}}],\"tasks\":[],\"permittedOperations\":{\"editable\":true,\"deletable\":true}},\"commentAnchor\":{\"fromHash\":\"252c0d65b7ddf63c6984a72af8dea0ae05291c8e\",\"toHash\":\"6264307ceca75b19d22ed891f9e1bb23508496d3\",\"line\":3,\"lineType\":\"ADDED\",\"fileType\":\"TO\",\"path\":\"unsinn.md\",\"srcPath\":\"unsinn.md\",\"diffType\":\"EFFECTIVE\",\"orphaned\":false},\"diff\":{\"source\":{\"components\":[\"unsinn.md\"],\"parent\":\"\",\"name\":\"unsinn.md\",\"extension\":\"md\",\"toString\":\"unsinn.md\"},\"destination\":{\"components\":[\"unsinn.md\"],\"parent\":\"\",\"name\":\"unsinn.md\",\"extension\":\"md\",\"toString\":\"unsinn.md\"},\"hunks\":[{\"sourceLine\":1,\"sourceSpan\":3,\"destinationLine\":1,\"destinationSpan\":3,\"segments\":[{\"type\":\"CONTEXT\",\"lines\":[{\"destination\":1,\"source\":1,\"line\":\"#So viel Unsinn\",\"truncated\":false},{\"destination\":2,\"source\":2,\"line\":\"\",\"truncated\":false}],\"truncated\":false},{\"type\":\"REMOVED\",\"lines\":[{\"destination\":3,\"source\":3,\"line\":\"Und as nur um einen PR yu machen...\",\"truncated\":false}],\"truncated\":false},{\"type\":\"ADDED\",\"lines\":[{\"destination\":3,\"source\":4,\"line\":\"Und das nur um einen PR zu machen...\",\"truncated\":false,\"commentIds\":[16633]}],\"truncated\":false}],\"truncated\":false}],\"truncated\":false,\"properties\":{\"toHash\":\"6264307ceca75b19d22ed891f9e1bb23508496d3\",\"current\":true,\"fromHash\":\"252c0d65b7ddf63c6984a72af8dea0ae05291c8e\"}}},{\"id\":168555,\"createdDate\":1541174899515,\"user\":{\"name\":\"imgrundm\",\"emailAddress\":\"maximilian.imgrund@tngtech.com\",\"id\":1913,\"displayName\":\"Maximilian Imgrund\",\"active\":true,\"slug\":\"imgrundm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/imgrundm\"}]}},\"action\":\"APPROVED\"},{\"id\":168553,\"createdDate\":1541174852106,\"user\":{\"name\":\"imgrundm\",\"emailAddress\":\"maximilian.imgrund@tngtech.com\",\"id\":1913,\"displayName\":\"Maximilian Imgrund\",\"active\":true,\"slug\":\"imgrundm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/imgrundm\"}]}},\"action\":\"REVIEWED\"},{\"id\":167730,\"createdDate\":1540562816314,\"user\":{\"name\":\"bruecknm\",\"emailAddress\":\"matthias.brueckner@tngtech.com\",\"id\":2029,\"displayName\":\"Matthias Brückner\",\"active\":true,\"slug\":\"bruecknm\",\"type\":\"NORMAL\",\"links\":{\"self\":[{\"href\":\"https://bitbucket.int.tngtech.com/users/bruecknm\"}]}},\"action\":\"OPENED\"}],\"start\":0}";
+    HttpResponse response = {commentWithReply, 200, true};
+    cout << commentWithReply << endl;
+    EXPECT_CALL ( httpClient, get ( StrEq ( "testUrl/42/activities?limit=1000" ) ) ).WillOnce ( Return ( response ) );
+    PullRequest pullRequest = {"", 42, "", "", {"", ""}, {}};
+
+    Comments comments ( client.getCommentsFor ( pullRequest ) );
+
+    CommentMatcher commentFromBitBucket;
+    commentFromBitBucket.check (
+    "has reply", [] ( auto file, auto lineComment ) {
+        return lineComment.getReplies().size() == 1;
+    }
+    );
+    commentFromBitBucket.check ( "reply author", [] ( auto file, auto lineComment ) {
+        return lineComment.getReplies() [0].getAuthor() == "replyMan";
+    } );
+    comments.accept ( commentFromBitBucket );
+    EXPECT_TRUE ( commentFromBitBucket.isMatching() );
 }
