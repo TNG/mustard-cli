@@ -43,11 +43,7 @@ void CommentAppender::finishFile()
         if ( lineComment.getLine() > fileLines.size() ) {
             throw MustardException ( "Could not append a comment past the last line of a file" );
         }
-        if ( lineComment.getComment().size() > 30 || lineComment.getComment().find ( '\n' ) != string::npos ) {
-            insertMultiLineComment ( fileLines, lineComment );
-        } else {
-            insertSingleLineComment ( fileLines, lineComment );
-        };
+        insertMultiLineComment ( fileLines, lineComment );
     }
     file.close();
 
@@ -62,15 +58,39 @@ void CommentAppender::finishFile()
 void CommentAppender::insertMultiLineComment ( vector<string> &fileLines, const LineComment &comment )
 {
     string &originalLine = fileLines[comment.getLine() - 1];
-    static regex newline ( "([^\n]{1,110})(?:( )|\n|$)" );
-    const string replacedNewLines = regex_replace ( comment.getComment(), newline, "\n * $1" );
     stringstream ss;
-    ss << endl << "/*~" << comment.getAuthor() << "~" << replacedNewLines << " */";
+    ss << endl <<  "/*";
+    formatComment ( comment, ss, 0 );
+    ss << " */";
     fileLines[comment.getLine() - 1] += ss.str();
 }
 
-void CommentAppender::insertSingleLineComment ( vector<string> &fileLines, const LineComment &comment )
+void CommentAppender::formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel )
 {
-    string &originalLine = fileLines[comment.getLine() - 1];
-    originalLine += "//~" + comment.getAuthor() + "~ " + comment.getComment();
+    string indentation = "";
+    for ( int i = 0; i < indentationLevel * indentationDepth ; ++i ) {
+        indentation += " ";
+    }
+    const string indentingReplace = "\n * " + indentation + "$1";
+    const string replacedNewLines = regex_replace ( comment.getComment(), getIndentationRegexForIndentationLevel ( indentationLevel ), indentingReplace );
+    ss << indentation << "~" << comment.getAuthor() << "~" << replacedNewLines ;
+    for ( const auto &reply : comment.getReplies() ) {
+        ss << endl << " *";
+        formatComment ( reply, ss, indentationLevel + 1 );
+    }
 }
+
+regex CommentAppender::getIndentationRegexForIndentationLevel ( unsigned int indentationLevel )
+{
+    if ( indentationLevel > 5 ) {
+        indentationLevel = 5;
+    }
+    unsigned int untilChars = 110 - ( indentationLevel * indentationDepth );
+    stringstream regexSs;
+    regexSs << "([^\n]{1," << untilChars << "})(?:( )|\n|$)" ;
+    return regex ( regexSs.str() );
+}
+
+//string CommentAppender::formatComment( const LineComment &comment ){
+
+//}

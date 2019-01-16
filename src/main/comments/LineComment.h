@@ -12,7 +12,7 @@ public:
     LineComment ( const unsigned int line,
                   const string &comment,
                   const string &author = "",
-                  const vector<LineComment> replies = {} )
+                  const vector<LineComment> &replies = {} )
         : line ( line ),
           comment ( comment ),
           author ( author ),

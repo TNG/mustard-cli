@@ -23,16 +23,18 @@ TEST_F ( CommentAppenderTest, Unit_AppendsCommentToFile )
         R"(Zeile 1
 Zeile 2
 Zeile 3
-Zeile 4//~imgrundm~ Dies ist ein Kommentar
+Zeile 4
+/*~imgrundm~
+ * Dies ist ein Kommentar */
 Zeile 5
 )");
-    Comments comments({{"datei", {{4,"Dies ist ein Kommentar","imgrundm"}}}});
+    Comments comments({{"datei", {{4, "Dies ist ein Kommentar", "imgrundm"}}}});
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
-TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToFile){
+TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToFile) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
     testEnv.run("echo Zeile 3 >> datei");
@@ -40,20 +42,24 @@ TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToFile){
     testEnv.run("echo Zeile 5 >> datei");
     const string datei(
             R"(Zeile 1
-Zeile 2//~Hans Wurst~ Dies ist auch ein Kommentar
+Zeile 2
+/*~Hans Wurst~
+ * Dies ist auch ein Kommentar */
 Zeile 3
-Zeile 4//~imgrundm~ Dies ist ein Kommentar
+Zeile 4
+/*~imgrundm~
+ * Dies ist ein Kommentar */
 Zeile 5
 )");
     Comments comments({{"datei", {
-        {2,"Dies ist auch ein Kommentar","Hans Wurst"},
-        {4,"Dies ist ein Kommentar","imgrundm"}}}});
+                                         {2, "Dies ist auch ein Kommentar", "Hans Wurst"},
+                                         {4, "Dies ist ein Kommentar", "imgrundm"}}}});
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
-TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToSingleLine){
+TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToSingleLine) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
     testEnv.run("echo Zeile 3 >> datei");
@@ -63,19 +69,23 @@ TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToSingleLine){
             R"(Zeile 1
 Zeile 2
 Zeile 3
-Zeile 4//~imgrundm~ Dies ist ein Kommentar//~Hans Wurst~ Dies ist auch ein Kommentar
+Zeile 4
+/*~imgrundm~
+ * Dies ist ein Kommentar */
+/*~Hans Wurst~
+ * Dies ist auch ein Kommentar */
 Zeile 5
 )");
     Comments comments({{"datei", {
-                                         {4,"Dies ist ein Kommentar","imgrundm"},
-                                         {4,"Dies ist auch ein Kommentar","Hans Wurst"}
-    }}});
+                                         {4, "Dies ist ein Kommentar", "imgrundm"},
+                                         {4, "Dies ist auch ein Kommentar", "Hans Wurst"}
+                                 }}});
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
-TEST_F(CommentAppenderTest, Unit_AppendsCommentsToSeveralFiles){
+TEST_F(CommentAppenderTest, Unit_AppendsCommentsToSeveralFiles) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
     testEnv.run("echo Zeile 3 >> datei");
@@ -87,12 +97,16 @@ TEST_F(CommentAppenderTest, Unit_AppendsCommentsToSeveralFiles){
             R"(Zeile 1
 Zeile 2
 Zeile 3
-Zeile 4//~imgrundm~ Dies ist ein Kommentar
+Zeile 4
+/*~imgrundm~
+ * Dies ist ein Kommentar */
 Zeile 5
 )");
     const string datei2(
             R"(Zeile 1
-Zeile 2//~oink~ Ein weiterer Kommentar
+Zeile 2
+/*~oink~
+ * Ein weiterer Kommentar */
 )");
     Comments comments({
                               {"datei",  {{4, "Dies ist ein Kommentar", "imgrundm"}}},
@@ -100,11 +114,11 @@ Zeile 2//~oink~ Ein weiterer Kommentar
                       });
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
-    EXPECT_STREQ(datei2.c_str(),testEnv.run("cat datei2").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei2.c_str(), testEnv.run("cat datei2").getOutput().c_str());
 }
 
-TEST_F(CommentAppenderTest, Unit_AppendsLongCommentMultilined){
+TEST_F(CommentAppenderTest, Unit_AppendsLongCommentMultilined) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
     testEnv.run("echo Zeile 3 >> datei");
@@ -120,14 +134,14 @@ Zeile 4
 Zeile 5
 )");
     Comments comments({{"datei", {
-                                         {4,"Dies ist ein langer Kommentar mit mehr als 30 Zeichen","imgrundm"}
+                                         {4, "Dies ist ein langer Kommentar mit mehr als 30 Zeichen", "imgrundm"}
                                  }}});
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
-TEST_F(CommentAppenderTest, Unit_AppendsCommentsWithNewlineMultilined){
+TEST_F(CommentAppenderTest, Unit_AppendsCommentsWithNewlineMultilined) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
     testEnv.run("echo Zeile 3 >> datei");
@@ -144,14 +158,41 @@ Zeile 4
 Zeile 5
 )");
     Comments comments({{"datei", {
-                                         {4,"Dies ist ein\ndoofer Reim.","imgrundm"}
+                                         {4, "Dies ist ein\ndoofer Reim.", "imgrundm"}
                                  }}});
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
-TEST_F(CommentAppenderTest, Unit_AppendsCommentsBreaksLongLines){
+TEST_F(CommentAppenderTest, Unit_AppendsRepliesIndented) {
+    testEnv.run("echo Zeile 1 >> datei");
+    testEnv.run("echo Zeile 2 >> datei");
+    testEnv.run("echo Zeile 3 >> datei");
+    testEnv.run("echo Zeile 4 >> datei");
+    testEnv.run("echo Zeile 5 >> datei");
+    const string datei(
+            R"(Zeile 1
+Zeile 2
+Zeile 3
+Zeile 4
+/*~imgrundm~
+ * Dies ist ein doofer Reim.
+ *        ~replyMan~
+ *         allerdings */
+Zeile 5
+)");
+    Comments comments({{"datei",
+                               {LineComment(4, "Dies ist ein doofer Reim.", "imgrundm",{
+                                       ((LineComment) {0, "allerdings", "replyMan", {}})
+                               })}
+    }});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
+}
+
+TEST_F(CommentAppenderTest, Unit_AppendsCommentsBreaksLongLines) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
     const string datei(
@@ -161,9 +202,9 @@ TEST_F(CommentAppenderTest, Unit_AppendsCommentsBreaksLongLines){
             " * 123456789 123456789 123456789 123456789 123456789 123456789 */\n"
             "Zeile 2\n");
     Comments comments({{"datei", {{1,
-                                   "123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789","imgrundm"}
+                                          "123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789", "imgrundm"}
                                  }}});
     comments.accept(commentAppender);
     commentAppender.finish();
-    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }

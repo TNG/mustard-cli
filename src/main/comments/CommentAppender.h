@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <regex>
 #include "CommentConsumer.h"
 #include "LineComment.h"
 
@@ -15,10 +16,14 @@ private:
     void finishFile();
     string openFileName = "";
     vector<LineComment> openFileComments;
+    const unsigned int indentationDepth = 8;
 
     void insertMultiLineComment ( vector<string> &fileLines, const LineComment &comment );
 
     void insertSingleLineComment ( vector<string> &vector, const LineComment &comment );
+    regex getIndentationRegexForIndentationLevel ( unsigned int indentationLevel );
+
+    void formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel );
 };
 
 
