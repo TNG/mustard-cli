@@ -192,6 +192,39 @@ Zeile 5
     EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
+TEST_F(CommentAppenderTest, Unit_AppendsRepliesIndented_MoreComplexCase) {
+    testEnv.run("echo Zeile 1 >> datei");
+    testEnv.run("echo Zeile 2 >> datei");
+    testEnv.run("echo Zeile 3 >> datei");
+    testEnv.run("echo Zeile 4 >> datei");
+    testEnv.run("echo Zeile 5 >> datei");
+    const string datei(
+            R"(Zeile 1
+Zeile 2
+Zeile 3
+Zeile 4
+/*~A~
+ * CommentA
+ *        ~B~
+ *         CommentB
+ *                ~C~
+ *                 CommentC
+ *        ~C~
+ *         CommentC2 */
+Zeile 5
+)");
+    Comments comments({{"datei",
+                               {LineComment(4, "CommentA", "A",{
+                                       (LineComment) {0, "CommentB", "B",
+                                                       {((LineComment) {0, "CommentC", "C", {}})}},
+
+                                       (LineComment) {0, "CommentC2", "C", }
+                                       })}}});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
+}
+
 TEST_F(CommentAppenderTest, Unit_AppendsCommentsBreaksLongLines) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
