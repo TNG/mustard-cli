@@ -12,6 +12,7 @@ public:
     shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
 private:
     CommentStateListener *listener;
+    LineConsumer consumer;
 };
 
 

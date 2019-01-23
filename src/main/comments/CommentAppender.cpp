@@ -59,7 +59,7 @@ void CommentAppender::insertMultiLineComment ( vector<string> &fileLines, const 
 {
     string &originalLine = fileLines[comment.getLine() - 1];
     stringstream ss;
-    ss << endl <<  "/*";
+    ss << endl << "/*";
     formatComment ( comment, ss, 0 );
     ss << " */";
     fileLines[comment.getLine() - 1] += ss.str();
@@ -67,13 +67,13 @@ void CommentAppender::insertMultiLineComment ( vector<string> &fileLines, const 
 
 void CommentAppender::formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel )
 {
-    string indentation = "";
+    string indentation;
     for ( int i = 0; i < indentationLevel * indentationDepth ; ++i ) {
         indentation += " ";
     }
     const string indentingReplace = "\n * " + indentation + "$1";
     const string replacedNewLines = regex_replace ( comment.getComment(), getIndentationRegexForIndentationLevel ( indentationLevel ), indentingReplace );
-    ss << indentation << "~" << comment.getAuthor() << "~" << replacedNewLines ;
+    ss << indentation << "~" << comment.getAuthorAndId() << "~" << replacedNewLines ;
     for ( const auto &reply : comment.getReplies() ) {
         ss << endl << " *";
         formatComment ( reply, ss, indentationLevel + 1 );

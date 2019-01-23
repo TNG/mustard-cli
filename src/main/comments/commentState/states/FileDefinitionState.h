@@ -2,6 +2,7 @@
 #define MUSTARD_FILEDEFINITIONSTATE_H
 
 #include "../CommentState.h"
+#include "../lineConsumers/FileDefinitionConsumer.h"
 
 class FileDefinitionState : public CommentState
 {
@@ -12,6 +13,7 @@ public:
 
 private:
     CommentStateListener *listener;
+    FileDefinitionConsumer consumer;
 };
 
 

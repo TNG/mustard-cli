@@ -34,8 +34,8 @@ void FileDiffLineConsumer::consumeLineNumberIncrease ( const string &line )
 
 void FileDiffLineConsumer::addCommentIfMatching ( const string &line, const RegexMatcher &commentMatcher ) const
 {
-    const string matchedComment = commentMatcher.getSingleCaptureIn ( line );
-    if ( !matchedComment.empty() ) {
-        listener->newComment ( "", matchedComment );
+    const auto matchedComment = commentMatcher.getSingleCaptureIn ( line );
+    if ( matchedComment.has_value() ) {
+        listener->newComment ( "", matchedComment.value() );
     }
 }

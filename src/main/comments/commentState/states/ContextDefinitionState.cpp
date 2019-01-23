@@ -6,9 +6,9 @@
 ContextDefinitionState::ContextDefinitionState ( CommentStateListener *commentStateListener,
         LineClassifier *lineClassifier ) :
     CommentState ( commentStateListener,
-                   new ContextDefinitionConsumer (
-                       commentStateListener ),
-                   lineClassifier ) {}
+                   consumer,
+                   lineClassifier ),
+    consumer ( commentStateListener ) {}
 
 shared_ptr<CommentState> ContextDefinitionState::traverse ( LineClassifier::LineType lineType )
 {

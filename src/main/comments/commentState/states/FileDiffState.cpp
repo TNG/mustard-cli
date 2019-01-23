@@ -5,9 +5,12 @@
 #include "MultiLineCommentState.h"
 #include "../lineConsumers/FileDiffLineConsumer.h"
 
-FileDiffState::FileDiffState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier ) : CommentState (
+FileDiffState::FileDiffState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier ) :
+    CommentState (
         commentStateListener,
-        new FileDiffLineConsumer ( commentStateListener ), lineClassifier ) {}
+        consumer, lineClassifier ),
+    consumer (
+        commentStateListener ) {}
 
 shared_ptr<CommentState> FileDiffState::traverse ( LineClassifier::LineType lineType )
 {

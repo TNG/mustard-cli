@@ -1,10 +1,12 @@
 #include <Depend.h>
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
+#include <optional>
 #include "BitBucketCommentUploader.h"
 #include "../comments/LineComment.h"
 
 using namespace rapidjson;
+using namespace std;
 
 BitBucketCommentUploader::BitBucketCommentUploader ( PullRequest pullRequest,
         HttpClient *httpClient,
@@ -18,7 +20,7 @@ void BitBucketCommentUploader::consume ( const string &file, const LineComment &
 {
     ++seen;
     const string postUrl = getCommentPostUrl();
-    const string json = serializeComment ( file, lineComment.getLine(), lineComment.getComment() );
+    const string json = serializeComment ( file, lineComment.getLine(), lineComment.getComment(), lineComment.getId() );
     auto respone = httpClient->post ( postUrl, json );
     if ( respone.successful ) {
         ++uploaded;
@@ -42,7 +44,7 @@ string BitBucketCommentUploader::buildCommentPostUrl() const
     return ss.str();
 }
 
-string BitBucketCommentUploader::serializeComment ( const string &file, unsigned int line, const string &comment ) const
+string BitBucketCommentUploader::serializeComment ( const string &file, unsigned int line, const string &comment, const optional<unsigned long> replyToId ) const
 {
     Document jsonDocument;
     Value root ( kObjectType );
@@ -65,6 +67,13 @@ string BitBucketCommentUploader::serializeComment ( const string &file, unsigned
 
     root.AddMember ( "text", text, jsonDocument.GetAllocator() );
     root.AddMember ( "anchor", anchor, jsonDocument.GetAllocator() );
+
+    Value parent;
+    parent.SetObject();
+    if ( replyToId.has_value() ) {
+        parent.AddMember ( "id", replyToId.value(), jsonDocument.GetAllocator() );
+        root.AddMember ( "parent", parent, jsonDocument.GetAllocator() );
+    }
 
     StringBuffer buffer;
     Writer<StringBuffer> writer ( buffer );

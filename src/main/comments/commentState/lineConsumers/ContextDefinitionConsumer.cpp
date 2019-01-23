@@ -4,9 +4,9 @@
 void ContextDefinitionConsumer::consume ( const string &line )
 {
     static RegexMatcher lineNumberMatcher ( R"(^@@ -\d*(?:,\d*)? \+(\d*)(?:,\d*)? @@.*)" );
-    string lineNumberString = lineNumberMatcher.getSingleCaptureIn ( line );
-    if ( !lineNumberString.empty() ) {
-        listener->setLine ( atoi ( lineNumberString.c_str() ) - 1 );
+    const auto lineNumber = lineNumberMatcher.getSingleCaptureIn ( line );
+    if ( lineNumber.has_value() ) {
+        listener->setLine ( atoi ( lineNumber.value().c_str() ) - 1 );
     }
 
 }

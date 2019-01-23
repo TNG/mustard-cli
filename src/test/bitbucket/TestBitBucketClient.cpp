@@ -341,7 +341,8 @@ TEST_F ( TestBitBucketClientImpl, Unit_ExtractComments )
         return ( comment.getComment() == "This comment neither." )
                && ( comment.getLine() == 2 )
                && ( file == "CMakeLists.txt" )
-               && ( comment.getAuthor() == "imgrundm" );
+               && ( comment.getAuthor() == "imgrundm" )
+               && ( comment.getId() == 16388L );
     } );
     comments.accept ( commentFromBitBucket );
     EXPECT_TRUE ( commentFromBitBucket.isMatching() );
@@ -526,10 +527,13 @@ TEST_F ( TestBitBucketClientImpl, Unit_canProcessNestedComments )
     commentFromBitBucket.check (
     "has reply", [] ( auto file, auto lineComment ) {
         return lineComment.getReplies().size() == 1;
-    }
-    );
+    } );
     commentFromBitBucket.check ( "reply author", [] ( auto file, auto lineComment ) {
         return lineComment.getReplies() [0].getAuthor() == "replyMan";
+    } );
+    commentFromBitBucket.check ( "reply author id", [] ( auto file, auto lineComment ) {
+        const auto &replyId = lineComment.getReplies() [0].getId();
+        return replyId.has_value() && replyId.value() == 17330;
     } );
     comments.accept ( commentFromBitBucket );
     EXPECT_TRUE ( commentFromBitBucket.isMatching() );

@@ -47,3 +47,11 @@ TEST_F ( BitBucketCommentUpdaterTest, Unit_postsToCorrectUrl )
     EXPECT_CALL ( httpClient, post ( StrEq ( expectedUrl ), _ ) ).WillOnce ( Return ( HttpResponse() ) );
     comments.accept ( commentUploader );
 }
+
+TEST_F ( BitBucketCommentUpdaterTest, Unit_repliesCorrectly )
+{
+    Comments comments ( {FileComments ( {"file", {LineComment ( 42, "text", "", {}, 41 ) }} ) } );
+    const char *expectedPostJson = "{\"text\":\"text\",\"anchor\":{\"line\":42,\"lineType\":\"ADDED\",\"fileType\":\"TO\",\"path\":\"file\",\"srcPath\":\"file\"},\"parent\":{\"id\":41}}";
+    EXPECT_CALL ( httpClient, post ( _, StrEq ( expectedPostJson ) ) ).WillOnce ( Return ( HttpResponse() ) );
+    comments.accept ( commentUploader );
+}

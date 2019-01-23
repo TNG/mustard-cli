@@ -1,10 +1,13 @@
+#include <iostream>
 #include "MultiLineCommentState.h"
 #include "FileDiffState.h"
 #include "../RegexMatcher.h"
 #include "../lineConsumers/MultiLineCommentConsumer.h"
+#include "MultiLineCommentReplyState.h"
 
 MultiLineCommentState::MultiLineCommentState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier )
-    : CommentState ( commentStateListener, new MultiLineCommentConsumer ( commentStateListener ), lineClassifier ) {}
+    : CommentState ( commentStateListener, consumer, lineClassifier ),
+      consumer ( commentStateListener ) {}
 
 shared_ptr<CommentState> MultiLineCommentState::traverse ( LineClassifier::LineType lineType )
 {
@@ -16,3 +19,8 @@ shared_ptr<CommentState> MultiLineCommentState::traverse ( LineClassifier::LineT
     }
     return shared_from_this();
 }
+
+MultiLineCommentState::MultiLineCommentState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier,
+        MultiLineCommentConsumer *inReplyTo )
+    : CommentState ( commentStateListener, consumer, lineClassifier ),
+      consumer ( commentStateListener ) {}

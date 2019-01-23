@@ -30,7 +30,7 @@ private:
 
     string buildCommentPostUrl() const;
 
-    string serializeComment ( const string &file, unsigned int line, const string &comment ) const;
+    string serializeComment ( const string &file, unsigned int line, const string &comment, const optional<unsigned long> replyToId ) const;
 
     unsigned int uploaded = 0;
     unsigned int seen = 0;

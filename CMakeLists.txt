@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(mustard)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE DEBUG)
 
 add_subdirectory(lib/cpr)
@@ -118,15 +118,18 @@ set(TEST_SOURCES
         src/test/bitbucket/TestBitBucketClient.cpp
         src/test/bitbucket/TestBitBucketCommentUploader.cpp
         src/test/bitbucket/TestBitbucketConfigGuesser.cpp
+        src/test/comments/CommentMatcher.cpp
+        src/test/comments/CommentMatcher.h
         src/test/comments/GitClientForTest.h
         src/test/comments/TestCommentAppender.cpp
         src/test/comments/TestCommentExtractor.cpp
+        src/test/comments/commentState/lineConsumers/testMultiLineCommentConsumer.cpp
         src/test/git/GitTestEnvironment.cpp
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp
         src/test/system/HttpClientForTest.h
         src/test/system/TestLinuxCommandRunner.cpp
-        src/test/comments/CommentMatcher.cpp src/test/comments/CommentMatcher.h)
+        )
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})

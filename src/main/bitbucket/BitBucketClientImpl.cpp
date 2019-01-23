@@ -126,6 +126,7 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
         const auto &comment = value["comment"];
         const string author = comment["author"]["name"].GetString();
         const string text = comment["text"].GetString();
+        const auto id = ( unsigned long ) comment["id"].GetInt64();
         if ( !value.HasMember ( "commentAnchor" ) || value["commentAnchor"]["orphaned"].GetBool() ) {
             continue;
         }
@@ -143,11 +144,11 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
 
         const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
         const string path = commentAnchor["path"].GetString();
-        commentsFromBitBucket[path].push_back ( {line, text, author, replies} );
+        commentsFromBitBucket[path].push_back ( {line, text, author, replies, id} );
     }
     vector<FileComments> fileComments;
     for ( const auto &commentFromBitBucket : commentsFromBitBucket ) {
-        fileComments.push_back ( {commentFromBitBucket.first, commentFromBitBucket.second} );
+        fileComments.emplace_back ( commentFromBitBucket.first, commentFromBitBucket.second );
     }
     return Comments ( fileComments );
 }
@@ -166,7 +167,8 @@ vector<LineComment> BitBucketClientImpl::extractReplies ( const Document::ValueT
                                    0,
                                    reply["text"].GetString(),
                                    reply["author"]["name"].GetString(),
-                                   extractReplies ( reply )
+                                   extractReplies ( reply ),
+                                   reply["id"].GetInt64()
                                ) );
     }
     return replies;

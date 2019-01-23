@@ -12,10 +12,10 @@ using namespace std;
 class CommentState : public enable_shared_from_this<CommentState>
 {
 public:
-    CommentState ( CommentStateListener *listener, LineConsumer *consumer, LineClassifier *lineClassifier = nullptr ) :
+    CommentState ( CommentStateListener *listener, LineConsumer &consumer, LineClassifier *lineClassifier = nullptr ) :
         listener ( listener ),
         lineClassifier ( DependentOn<LineClassifier> ( lineClassifier ) ),
-        consumer ( consumer ) {}
+        consumer ( &consumer ) {}
 
     virtual void consume ( const string &line ) {
         consumer->consume ( line );
@@ -27,9 +27,7 @@ public:
         return shared_from_this();
     }
 
-    virtual ~CommentState() {
-        delete consumer;
-    };
+    virtual ~CommentState() {};
 private:
 
 protected:

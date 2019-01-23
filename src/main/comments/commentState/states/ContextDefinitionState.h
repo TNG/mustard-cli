@@ -3,6 +3,7 @@
 
 
 #include "../CommentState.h"
+#include "../lineConsumers/ContextDefinitionConsumer.h"
 
 class ContextDefinitionState : public CommentState
 {
@@ -10,6 +11,8 @@ public:
     ContextDefinitionState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier );
 
     shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
+private:
+    ContextDefinitionConsumer consumer;
 };
 
 

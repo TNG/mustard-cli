@@ -2,7 +2,8 @@
 #include "FileDefinitionState.h"
 
 DiffHeaderState::DiffHeaderState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier )
-    : listener ( commentStateListener ), CommentState ( commentStateListener, new LineConsumer, lineClassifier ) {}
+    : listener ( commentStateListener ), CommentState ( commentStateListener, consumer, lineClassifier ),
+      consumer() {}
 
 shared_ptr<CommentState> DiffHeaderState::traverse ( LineClassifier::LineType lineType )
 {

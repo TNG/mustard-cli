@@ -5,7 +5,8 @@
 
 FileDefinitionState::FileDefinitionState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier )
     : listener ( commentStateListener ),
-      CommentState ( commentStateListener, new FileDefinitionConsumer ( commentStateListener ), lineClassifier ) {}
+      CommentState ( commentStateListener, consumer, lineClassifier ),
+      consumer ( commentStateListener ) {}
 
 shared_ptr<CommentState> FileDefinitionState::traverse ( LineClassifier::LineType lineType )
 {

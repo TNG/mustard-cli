@@ -34,6 +34,28 @@ Zeile 5
     EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
 
+TEST_F ( CommentAppenderTest, Unit_AppendsCommentWithIdToFile )
+{
+    testEnv.run ( "echo Zeile 1 >> datei" );
+    testEnv.run ( "echo Zeile 2 >> datei" );
+    testEnv.run ( "echo Zeile 3 >> datei" );
+    testEnv.run ( "echo Zeile 4 >> datei" );
+    testEnv.run ( "echo Zeile 5 >> datei" );
+    const string datei (
+            R"(Zeile 1
+Zeile 2
+Zeile 3
+Zeile 4
+/*~imgrundm@1234321~
+ * Dies ist ein Kommentar */
+Zeile 5
+)");
+    Comments comments({{"datei", {{4,"Dies ist ein Kommentar","imgrundm",{},1234321}}}});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(),testEnv.run("cat datei").getOutput().c_str());
+}
+
 TEST_F(CommentAppenderTest, Unit_AppendsMultipleCommentsToFile) {
     testEnv.run("echo Zeile 1 >> datei");
     testEnv.run("echo Zeile 2 >> datei");
@@ -187,6 +209,33 @@ Zeile 5
                                        ((LineComment) {0, "allerdings", "replyMan", {}})
                                })}
     }});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
+}
+
+TEST_F(CommentAppenderTest, Unit_AppendsRepliesIndentedWithId) {
+    testEnv.run("echo Zeile 1 >> datei");
+    testEnv.run("echo Zeile 2 >> datei");
+    testEnv.run("echo Zeile 3 >> datei");
+    testEnv.run("echo Zeile 4 >> datei");
+    testEnv.run("echo Zeile 5 >> datei");
+    const string datei(
+            R"(Zeile 1
+Zeile 2
+Zeile 3
+Zeile 4
+/*~imgrundm@1~
+ * Dies ist ein doofer Reim.
+ *        ~replyMan@2~
+ *         allerdings */
+Zeile 5
+)");
+    Comments comments({{"datei",
+                               {LineComment(4, "Dies ist ein doofer Reim.", "imgrundm",{
+                                       ((LineComment) {0, "allerdings", "replyMan", {},2})
+                               },1)}
+                       }});
     comments.accept(commentAppender);
     commentAppender.finish();
     EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());

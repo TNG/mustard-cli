@@ -6,8 +6,8 @@ FileDefinitionConsumer::FileDefinitionConsumer ( CommentStateListener *listener 
 void FileDefinitionConsumer::consume ( const string &line )
 {
     static RegexMatcher fileName ( R"(^\+\+\+ b/(.*)$)" );
-    string extractedFileName = fileName.getSingleCaptureIn ( line );
-    if ( !extractedFileName.empty() ) {
-        listener->newFile ( extractedFileName );
+    const auto extractedFileName = fileName.getSingleCaptureIn ( line );
+    if ( extractedFileName.has_value() ) {
+        listener->newFile ( extractedFileName.value() );
     }
 }
