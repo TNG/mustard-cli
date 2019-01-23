@@ -7,11 +7,11 @@
 #include "../LineConsumer.h"
 
 using namespace std;
+
 class MultiLineCommentConsumer : public LineConsumer
 {
 public:
-    MultiLineCommentConsumer ( CommentStateListener *listener );
-public:
+    MultiLineCommentConsumer ( CommentStateListener *listener, MultiLineCommentConsumer *inReplyTo = nullptr );
     void consume ( const string &line ) override;
 
     optional<long> getId() {
@@ -24,6 +24,7 @@ private:
     CommentStateListener *listener;
     string comment;
     optional<unsigned long> id;
+    MultiLineCommentConsumer *inReplyTo;
     bool foreignComment = false;
 
     void extractId ( const string &line );

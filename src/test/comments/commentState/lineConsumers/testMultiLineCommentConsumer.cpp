@@ -13,7 +13,7 @@ private:
         void newFile ( const string &fileName ) override {}
         void newLine() override {}
         void newPhantomLine() override {}
-        void newComment ( const string &author, const string &comment ) override {}
+        void newComment ( const string &author, const string &comment, optional<unsigned long> replyToId ) override {}
         void setLine ( int i ) override {}
     };
     TestCommentListener testListener;

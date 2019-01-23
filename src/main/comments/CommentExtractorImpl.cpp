@@ -104,7 +104,13 @@ void CommentExtractorImpl::setLine ( int lineNumber )
     currentLine = lineNumber - phantomLines;
 }
 
-void CommentExtractorImpl::newComment ( const string &author, const string &comment )
+void CommentExtractorImpl::newComment ( const string &author, const string &comment, optional<unsigned long> inReplyTo )
 {
-    currentLineComments.push_back ( {currentLine, comment, author} );
+    if ( inReplyTo.has_value() ) {
+        currentLineComments.emplace_back ( ( LineComment ) {
+            currentLine, comment, author, {}, inReplyTo
+        } );
+        return;
+    }
+    currentLineComments.emplace_back ( currentLine, comment, author );
 }

@@ -75,6 +75,8 @@ set(SOURCES
         src/main/comments/commentState/states/FileDefinitionState.h
         src/main/comments/commentState/states/FileDiffState.cpp
         src/main/comments/commentState/states/FileDiffState.h
+        src/main/comments/commentState/states/MultiLineCommentReplyState.cpp
+        src/main/comments/commentState/states/MultiLineCommentReplyState.h
         src/main/comments/commentState/states/MultiLineCommentState.cpp
         src/main/comments/commentState/states/MultiLineCommentState.h
         src/main/credentials/CredentialProvider.h

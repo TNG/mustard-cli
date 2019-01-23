@@ -9,6 +9,9 @@ map <LineClassifier::LineType, regex> LineClassifier::lineTypeRegexes = {
     {ADDFILE,           regex ( "^\\+\\+\\+.*" ) },
     {C_STYLE_SINGLE_LINE_COMMENT, regex ( R"(^\+\s*/\*~.*\\*/)" ) },
     {MULTILINECOMMENT_START, regex ( R"(^\+\s*/\*~.*)" ) },
+    {REPLY_AND_END, regex ( R"(.*@reply.*\*/.*)" ) },
+    {REPLY_START, regex ( R"(.*@reply.*)" ) },
+    {COMMENT_ID_START, regex ( R"(^\+\s*\*\s*~.*@\d*~.*)" ) },
     {MULTILINECOMMENT_END, regex ( "^\\+.*\\*/" ) },
     {ADDLINE,           regex ( "^\\+.*" ) },
     {DELLINE,           regex ( "^\\-.*" ) }

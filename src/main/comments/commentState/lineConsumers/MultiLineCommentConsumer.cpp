@@ -1,7 +1,9 @@
 #include "MultiLineCommentConsumer.h"
 #include "../RegexMatcher.h"
 
-MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *listener ) : listener ( listener ) {}
+MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *listener, MultiLineCommentConsumer *inReplyTo ) :
+    listener ( listener ),
+    inReplyTo ( inReplyTo ) {}
 
 void MultiLineCommentConsumer::consume ( const string &line )
 {
@@ -13,12 +15,11 @@ void MultiLineCommentConsumer::consume ( const string &line )
     if ( regex_match ( line, foreignCommentRegex ) ) {
         extractId ( line );
         foreignComment = true;
-        return;
     }
     if ( !comment.empty() ) {
         comment += "\n";
     }
-    static RegexMatcher commentOnly ( R"(^\+\s*(?:/\*~|\*)?\s*((?:[^\*]*|\*[^/])*)(?:\*/)?$)" );
+    static RegexMatcher commentOnly ( R"(^\+\s*(?:/\*~|\*)?\s*(?:@\w+\s*)?((?:[^\*]*|\*[^/])*)(?:\*/)?$)" );
     const auto commentString = commentOnly.getSingleCaptureIn ( line );
     comment += commentString.value_or ( "" );
 }
@@ -26,7 +27,11 @@ void MultiLineCommentConsumer::consume ( const string &line )
 void MultiLineCommentConsumer::finishScope()
 {
     if ( !foreignComment && !comment.empty() ) {
-        listener->newComment ( "", comment );
+        optional<unsigned long >replyToId;
+        if ( inReplyTo != nullptr ) {
+            replyToId = inReplyTo->getId();
+        }
+        listener->newComment ( "", comment, replyToId );
     }
     comment = "";
 }

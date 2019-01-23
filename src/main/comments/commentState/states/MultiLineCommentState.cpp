@@ -14,6 +14,11 @@ shared_ptr<CommentState> MultiLineCommentState::traverse ( LineClassifier::LineT
     if ( lastLineEncountered ) {
         return ( make_shared<FileDiffState> ( listener, lineClassifier ) )->traverse ( lineType );
     }
+    if ( lineType == LineClassifier::REPLY_START || lineType == LineClassifier::REPLY_AND_END ) {
+        return  ( make_shared<MultiLineCommentReplyState> ( &consumer, listener, lineClassifier ) )->traverse (
+                    lineType == LineClassifier::REPLY_AND_END ? LineClassifier::MULTILINECOMMENT_END : lineType
+                );
+    }
     if ( lineType == LineClassifier::MULTILINECOMMENT_END ) {
         lastLineEncountered = true;
     }
@@ -23,4 +28,4 @@ shared_ptr<CommentState> MultiLineCommentState::traverse ( LineClassifier::LineT
 MultiLineCommentState::MultiLineCommentState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier,
         MultiLineCommentConsumer *inReplyTo )
     : CommentState ( commentStateListener, consumer, lineClassifier ),
-      consumer ( commentStateListener ) {}
+      consumer ( commentStateListener, inReplyTo ) {}
