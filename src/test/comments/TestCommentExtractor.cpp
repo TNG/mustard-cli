@@ -213,6 +213,62 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultiLineCommentsMixedWithNor
     EXPECT_TRUE ( commentInLineFiveteen.isMatching() );
 }
 
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultiLineCommentsSplitOverContexts )
+{
+    const string diffWithMultiLineComment = R"(diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt
+index 7f8b793..c85a0c3 100644
+--- a/subdir/subsubdir/file.txt
++++ b/subdir/subsubdir/file.txt
+@@ -1,5 +1,6 @@
+ File with line 1
+ File with line 2
++/*~ comment on 2*/
+ File with line 3
+ File with line 4
+ File with line 5
+@@ -10,6 +11,8 @@ File with line 9
+ File with line 10
+ File with line 11
+ File with line 12
++/*~
++ * comment on 12*/
+ File with line 13
+ File with line 14
+ File with line 15
+@@ -17,4 +20,5 @@ File with line 16
+ File with line 17
+ File with line 18
+ File with line 19
++/*~ comment on 19*/
+)";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLine2 ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 2 )
+               && ( lineComment.getComment() == "comment on 2" );
+    } );
+
+    CommentMatcher commentInLine12 ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 12 )
+               && ( lineComment.getComment() == "comment on 12" );
+    } );
+
+    CommentMatcher commentInLine19 ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 19 )
+               && ( lineComment.getComment() == "comment on 19" );
+    } );
+
+    resultingComments.accept ( commentInLine2 );
+    resultingComments.accept ( commentInLine12 );
+    resultingComments.accept ( commentInLine19 );
+    EXPECT_TRUE ( commentInLine2.isMatching() );
+    EXPECT_TRUE ( commentInLine12.isMatching() );
+    EXPECT_TRUE ( commentInLine19.isMatching() );
+}
+
+
 TEST_F ( CommentExtractorTest, Unit_TestExtraction_TwoMultinlineCommentsOnSameLineAreFine )
 {
     const string diffWithMultiLineComment =

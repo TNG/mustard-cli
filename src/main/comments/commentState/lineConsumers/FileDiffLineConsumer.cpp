@@ -13,6 +13,10 @@ void FileDiffLineConsumer::consume ( const string &line )
     static RegexMatcher cStyleCommentMatcher ( R"(^\+.*/\*~\s*([^~]*)\*/$)" );
 
     if ( cStyleCommentMatcher.isMatching ( line ) ) {
+        static RegexMatcher phantomLine ( R"(^\+.*)" );
+        if ( phantomLine.isMatching ( line ) ) {
+            listener->newPhantomLine();
+        }
         addCommentIfMatching ( line, cStyleCommentMatcher );
         return;
     }

@@ -23,6 +23,7 @@ private:
 
     void newFile ( const string &fileName ) override;
     void newLine() override;
+    void newPhantomLine() override;
     void newComment ( const string &author, const string &comment ) override;
     void setLine ( int lineNumber ) override;
 
@@ -37,6 +38,7 @@ private:
 
     string currentFile;
     unsigned int currentLine;
+    unsigned int phantomLines;
     vector<LineComment> currentLineComments;
     vector<FileComments> fileComments;
 };

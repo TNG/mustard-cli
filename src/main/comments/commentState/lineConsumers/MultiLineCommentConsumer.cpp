@@ -5,6 +5,10 @@ MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *liste
 
 void MultiLineCommentConsumer::consume ( const string &line )
 {
+    static RegexMatcher phantomLine ( R"(^\+.*)" );
+    if ( phantomLine.isMatching ( line ) ) {
+        listener->newPhantomLine();
+    }
 
     static regex foreignCommentRegex ( R"(^\+\s*/\*~.*~.*)" );
     if ( foreignComment ||  regex_match ( line, foreignCommentRegex ) ) {

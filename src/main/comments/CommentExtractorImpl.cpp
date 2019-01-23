@@ -85,6 +85,7 @@ void CommentExtractorImpl::newFile ( const string &fileName )
     currentFile = fileName;
     currentLineComments.clear();
     currentLine = 1;
+    phantomLines = 0;
 }
 
 
@@ -93,9 +94,14 @@ void CommentExtractorImpl::newLine()
     ++currentLine;
 }
 
+void CommentExtractorImpl::newPhantomLine()
+{
+    ++phantomLines;
+}
+
 void CommentExtractorImpl::setLine ( int lineNumber )
 {
-    currentLine = lineNumber;
+    currentLine = lineNumber - phantomLines;
 }
 
 void CommentExtractorImpl::newComment ( const string &author, const string &comment )
