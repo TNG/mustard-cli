@@ -11,13 +11,13 @@
     cmake ..
     make -j4
 ## Usage
- Involve mustard with no arguments to get current set of commands.
+ Invoke mustard with no arguments to get current set of commands.
  ### mustard autoconf
  On the first run in a repo new to mustard, autoconf tries to guess the BitBucket server location by the origin's remote
  URL. These settings will be persisted in the git config of the repository, using the following values:
  
     [mustard]
-           bitbucket = bitbucket.server.com
+           bitbucket = bitbucket.example.com
            repositorySlug = mustard
            projectKey = someProject
            userName = yourUser
