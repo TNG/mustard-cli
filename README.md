@@ -2,6 +2,7 @@
 ## Installation
 ### Requirements
 - Google Test libraries
+- RapidJson
 - Libsecret if you want to persist your credentials to your session keyring
 ### Build steps
     git submodule update --init --recursive
