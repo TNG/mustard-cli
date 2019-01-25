@@ -36,10 +36,9 @@
     echo "Hello World\n"; //~This is a comment on a line
     
     echo "Some other line\n";
-    /*~ This is a multiLineComment.
-     *  Keep in mind that a multiLineComment is assumed to be inserted on a line by
-     *  yourself, not in the original code to post comments below the multiline comment
-     *  onto the right code line.*/
+    /*~ This is a multiLineComment
+     *  Keep in mind to insert a new line and do not re-use an empty one.
+     *  If you re-used an existing line, the comments below may be posted on the wrong lines. */
      
    #### Replying to comments
    You can extend an existing multiline comment section marked to contain the comment of another author starting by @reply:
