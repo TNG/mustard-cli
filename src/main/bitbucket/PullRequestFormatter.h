@@ -11,9 +11,9 @@ public:
     static string format ( const PullRequest &pullRequest );
 
 private:
-    static ostream &bold_on ( ostream &os );
+    static ostream &formatBold ( ostream &stream );
 
-    static ostream &bold_off ( ostream &os );
+    static ostream &formatNormal ( ostream &stream );
     static string formatUser ( const User &user );
     static string symbol ( ReviewStatus status );
 };
