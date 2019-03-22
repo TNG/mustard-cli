@@ -58,8 +58,8 @@
 - SSL Certificate of BitBucket server is not being checked
 - mustard cannot cope with a BitBucket server that is not on 'origin'
 - comments on whole files are not working
+- on PRs with conflicts, comments on files with conflicts are not properly displayed/added
 - obsolete comments and comments on single commits are not being displayed
-- still needs google-test libraries in path instead of redistributing it along
 - username is not being normalized on first input, might be case sensitive depending on BitBucket Installation
 
      
