@@ -2,6 +2,7 @@
 #include "StartReviewWorkflow.h"
 #include "../bitbucket/PullRequestFormatter.h"
 #include "../comments/CommentAppender.h"
+#include "../error/MustardException.h"
 
 StartReviewWorkflow::StartReviewWorkflow ( BitBucketClient *bitBucketClient, GitClient *gitClient ) :
     bitBucketClient ( DependentOn<BitBucketClient> ( bitBucketClient ) ),
@@ -15,8 +16,11 @@ int StartReviewWorkflow::run ( int argc, const char **argv )
     cout << PullRequestFormatter::format ( pullRequest );
 
     Commitish pullRequestTarget = bitBucketClient->getPullRequestTargetFor ( headCommit );
-    Commitish baseCommit = gitClient->getMergeBase ( headCommit, pullRequestTarget );
-    gitClient->reset ( baseCommit );
+    gitClient->reset ( pullRequestTarget, true );
+    if ( !gitClient->merge ( headCommit ) ) {
+        printf ( "***You are reviewing a pull request with a merge-conflict***\n***Comments on files with merge conflict are not supported***\n" );
+    }
+    gitClient->reset ( pullRequestTarget );
 
     const Comments comments = bitBucketClient->getCommentsFor ( pullRequest );
 
