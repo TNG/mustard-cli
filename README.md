@@ -1,4 +1,4 @@
-#Mustard - A Bitbucket CLI
+# Mustard - A Bitbucket CLI
 ## Installation
 ### Requirements
 - RapidJson
