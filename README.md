@@ -62,4 +62,5 @@
 - obsolete comments and comments on single commits are not being displayed
 - username is not being normalized on first input, might be case sensitive depending on BitBucket Installation
 
-     
+## License
+mustard CLI is licensed under the [Apache 2.0 License]( https://www.apache.org/licenses/LICENSE-2.0 )
