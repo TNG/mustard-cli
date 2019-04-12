@@ -1,6 +1,5 @@
 #ifndef MUSTARD_GITCLIENT_H
 #define MUSTARD_GITCLIENT_H
-#include <gmock/gmock.h>
 
 #include "Commitish.h"
 
