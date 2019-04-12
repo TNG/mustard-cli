@@ -89,9 +89,9 @@ Credentials BitBucketConfiguration::askUserForCredentials()
 
 void BitBucketConfiguration::toggleConsoleEcho()
 {
-    termios oldt;
-    tcgetattr ( STDIN_FILENO, &oldt );
-    termios newt = oldt;
-    newt.c_lflag &= ~ECHO;
-    tcsetattr ( STDIN_FILENO, TCSANOW, &newt );
+    termios oldTerminalSettings;
+    tcgetattr ( STDIN_FILENO, &oldTerminalSettings );
+    termios newTerminalSettings = oldTerminalSettings;
+    newTerminalSettings.c_lflag &= ~ECHO;
+    tcsetattr ( STDIN_FILENO, TCSANOW, &newTerminalSettings );
 }

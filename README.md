@@ -1,8 +1,8 @@
-#Mustard - A Bitbucket CLI
+# Mustard - A Bitbucket CLI
 ## Installation
 ### Requirements
-- Google Test libraries
 - RapidJson
+- libCurl
 - Libsecret if you want to persist your credentials to your session keyring
 ### Build steps
     git submodule update --init --recursive
@@ -11,13 +11,13 @@
     cmake ..
     make -j4
 ## Usage
- Involve mustard with no arguments to get current set of commands.
+ Invoke mustard with no arguments to get current set of commands.
  ### mustard autoconf
  On the first run in a repo new to mustard, autoconf tries to guess the BitBucket server location by the origin's remote
  URL. These settings will be persisted in the git config of the repository, using the following values:
  
     [mustard]
-           bitbucket = bitbucket.server.com
+           bitbucket = bitbucket.example.com
            repositorySlug = mustard
            projectKey = someProject
            userName = yourUser
@@ -36,10 +36,9 @@
     echo "Hello World\n"; //~This is a comment on a line
     
     echo "Some other line\n";
-    /*~ This is a multiLineComment.
-     *  Keep in mind that a multiLineComment is assumed to be inserted on a line by
-     *  yourself, not in the original code to post comments below the multiline comment
-     *  onto the right code line.*/
+    /*~ This is a multiLineComment
+     *  Keep in mind to insert a new line and do not re-use an empty one.
+     *  If you re-used an existing line, the comments below may be posted on the wrong lines. */
      
    #### Replying to comments
    You can extend an existing multiline comment section marked to contain the comment of another author starting by @reply:
@@ -59,8 +58,9 @@
 - SSL Certificate of BitBucket server is not being checked
 - mustard cannot cope with a BitBucket server that is not on 'origin'
 - comments on whole files are not working
+- on PRs with conflicts, comments on files with conflicts are not properly displayed/added
 - obsolete comments and comments on single commits are not being displayed
-- still needs google-test libraries in path instead of redistributing it along
 - username is not being normalized on first input, might be case sensitive depending on BitBucket Installation
 
-     
+## License
+mustard CLI is licensed under the [Apache 2.0 License]( https://www.apache.org/licenses/LICENSE-2.0 )

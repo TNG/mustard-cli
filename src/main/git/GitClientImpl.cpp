@@ -56,7 +56,6 @@ string GitClientImpl::getDiff()
     return commandResult.getOutput();
 }
 
-//CommandResult commandResult = commandRunner->run ( "git rev-parse $(git branch -vv|grep \\*|sed -r 's/^[^[]*\\[([^]:]*)[]:].*/\\1/')" );
 Commitish GitClientImpl::getFeatureBranchOnOrigin()
 {
     CommandResult commandResult = commandRunner->run (
@@ -65,4 +64,10 @@ Commitish GitClientImpl::getFeatureBranchOnOrigin()
         throw GitClientException ( "Could not determine feature branch head - maybe you are on a non tracking branch?" );
     }
     return Commitish ( commandResult.getOutputStripNewline() );
+}
+
+bool GitClientImpl::merge ( const Commitish &branch )
+{
+    const auto result = commandRunner->run ( "git merge --no-commit " + branch );
+    return result.getReturnCode() == 0;
 }

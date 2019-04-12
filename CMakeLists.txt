@@ -4,8 +4,11 @@ project(mustard)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE DEBUG)
 
+add_subdirectory(lib/googletest)
+
+option(BUILD_CPR_TESTS "" OFF)
+option(USE_SYSTEM_CURL "" ON)
 add_subdirectory(lib/cpr)
-add_subdirectory(lib/gmock-1.7.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 find_package(LibSecret)

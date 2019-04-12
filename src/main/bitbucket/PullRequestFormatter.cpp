@@ -4,7 +4,7 @@
 string PullRequestFormatter::format ( const PullRequest &pullRequest )
 {
     stringstream ss;
-    ss << " *** " << bold_on << pullRequest.title << bold_off << " *** " << endl;
+    ss << " *** " << formatBold << pullRequest.title << formatNormal << " *** " << endl;
     ss << pullRequest.description << endl << endl;
     ss << "author:        " << formatUser ( pullRequest.author ) << endl;
     ss << "reviewers: ";
@@ -25,14 +25,14 @@ string PullRequestFormatter::format ( const PullRequest &pullRequest )
     return ss.str();
 }
 
-std::ostream &PullRequestFormatter::bold_on ( std::ostream &os )
+std::ostream &PullRequestFormatter::formatBold ( std::ostream &stream )
 {
-    return os << "\e[1m";
+    return stream << "\e[1m";
 }
 
-std::ostream &PullRequestFormatter::bold_off ( std::ostream &os )
+std::ostream &PullRequestFormatter::formatNormal ( std::ostream &stream )
 {
-    return os << "\e[0m";
+    return stream << "\e[0m";
 }
 
 string PullRequestFormatter::symbol ( ReviewStatus status )
@@ -50,6 +50,6 @@ string PullRequestFormatter::symbol ( ReviewStatus status )
 string PullRequestFormatter::formatUser ( const User &user )
 {
     stringstream ss;
-    ss << bold_on << user.displayName << bold_off << " <" <<  user.eMail << ">";
+    ss << formatBold << user.displayName << formatNormal << " <" <<  user.eMail << ">";
     return ss.str();
 }

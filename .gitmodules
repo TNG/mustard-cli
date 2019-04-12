@@ -1,6 +1,6 @@
-[submodule "lib/poorMansDi"]
-	path = lib/poorMansDi
-	url = ssh://git@bitbucket.int.tngtech.com:122/~imgrundm/poormansdi.git
 [submodule "lib/cpr"]
 	path = lib/cpr
 	url = https://github.com/whoshuu/cpr.git
+[submodule "lib/googletest"]
+	path = lib/googletest
+	url = https://github.com/google/googletest.git
