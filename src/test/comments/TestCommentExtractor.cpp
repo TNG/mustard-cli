@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <utility>
 #include <functional>
 #include "GitClientForTest.h"

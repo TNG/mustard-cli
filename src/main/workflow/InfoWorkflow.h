@@ -1,10 +1,12 @@
 #ifndef MUSTARD_INFOWORKFLOW_H
 #define MUSTARD_INFOWORKFLOW_H
 
-
+#include <iostream>
 #include "Workflow.h"
 #include "../bitbucket/BitBucketClient.h"
 #include "../git/GitClient.h"
+
+using namespace std;
 
 class InfoWorkflow : public Workflow
 {

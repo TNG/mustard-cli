@@ -1,0 +1,24 @@
+language: cpp
+compiler: clang
+
+os: linux
+dist: xenial
+
+env: COMPILER=clang++-6.0 BUILD_TYPE=Debug GSL_CXX_STANDARD=17
+
+addons:
+  apt:
+    update: true
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+before_install:
+  - wget "https://launchpad.net/ubuntu/+source/rapidjson/1.1.0+dfsg2-3/+build/14513429/+files/rapidjson-dev_1.1.0+dfsg2-3_all.deb"
+  - sudo dpkg -i rapidjson*.deb
+script:
+  - mkdir build
+  - cd build
+  - cmake .. -DRAPIDJSON_BUILD_CXX11=OFF
+  - make
+  - ./mustard_tests

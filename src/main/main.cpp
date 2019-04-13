@@ -1,8 +1,10 @@
-
+#include <iostream>
 #include "workflow/StartReviewWorkflow.h"
 #include "error/MustardException.h"
 #include "workflow/WorkflowFactory.h"
 #include "workflow/WorkflowException.h"
+
+using namespace std;
 
 void printUsage ( WorkflowFactory &factory );
 
