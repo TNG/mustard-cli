@@ -1,7 +1,8 @@
+[![Build Status](https://travis-ci.org/TNG/mustard-cli.svg?branch=release)](https://travis-ci.org/TNG/mustard-cli)
 # Mustard - A Bitbucket CLI
 ## Installation
 ### Requirements
-- RapidJson
+- RapidJson >= 1.1.0
 - libCurl
 - Libsecret if you want to persist your credentials to your session keyring
 ### Build steps

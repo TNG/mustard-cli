@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 project(mustard)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_compile_options("-std=c++17")
 set(CMAKE_BUILD_TYPE DEBUG)
 
 add_subdirectory(lib/googletest)
@@ -117,6 +120,7 @@ set(SOURCES
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
 target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES})
+target_compile_features(mustard PUBLIC cxx_std_17)
 
 set(TEST_SOURCES
         ${SOURCES}
@@ -138,4 +142,4 @@ set(TEST_SOURCES
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})
-
+target_compile_features(mustard_tests PUBLIC cxx_std_17)

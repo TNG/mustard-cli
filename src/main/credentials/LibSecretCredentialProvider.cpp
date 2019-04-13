@@ -1,14 +1,14 @@
 #include <Provide.h>
-#include <glib.h>
 #include "LibSecretCredentialProvider.h"
 #include "CredentialProvider.h"
 
 #ifndef WITH_LIBSECRET
-ProvideDepedendency<CredentialProvider> credentialProvider;
+ProvideDependency<CredentialProvider> credentialProvider;
 #endif
 
 #ifdef WITH_LIBSECRET
 
+#include <glib.h>
 #include <libsecret/secret.h>
 #include <Depend.h>
 

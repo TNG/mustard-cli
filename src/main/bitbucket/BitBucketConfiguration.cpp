@@ -1,8 +1,14 @@
 #include <Depend.h>
 #include <Provide.h>
 #include <termios.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <sstream>
+#include <iostream>
 #include "BitBucketConfiguration.h"
 #include "../git/GitClientException.h"
+
+using namespace std;
 
 ProvideDependency<BitBucketConfiguration> bitBucketConfigurationDependency;
 

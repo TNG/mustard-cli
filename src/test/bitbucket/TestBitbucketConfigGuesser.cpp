@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include "../comments/GitClientForTest.h"
 #include "../../main/bitbucket/BitBucketConfigGuesser.h"
 
