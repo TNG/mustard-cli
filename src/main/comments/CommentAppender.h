@@ -23,7 +23,8 @@ private:
     void insertSingleLineComment ( vector<string> &vector, const LineComment &comment );
     regex getIndentationRegexForIndentationLevel ( unsigned int indentationLevel );
 
-    void formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel );
+    void formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel,
+                         optional<unsigned long> inReplyTo );
 };
 
 

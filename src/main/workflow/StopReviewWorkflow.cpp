@@ -73,11 +73,16 @@ void StopReviewWorkflow::printCommentSummary ( const Comments &comments ) const
     class : public CommentConsumer
     {
         void consume ( const string &file, const LineComment &lineComment ) {
+            lineComment.forEachReply ( [this, &file] ( const LineComment & lineComment ) {
+                consume ( file, lineComment );
+            } );
+            if ( !lineComment.getAuthor().empty() ) {
+                return;
+            }
             if ( lastFile != file ) {
                 lastFile = file;
                 printf ( "---- %s ----\n", file.c_str() );
             }
-
             static regex newline ( "\n" );
             const string commentIndented = regex_replace ( lineComment.getComment(), newline, "\n\t" );
             printf ( "%6.u\t%s\n", lineComment.getLine(), commentIndented.c_str() );

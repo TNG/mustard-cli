@@ -11,9 +11,9 @@ public:
     virtual void newFile ( const string &fileName ) = 0;
     virtual void newLine() = 0;
     virtual void newPhantomLine() = 0;
-    virtual void newComment ( const string &author, const string &comment, optional<unsigned long> replyToId ) = 0;
+    virtual void newComment ( const string &author, const string &comment, optional <unsigned long> id, optional<unsigned long> replyToId ) = 0;
     void newComment ( const string &author, const string &comment ) {
-        newComment ( author, comment, {} );
+        newComment ( author, comment, {}, {} );
     }
     virtual void setLine ( int i ) = 0;
 };

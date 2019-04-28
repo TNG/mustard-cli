@@ -104,13 +104,35 @@ void CommentExtractorImpl::setLine ( int lineNumber )
     currentLine = lineNumber - phantomLines;
 }
 
-void CommentExtractorImpl::newComment ( const string &author, const string &comment, optional<unsigned long> inReplyTo )
+void CommentExtractorImpl::newComment ( const string &author, const string &comment, optional<unsigned long> id, optional<unsigned long> inReplyTo )
 {
     if ( inReplyTo.has_value() ) {
-        currentLineComments.emplace_back ( ( LineComment ) {
-            currentLine, comment, author, {}, inReplyTo
-        } );
+        auto &parentComment = findCommentWithId ( inReplyTo.value() );
+        parentComment.addReply ( LineComment ( currentLine, comment, author, id, {} ) );
         return;
     }
-    currentLineComments.emplace_back ( currentLine, comment, author );
+    currentLineComments.push_back ( LineComment ( currentLine, comment, author, id, {} ) );
+}
+
+LineComment &CommentExtractorImpl::findCommentWithId ( unsigned long id )
+{
+    for ( auto &lineComment : currentLineComments ) {
+        if ( auto found = findCommentWithIdIn ( lineComment, id ) ) {
+            return *found;
+        }
+    }
+    throw MustardException ( "Could not resolve a comment reference." );
+}
+
+LineComment *CommentExtractorImpl::findCommentWithIdIn ( LineComment &comment, unsigned long id )
+{
+    if ( comment.getId() == id ) {
+        return &comment;
+    }
+    for ( auto &innerComment : comment.getReplies() ) {
+        if ( auto found = findCommentWithIdIn ( innerComment, id ) ) {
+            return found;
+        }
+    }
+    return nullptr;
 }

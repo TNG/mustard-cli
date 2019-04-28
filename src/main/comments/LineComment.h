@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 #ifndef MUSTARD_LINECOMMENT_H
 #define MUSTARD_LINECOMMENT_H
 
@@ -7,6 +9,7 @@
 #include <vector>
 #include <sstream>
 #include <optional>
+#include <functional>
 
 using namespace std;
 
@@ -14,14 +17,14 @@ class LineComment
 {
 public:
     LineComment ( const unsigned int line,
-                  const string &comment,
-                  const string &author = "",
-                  const vector<LineComment> &replies = {},
-                  optional<unsigned long> id = {} )
+                  string comment,
+                  string author = "",
+                  optional<unsigned long> id = {},
+                  vector<LineComment> replies = {} )
         : line ( line ),
-          comment ( comment ),
-          author ( author ),
-          replies ( replies ),
+          comment ( std::move ( comment ) ),
+          author ( std::move ( author ) ),
+          replies ( std::move ( replies ) ),
           id ( move ( id ) ) {}
 
     unsigned int getLine() const {
@@ -36,8 +39,16 @@ public:
         return author;
     }
 
+    vector<LineComment> &getReplies() {
+        return replies;
+    }
+
     const vector<LineComment> &getReplies() const {
         return replies;
+    }
+
+    void addReply ( const LineComment &lineComment ) {
+        replies.push_back ( lineComment );
     }
 
     const optional<unsigned long> &getId() const {
@@ -46,18 +57,24 @@ public:
 
     const string getAuthorAndId() const {
         if ( !id.has_value() ) {
-            return getAuthor();
+            return "@author(" + getAuthor() + ")";
         }
         stringstream ss;
-        ss << getAuthor() << "@" << getId().value();
+        ss << "@author(" << getAuthor() << ") @id(" << getId().value() << ")";
         return ss.str();
+    }
+
+    void forEachReply ( std::function<void ( const LineComment & ) > lineCommentFunction ) const {
+        for ( auto &reply : replies ) {
+            lineCommentFunction ( reply );
+        }
     }
 
 private:
     const unsigned int line;
     const string comment;
     const string author;
-    const vector<LineComment> replies;
+    vector<LineComment> replies;
     const optional<unsigned long> id;
 };
 

@@ -11,11 +11,10 @@ public:
     MultiLineCommentState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier );
     virtual shared_ptr<CommentState> traverse ( LineClassifier::LineType lineType ) override;
 
-protected:
     MultiLineCommentState ( CommentStateListener *commentStateListener, LineClassifier *lineClassifier,
                             MultiLineCommentConsumer *inReplyTo );
 
-private:
+protected:
     bool lastLineEncountered = false;
     MultiLineCommentConsumer consumer;
 };

@@ -59,7 +59,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoNotCaptureAutoInsertedComme
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //~imgrundm~ - Nice line\n";
+                        "+File with line 4 //~@author(imgrundm)~ - Nice line\n";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -80,7 +80,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoCaptureCommentsAfterAutoins
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //~imgrundm~ Nice line//~indeed!\n";
+                        "+File with line 4 //~@author(imgrundm)~ Nice line//~indeed!\n";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -366,7 +366,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CommentsAtEndOfDiffFileWithou
     EXPECT_TRUE ( anotherCommentInLineTen.isMatching() );
 }
 
-TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignMultilineComments )
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesTakeForeignMultilineComments )
 {
     const string diffWithMultiLineComment =
         "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
@@ -380,7 +380,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignMultilineCo
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
 
     Comments resultingComments = commentExtractor.extract();
-    EXPECT_TRUE ( resultingComments.isEmpty() );
+    EXPECT_FALSE ( resultingComments.isEmpty() );
 }
 
 TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignSinglelineComments )
@@ -410,7 +410,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractReplies )
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~author@42~\n"
+        "+/*~@author(author) @id(42)~\n"
         "+ * foreign comment\n"
         "+ * @reply very interesting comment*/\n"
         " File with line 11\n"
@@ -425,7 +425,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractReplies )
     } );
     matcher.check ( "comment content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "very interesting comment";
+        return lineComment.getReplies()[0].getComment() == "very interesting comment";
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
@@ -442,7 +442,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractRepliesMultiLined )
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~author@42~\n"
+        "+/*~@author(author) @id(42)~\n"
         "+ * foreign comment\n"
         "+ * @reply\n"
         "+ * and so trivial indeed.*/\n"
@@ -458,7 +458,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractRepliesMultiLined )
     } );
     matcher.check ( "comment content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "and so trivial indeed.";
+        return lineComment.getReplies()[0].getComment() == "and so trivial indeed.";
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
@@ -475,9 +475,9 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToReplies )
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~imgrundm@17365~\n"
+        "+/*~@author(imgrundm) @id(17365)~\n"
         "+ * der folgende Kommentar ist viel zu lang!\n"
-        "+ *        ~imgrundm@17366~\n"
+        "+ *        ~@author(imgrundm) @id(17366) @inReplyTo(17365)~\n"
         "+ *         finde ich nicht!\n"
         "+ * @reply doch, ist so. */\n"
         " File with line 11\n"
@@ -489,11 +489,11 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToReplies )
     CommentMatcher matcher;
     matcher.check ( "reply content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "doch, ist so. ";
+        return lineComment.getReplies()[0].getReplies()[0].getComment() == "doch, ist so. ";
     } );
     matcher.check ( "reply id",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getId().value() == 17366;
+        return lineComment.getReplies()[0].getId().value() == 17366;
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
@@ -510,12 +510,12 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToRepliesInMiddleOfS
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~imgrundm@17365~\n"
+        "+/*~author(imgrundm) @id(17365)~\n"
         "+ * der folgende Kommentar ist viel zu lang!\n"
-        "+ *        ~imgrundm@17366~\n"
+        "+ *        ~@author(imgrundm) @id(17366) @inReplyTo(17365)~\n"
         "+ *         finde ich nicht!\n"
         "+ *         @reply und wie!\n"
-        "+ *        ~imgrundm@17367~\n"
+        "+ *        ~@author(imgrundm) @id(17367) @inReplyTo(17365)~\n"
         "+ *         doch ist er!\n"
         "+ *         Du kannst ja auch nochmal im style nachschlagen. */\n"
         " File with line 11\n"
@@ -527,11 +527,12 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToRepliesInMiddleOfS
     CommentMatcher matcher;
     matcher.check ( "reply content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "und wie!";
+        return lineComment.getReplies().size() == 2 &&
+        lineComment.getReplies()[0].getReplies()[0].getComment() == "und wie!";
     } );
-    matcher.check ( "reply id",
+    matcher.check ( "id",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getId().value() == 17366;
+        return lineComment.getId().value() == 17365;
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
