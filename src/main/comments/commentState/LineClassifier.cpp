@@ -11,7 +11,7 @@ map <LineClassifier::LineType, regex> LineClassifier::lineTypeRegexes = {
     {MULTILINECOMMENT_START, regex ( R"(^\+\s*/\*~.*)" ) },
     {REPLY_AND_END, regex ( R"(.*@reply.*\*/.*)" ) },
     {REPLY_START, regex ( R"(.*@reply.*)" ) },
-    {COMMENT_ID_START, regex ( R"(^\+.*@author\(\w+\).*)" ) },
+    {COMMENT_ID_START, regex ( R"(^\+.*@author\([^\)]+\).*)" ) },
     {MULTILINECOMMENT_END, regex ( "^\\+.*\\*/" ) },
     {ADDLINE,           regex ( "^\\+.*" ) },
     {DELLINE,           regex ( "^\\-.*" ) }

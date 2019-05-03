@@ -538,6 +538,23 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToRepliesInMiddleOfS
     EXPECT_TRUE ( matcher.isMatching() );
 }
 
-
-
-
+TEST_F(CommentExtractorTest, Unit_FullRepliesWithNonAlphabetUserNames){
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..cdc23e0 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -8,6 +8,9 @@ File with line 7\n"
+            " File with line 8\n"
+            " File with line 9\n"
+            " File with line 10\n"
+            "+/*~@author(Hans.Eimer) @id(55181)~\n"
+            "+ * Wenn Du das machst, dann...\n"
+            "+ *        ~@author(Bans.Zweimer) @id(55185) @inReplyTo(55181)~\n"
+            "+ *         Erledigt. */\n"
+            " File with line 11\n"
+            " File with line 12\n"
+            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+    auto extractedComments = commentExtractor.extract(); //without reference error...
+}
