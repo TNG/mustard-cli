@@ -24,7 +24,9 @@ private:
     void newFile ( const string &fileName ) override;
     void newLine() override;
     void newPhantomLine() override;
-    void newComment ( const string &author, const string &comment, optional<unsigned long> inReplyTo = {} ) override;
+    void newComment ( const string &author, const string &comment, optional<unsigned long> id, optional<unsigned long> inReplyTo ) override;
+    LineComment &findCommentWithId ( unsigned long id );
+    LineComment *findCommentWithIdIn ( LineComment &comment, unsigned long id );
     void setLine ( int lineNumber ) override;
 
     vector<string> getDiffLines();

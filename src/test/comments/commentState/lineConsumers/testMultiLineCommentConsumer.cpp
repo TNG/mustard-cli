@@ -13,7 +13,7 @@ private:
         void newFile ( const string &fileName ) override {}
         void newLine() override {}
         void newPhantomLine() override {}
-        void newComment ( const string &author, const string &comment, optional<unsigned long> replyToId ) override {}
+        void newComment ( const string &author, const string &comment, optional<unsigned long> id, optional<unsigned long> replyToId ) override {}
         void setLine ( int i ) override {}
     };
     TestCommentListener testListener;
@@ -34,7 +34,7 @@ TEST_F ( TestMultiLineCommentConsumer, Unit_DoesNotCrashOnMalformedId )
 
 TEST_F ( TestMultiLineCommentConsumer, Unit_extractsId )
 {
-    multiLineCommentConsumer.consume ( "+/*~author@1234321~ blubb" );
+    multiLineCommentConsumer.consume ( "+/*~@author(author) @id(1234321)~ blubb" );
     ASSERT_TRUE ( multiLineCommentConsumer.getId().has_value() );
     ASSERT_EQ ( 1234321L, multiLineCommentConsumer.getId().value() );
 }

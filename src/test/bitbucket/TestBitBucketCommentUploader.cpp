@@ -50,7 +50,12 @@ TEST_F ( BitBucketCommentUpdaterTest, Unit_postsToCorrectUrl )
 
 TEST_F ( BitBucketCommentUpdaterTest, Unit_repliesCorrectly )
 {
-    Comments comments ( {FileComments ( {"file", {LineComment ( 42, "text", "", {}, 41 ) }} ) } );
+    Comments comments ( {FileComments ( {"file", {LineComment ( 42, "whatever", "whoever", 41, {
+                    LineComment ( 42, "text", "" )
+                } )
+            }
+        } )
+    } );
     const char *expectedPostJson = "{\"text\":\"text\",\"anchor\":{\"line\":42,\"lineType\":\"ADDED\",\"fileType\":\"TO\",\"path\":\"file\",\"srcPath\":\"file\"},\"parent\":{\"id\":41}}";
     EXPECT_CALL ( httpClient, post ( _, StrEq ( expectedPostJson ) ) ).WillOnce ( Return ( HttpResponse() ) );
     comments.accept ( commentUploader );

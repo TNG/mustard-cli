@@ -144,7 +144,7 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
 
         const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
         const string path = commentAnchor["path"].GetString();
-        commentsFromBitBucket[path].push_back ( {line, text, author, replies, id} );
+        commentsFromBitBucket[path].push_back ( {line, text, author, id, replies} );
     }
     vector<FileComments> fileComments;
     for ( const auto &commentFromBitBucket : commentsFromBitBucket ) {
@@ -167,8 +167,8 @@ vector<LineComment> BitBucketClientImpl::extractReplies ( const Document::ValueT
                                    0,
                                    reply["text"].GetString(),
                                    reply["author"]["name"].GetString(),
-                                   extractReplies ( reply ),
-                                   reply["id"].GetInt64()
+                                   reply["id"].GetInt64(),
+                                   extractReplies ( reply )
                                ) );
     }
     return replies;

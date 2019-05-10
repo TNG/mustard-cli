@@ -19,11 +19,7 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
     const Commitish originFeatureHead = gitClient->getFeatureBranchOnOrigin();
     gitClient->reset ( originFeatureHead );
     const Comments comments = commentExtractor->extract();
-    if ( comments.isEmpty() ) {
-        printf ( "You did not make any comments.\n" );
-    } else {
-        handleCommentUpload ( originFeatureHead, comments );
-    }
+    handleCommentUpload ( originFeatureHead, comments );
 
     if ( UserConfirmation ( "Should I reset the feature branch and discard all of your review changes?" ).askUser() ==
             YES ) {
@@ -50,7 +46,11 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
 
 void StopReviewWorkflow::handleCommentUpload ( const Commitish &originFeatureHead, const Comments &comments ) const
 {
-    printCommentSummary ( comments );
+    const unsigned int encounteredComments = printCommentSummary ( comments );
+    if ( encounteredComments == 0 ) {
+        cout << "You did not make any comments." << endl;
+        return;
+    }
 
     if ( UserConfirmation ( "Do you want to upload these comments now?" ).askUser() == NO ) {
         cout << "will not upload comments" << endl;
@@ -68,23 +68,33 @@ void StopReviewWorkflow::handleCommentUpload ( const Commitish &originFeatureHea
     printf ( "Visit Bitbucket pull-request under:  %s\n", pullRequest.url.c_str() );
 }
 
-void StopReviewWorkflow::printCommentSummary ( const Comments &comments ) const
+unsigned int StopReviewWorkflow::printCommentSummary ( const Comments &comments ) const
 {
     class : public CommentConsumer
     {
-        void consume ( const string &file, const LineComment &lineComment ) {
+    public:
+        void consume ( const string &file, const LineComment &lineComment ) override {
+            lineComment.forEachReply ( [this, &file] ( const LineComment & lineComment ) {
+                consume ( file, lineComment );
+            } );
+            if ( !lineComment.getAuthor().empty() ) {
+                return;
+            }
             if ( lastFile != file ) {
                 lastFile = file;
                 printf ( "---- %s ----\n", file.c_str() );
             }
-
             static regex newline ( "\n" );
             const string commentIndented = regex_replace ( lineComment.getComment(), newline, "\n\t" );
             printf ( "%6.u\t%s\n", lineComment.getLine(), commentIndented.c_str() );
+            ++this->encounteredComments;
         }
 
+        unsigned int encounteredComments = 0;
     private:
         string lastFile = "";
     } consumer;
     comments.accept ( consumer );
+    return consumer.encounteredComments;
+
 }

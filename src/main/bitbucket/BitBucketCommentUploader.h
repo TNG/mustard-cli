@@ -14,6 +14,7 @@ public:
     BitBucketCommentUploader ( PullRequest pullRequest, HttpClient *httpClient = nullptr,  BitBucketConfiguration *bitBucketConfiguration = nullptr );
 
     void consume ( const string &file, const LineComment &lineComment ) override;
+    void consume ( const string &file, const LineComment &lineComment, optional<unsigned long> inReplyTo );
     unsigned int getUploadedCommentNumber() {
         return uploaded;
     }
@@ -34,6 +35,9 @@ private:
 
     unsigned int uploaded = 0;
     unsigned int seen = 0;
+
+    void uploadComment ( const string &file, unsigned int line, const string &comment,
+                         const optional<unsigned long> inReplyTo );
 };
 
 

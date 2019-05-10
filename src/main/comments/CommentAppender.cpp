@@ -60,12 +60,13 @@ void CommentAppender::insertMultiLineComment ( vector<string> &fileLines, const 
     string &originalLine = fileLines[comment.getLine() - 1];
     stringstream ss;
     ss << endl << "/*";
-    formatComment ( comment, ss, 0 );
+    formatComment ( comment, ss, 0, optional<unsigned long>() );
     ss << " */";
     fileLines[comment.getLine() - 1] += ss.str();
 }
 
-void CommentAppender::formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel )
+void CommentAppender::formatComment ( const LineComment &comment, stringstream &ss, unsigned int indentationLevel,
+                                      optional<unsigned long> inReplyTo )
 {
     string indentation;
     for ( int i = 0; i < indentationLevel * indentationDepth ; ++i ) {
@@ -73,10 +74,15 @@ void CommentAppender::formatComment ( const LineComment &comment, stringstream &
     }
     const string indentingReplace = "\n * " + indentation + "$1";
     const string replacedNewLines = regex_replace ( comment.getComment(), getIndentationRegexForIndentationLevel ( indentationLevel ), indentingReplace );
-    ss << indentation << "~" << comment.getAuthorAndId() << "~" << replacedNewLines ;
+    ss << indentation << "~"
+       << comment.getAuthorAndId();
+    if ( inReplyTo.has_value() ) {
+        ss << " @inReplyTo(" << inReplyTo.value() << ")";
+    }
+    ss << "~" << replacedNewLines ;
     for ( const auto &reply : comment.getReplies() ) {
         ss << endl << " *";
-        formatComment ( reply, ss, indentationLevel + 1 );
+        formatComment ( reply, ss, indentationLevel + 1, comment.getId() );
     }
 }
 
@@ -91,6 +97,3 @@ regex CommentAppender::getIndentationRegexForIndentationLevel ( unsigned int ind
     return regex ( regexSs.str() );
 }
 
-//string CommentAppender::formatComment( const LineComment &comment ){
-
-//}
