@@ -21,7 +21,7 @@ private:
     GitClient *gitClient;
     BitBucketClient *bitBucketClient;
 
-    void printCommentSummary ( const Comments &comments ) const;
+    unsigned int printCommentSummary ( const Comments &comments ) const;
 
     void handleCommentUpload ( const Commitish &originFeatureHead, const Comments &comments ) const;
 };
