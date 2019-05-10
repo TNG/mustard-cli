@@ -27,12 +27,14 @@ void MultiLineCommentConsumer::consume ( const string &line )
         }
     }
     string lineWithoutTags = tagExtractor->removeTagsFrom ( line );
-    if ( !comment.empty() ) {
-        comment += "\n";
-    }
     static RegexMatcher commentOnly ( R"(^\+[\s*~/]*((?:[^\*]*|\*[^/])*)(?:\*/)?$)" );
     const auto commentString = commentOnly.getSingleCaptureIn ( lineWithoutTags );
-    comment += commentString.value_or ( "" );
+    if ( commentString.has_value() && !commentString.value().empty() ) {
+        if ( !comment.empty() ) {
+            comment += "\n";
+        }
+        comment += commentString.value_or ( "" );
+    }
 }
 
 void MultiLineCommentConsumer::finishScope()

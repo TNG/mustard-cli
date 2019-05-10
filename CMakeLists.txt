@@ -135,6 +135,7 @@ set(TEST_SOURCES
         src/test/comments/TestCommentExtractor.cpp
         src/test/comments/TestTagExtractor.cpp
         src/test/comments/commentState/lineConsumers/testMultiLineCommentConsumer.cpp
+        src/test/comments/commentState/TestLineClassifier.cpp
         src/test/git/GitTestEnvironment.cpp
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp

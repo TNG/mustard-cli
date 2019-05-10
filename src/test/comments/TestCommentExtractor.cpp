@@ -383,6 +383,32 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesTakeForeignMultilineComme
     EXPECT_FALSE ( resultingComments.isEmpty() );
 }
 
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultilineComments_EmptyLineIsIgnored )
+{
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..8fff734 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -10,0 +11,2 @@ File with line 10\n"
+            "+/*~ This comment\n"
+            "+ *\n"
+            "+ * has been made by someone\n"
+            "+ *\n"
+            "+ */\n"
+            "context line after comment\n";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+    CommentMatcher matcher;
+    matcher.check ( "comment content",
+                    [] ( auto file, auto lineComment ) {
+                        return lineComment.getComment() == "This comment\nhas been made by someone";
+                    } );
+    resultingComments.accept(matcher);
+    EXPECT_TRUE (matcher.isMatching() );
+}
+
 TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignSinglelineComments )
 {
     const string diffWithMultiLineComment =
@@ -557,4 +583,40 @@ TEST_F(CommentExtractorTest, Unit_FullRepliesWithNonAlphabetUserNames){
             " File with line 13";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
     auto extractedComments = commentExtractor.extract(); //without reference error...
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_ConsecutiveSimpleLineComments )
+{
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..64adcc1 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -8,6 +8,11 @@ File with line 7\n"
+            " File with line 8\n"
+            " File with line 9\n"
+            "-File with line 10\n"
+            "+File with line 10//~ comment 1\n"
+            "-File with line 11\n"
+            "+File with line 11//~ comment 2\n"
+            " File with line 12\n"
+            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+
+    CommentMatcher commentInLineTen ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 10 )
+               && ( file == "subdir/subsubdir/file.txt" )
+               && ( lineComment.getComment() == "comment 1" );
+    } );
+    CommentMatcher commentInLineEleven ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 11 )
+               && ( file == "subdir/subsubdir/file.txt" )
+                  && ( lineComment.getComment() == "comment 2" );
+    } );
+    resultingComments.accept ( commentInLineTen );
+    resultingComments.accept ( commentInLineEleven );
+    EXPECT_TRUE ( commentInLineTen.isMatching() );
+    EXPECT_TRUE ( commentInLineEleven.isMatching() );
 }
