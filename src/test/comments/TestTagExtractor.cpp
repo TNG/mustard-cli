@@ -64,3 +64,11 @@ TEST_F ( TestTagExtractor, Unit_several_tags_with_and_without_value_are_parsed )
     EXPECT_STREQ ( "replyTo", tagList[2].name.c_str() );
     EXPECT_STREQ ( "4", tagList[2].value.value().c_str() );
 }
+
+TEST_F ( TestTagExtractor, Unit_tagWithValueWithSpacesIsParsed )
+{
+    const auto &tagList = tagExtractor.extractTagsIn ( "//~ @author(Maximilian Imgrund)" );
+    ASSERT_EQ ( 1, tagList.size() );
+    EXPECT_STREQ ( "author", tagList[0].name.c_str() );
+    EXPECT_STREQ ( "Maximilian Imgrund", tagList[0].value.value().c_str() );
+}

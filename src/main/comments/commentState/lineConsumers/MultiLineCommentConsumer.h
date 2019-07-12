@@ -5,6 +5,7 @@
 #include "../CommentStateListener.h"
 #include "../LineConsumer.h"
 #include "../../../comments/TagExtractor.h"
+#include "../../Todo.h"
 
 using namespace std;
 
@@ -27,6 +28,7 @@ private:
     optional<unsigned long> id = {};
     optional<unsigned long> inReplyToId = {};
     optional<string> author = {};
+    vector<Todo> todos = {};
 
     MultiLineCommentConsumer *inReplyTo;
     TagExtractor *tagExtractor;

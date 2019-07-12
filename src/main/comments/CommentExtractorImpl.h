@@ -25,6 +25,7 @@ private:
     void newLine() override;
     void newPhantomLine() override;
     void newComment ( const string &author, const string &comment, optional<unsigned long> id, optional<unsigned long> inReplyTo ) override;
+    void withTodos ( vector<Todo> &todos );
     LineComment &findCommentWithId ( unsigned long id );
     LineComment *findCommentWithIdIn ( LineComment &comment, unsigned long id );
     void setLine ( int lineNumber ) override;

@@ -58,6 +58,7 @@ set(SOURCES
         src/main/comments/FileComments.h
         src/main/comments/LineComment.cpp
         src/main/comments/LineComment.h
+        src/main/comments/Todo.h
         src/main/comments/Tag.h
         src/main/comments/TagExtractor.cpp
         src/main/comments/TagExtractor.h

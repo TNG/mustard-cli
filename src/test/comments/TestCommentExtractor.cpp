@@ -620,3 +620,35 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_ConsecutiveSimpleLineComments
     EXPECT_TRUE ( commentInLineTen.isMatching() );
     EXPECT_TRUE ( commentInLineEleven.isMatching() );
 }
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractTodos )
+{
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..cdc23e0 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -8,6 +8,9 @@ File with line 7\n"
+            " File with line 8\n"
+            " File with line 9\n"
+            " File with line 10\n"
+            "+/*~@author(author) @id(42)~\n"
+            "+ * foreign comment\n"
+            "+ * @todo(remove this thing)*/\n"
+            " File with line 11\n"
+            " File with line 12\n"
+            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+    CommentMatcher matcher;
+    matcher.check ( "replyId", [] ( auto file, auto lineComment ) {
+        return lineComment.getId() == 42;
+    } );
+    matcher.check ( "todo content",
+                    [] ( auto file, auto lineComment ) {
+                        return lineComment.getTodos()[0].text == "remove this thing";
+                    } );
+    resultingComments.accept ( matcher );
+    EXPECT_TRUE ( matcher.isMatching() );
+}
