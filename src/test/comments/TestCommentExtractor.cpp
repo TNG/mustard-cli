@@ -59,7 +59,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoNotCaptureAutoInsertedComme
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //~imgrundm~ - Nice line\n";
+                        "+File with line 4 //~@author(imgrundm)~ - Nice line\n";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -80,7 +80,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoCaptureCommentsAfterAutoins
                         "+++ b/subdir/subsubdir/file.txt\n"
                         "@@ -4 +4 @@ File with line 3\n"
                         "-File with line 4\n"
-                        "+File with line 4 //~imgrundm~ Nice line//~indeed!\n";
+                        "+File with line 4 //~@author(imgrundm)~ Nice line//~indeed!\n";
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diff ) );
 
     Comments resultingComments = commentExtractor.extract();
@@ -366,7 +366,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CommentsAtEndOfDiffFileWithou
     EXPECT_TRUE ( anotherCommentInLineTen.isMatching() );
 }
 
-TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignMultilineComments )
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesTakeForeignMultilineComments )
 {
     const string diffWithMultiLineComment =
         "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
@@ -380,7 +380,33 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignMultilineCo
     EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
 
     Comments resultingComments = commentExtractor.extract();
-    EXPECT_TRUE ( resultingComments.isEmpty() );
+    EXPECT_FALSE ( resultingComments.isEmpty() );
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_MultilineComments_EmptyLineIsIgnored )
+{
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..8fff734 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -10,0 +11,2 @@ File with line 10\n"
+            "+/*~ This comment\n"
+            "+ *\n"
+            "+ * has been made by someone\n"
+            "+ *\n"
+            "+ */\n"
+            "context line after comment\n";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+    CommentMatcher matcher;
+    matcher.check ( "comment content",
+                    [] ( auto file, auto lineComment ) {
+                        return lineComment.getComment() == "This comment\nhas been made by someone";
+                    } );
+    resultingComments.accept(matcher);
+    EXPECT_TRUE (matcher.isMatching() );
 }
 
 TEST_F ( CommentExtractorTest, Unit_TestExtraction_DoesNotTakeForeignSinglelineComments )
@@ -410,7 +436,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractReplies )
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~author@42~\n"
+        "+/*~@author(author) @id(42)~\n"
         "+ * foreign comment\n"
         "+ * @reply very interesting comment*/\n"
         " File with line 11\n"
@@ -425,7 +451,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractReplies )
     } );
     matcher.check ( "comment content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "very interesting comment";
+        return lineComment.getReplies()[0].getComment() == "very interesting comment";
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
@@ -442,7 +468,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractRepliesMultiLined )
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~author@42~\n"
+        "+/*~@author(author) @id(42)~\n"
         "+ * foreign comment\n"
         "+ * @reply\n"
         "+ * and so trivial indeed.*/\n"
@@ -458,7 +484,7 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractRepliesMultiLined )
     } );
     matcher.check ( "comment content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "and so trivial indeed.";
+        return lineComment.getReplies()[0].getComment() == "and so trivial indeed.";
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
@@ -475,9 +501,9 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToReplies )
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~imgrundm@17365~\n"
+        "+/*~@author(imgrundm) @id(17365)~\n"
         "+ * der folgende Kommentar ist viel zu lang!\n"
-        "+ *        ~imgrundm@17366~\n"
+        "+ *        ~@author(imgrundm) @id(17366) @inReplyTo(17365)~\n"
         "+ *         finde ich nicht!\n"
         "+ * @reply doch, ist so. */\n"
         " File with line 11\n"
@@ -489,11 +515,11 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToReplies )
     CommentMatcher matcher;
     matcher.check ( "reply content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "doch, ist so. ";
+        return lineComment.getReplies()[0].getReplies()[0].getComment() == "doch, ist so. ";
     } );
     matcher.check ( "reply id",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getId().value() == 17366;
+        return lineComment.getReplies()[0].getId().value() == 17366;
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
@@ -510,12 +536,12 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToRepliesInMiddleOfS
         " File with line 8\n"
         " File with line 9\n"
         " File with line 10\n"
-        "+/*~imgrundm@17365~\n"
+        "+/*~author(imgrundm) @id(17365)~\n"
         "+ * der folgende Kommentar ist viel zu lang!\n"
-        "+ *        ~imgrundm@17366~\n"
+        "+ *        ~@author(imgrundm) @id(17366) @inReplyTo(17365)~\n"
         "+ *         finde ich nicht!\n"
         "+ *         @reply und wie!\n"
-        "+ *        ~imgrundm@17367~\n"
+        "+ *        ~@author(imgrundm) @id(17367) @inReplyTo(17365)~\n"
         "+ *         doch ist er!\n"
         "+ *         Du kannst ja auch nochmal im style nachschlagen. */\n"
         " File with line 11\n"
@@ -527,16 +553,102 @@ TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanAnswerToRepliesInMiddleOfS
     CommentMatcher matcher;
     matcher.check ( "reply content",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getComment() == "und wie!";
+        return lineComment.getReplies().size() == 2 &&
+        lineComment.getReplies()[0].getReplies()[0].getComment() == "und wie!";
     } );
-    matcher.check ( "reply id",
+    matcher.check ( "id",
     [] ( auto file, auto lineComment ) {
-        return lineComment.getId().value() == 17366;
+        return lineComment.getId().value() == 17365;
     } );
     resultingComments.accept ( matcher );
     EXPECT_TRUE ( matcher.isMatching() );
 }
 
+TEST_F(CommentExtractorTest, Unit_FullRepliesWithNonAlphabetUserNames){
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..cdc23e0 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -8,6 +8,9 @@ File with line 7\n"
+            " File with line 8\n"
+            " File with line 9\n"
+            " File with line 10\n"
+            "+/*~@author(Hans.Eimer) @id(55181)~\n"
+            "+ * Wenn Du das machst, dann...\n"
+            "+ *        ~@author(Bans.Zweimer) @id(55185) @inReplyTo(55181)~\n"
+            "+ *         Erledigt. */\n"
+            " File with line 11\n"
+            " File with line 12\n"
+            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+    auto extractedComments = commentExtractor.extract(); //without reference error...
+}
 
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_ConsecutiveSimpleLineComments )
+{
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..64adcc1 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -8,6 +8,11 @@ File with line 7\n"
+            " File with line 8\n"
+            " File with line 9\n"
+            "-File with line 10\n"
+            "+File with line 10//~ comment 1\n"
+            "-File with line 11\n"
+            "+File with line 11//~ comment 2\n"
+            " File with line 12\n"
+            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
 
+    Comments resultingComments = commentExtractor.extract();
 
+    CommentMatcher commentInLineTen ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 10 )
+               && ( file == "subdir/subsubdir/file.txt" )
+               && ( lineComment.getComment() == "comment 1" );
+    } );
+    CommentMatcher commentInLineEleven ( [] ( const string & file, const LineComment & lineComment ) {
+        return ( lineComment.getLine() == 11 )
+               && ( file == "subdir/subsubdir/file.txt" )
+                  && ( lineComment.getComment() == "comment 2" );
+    } );
+    resultingComments.accept ( commentInLineTen );
+    resultingComments.accept ( commentInLineEleven );
+    EXPECT_TRUE ( commentInLineTen.isMatching() );
+    EXPECT_TRUE ( commentInLineEleven.isMatching() );
+}
+
+TEST_F ( CommentExtractorTest, Unit_TestExtraction_CanExtractTodos )
+{
+    const string diffWithMultiLineComment =
+            "diff --git a/subdir/subsubdir/file.txt b/subdir/subsubdir/file.txt\n"
+            "index 7f8b793..cdc23e0 100644\n"
+            "--- a/subdir/subsubdir/file.txt\n"
+            "+++ b/subdir/subsubdir/file.txt\n"
+            "@@ -8,6 +8,9 @@ File with line 7\n"
+            " File with line 8\n"
+            " File with line 9\n"
+            " File with line 10\n"
+            "+/*~@author(author) @id(42)~\n"
+            "+ * foreign comment\n"
+            "+ * @todo(remove this thing)*/\n"
+            " File with line 11\n"
+            " File with line 12\n"
+            " File with line 13";
+    EXPECT_CALL ( gitClient, getDiff() ).WillOnce ( Return ( diffWithMultiLineComment ) );
+
+    Comments resultingComments = commentExtractor.extract();
+    CommentMatcher matcher;
+    matcher.check ( "replyId", [] ( auto file, auto lineComment ) {
+        return lineComment.getId() == 42;
+    } );
+    matcher.check ( "todo content",
+                    [] ( auto file, auto lineComment ) {
+                        return lineComment.getTodos()[0].text == "remove this thing";
+                    } );
+    resultingComments.accept ( matcher );
+    EXPECT_TRUE ( matcher.isMatching() );
+}

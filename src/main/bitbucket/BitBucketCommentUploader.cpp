@@ -18,14 +18,35 @@ BitBucketCommentUploader::BitBucketCommentUploader ( PullRequest pullRequest,
 
 void BitBucketCommentUploader::consume ( const string &file, const LineComment &lineComment )
 {
+    if ( lineComment.getAuthor().empty() ) {
+        uploadComment ( file, lineComment.getLine(), lineComment.getComment(), {} );
+    } else {
+        consume ( file, lineComment, lineComment.getId() );
+    }
+}
+
+void BitBucketCommentUploader::consume ( const string &file, const LineComment &lineComment,
+        optional<unsigned long> inReplyTo )
+{
+    if ( lineComment.getAuthor().empty() ) {
+        uploadComment ( file, lineComment.getLine(), lineComment.getComment(), inReplyTo );
+    }
+    lineComment.forEachReply ( [this, &file, &lineComment] ( const LineComment & comment ) {
+        consume ( file, comment, lineComment.getId() );
+    } );
+}
+
+void BitBucketCommentUploader::uploadComment ( const string &file, unsigned int line, const string &comment,
+        const optional<unsigned long> inReplyTo )
+{
     ++seen;
     const string postUrl = getCommentPostUrl();
-    const string json = serializeComment ( file, lineComment.getLine(), lineComment.getComment(), lineComment.getId() );
-    auto respone = httpClient->post ( postUrl, json );
-    if ( respone.successful ) {
+    const string json = serializeComment ( file, line, comment, inReplyTo );
+    auto response = httpClient->post ( postUrl, json );
+    if ( response.successful ) {
         ++uploaded;
     } else {
-        printf ( "Could not upload comment '%s'\n", lineComment.getComment().c_str() );
+        printf ( "Could not upload comment '%s'\n", comment.c_str() );
     }
 }
 

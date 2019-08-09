@@ -58,6 +58,10 @@ set(SOURCES
         src/main/comments/FileComments.h
         src/main/comments/LineComment.cpp
         src/main/comments/LineComment.h
+        src/main/comments/Todo.h
+        src/main/comments/Tag.h
+        src/main/comments/TagExtractor.cpp
+        src/main/comments/TagExtractor.h
         src/main/comments/commentState/CommentState.h
         src/main/comments/commentState/CommentStateListener.h
         src/main/comments/commentState/LineClassifier.cpp
@@ -81,8 +85,6 @@ set(SOURCES
         src/main/comments/commentState/states/FileDefinitionState.h
         src/main/comments/commentState/states/FileDiffState.cpp
         src/main/comments/commentState/states/FileDiffState.h
-        src/main/comments/commentState/states/MultiLineCommentReplyState.cpp
-        src/main/comments/commentState/states/MultiLineCommentReplyState.h
         src/main/comments/commentState/states/MultiLineCommentState.cpp
         src/main/comments/commentState/states/MultiLineCommentState.h
         src/main/credentials/CredentialProvider.h
@@ -108,6 +110,8 @@ set(SOURCES
         src/main/workflow/AutoconfWorkflow.h
         src/main/workflow/InfoWorkflow.cpp
         src/main/workflow/InfoWorkflow.h
+        src/main/workflow/PasswdWorkflow.cpp
+        src/main/workflow/PasswdWorkflow.h
         src/main/workflow/StartReviewWorkflow.cpp
         src/main/workflow/StartReviewWorkflow.h
         src/main/workflow/StopReviewWorkflow.cpp
@@ -132,7 +136,9 @@ set(TEST_SOURCES
         src/test/comments/GitClientForTest.h
         src/test/comments/TestCommentAppender.cpp
         src/test/comments/TestCommentExtractor.cpp
+        src/test/comments/TestTagExtractor.cpp
         src/test/comments/commentState/lineConsumers/testMultiLineCommentConsumer.cpp
+        src/test/comments/commentState/TestLineClassifier.cpp
         src/test/git/GitTestEnvironment.cpp
         src/test/git/GitTestEnvironment.h
         src/test/git/TestGitClientImpl.cpp

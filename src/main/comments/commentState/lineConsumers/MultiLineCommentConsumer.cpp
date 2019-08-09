@@ -1,9 +1,11 @@
+#include <Depend.h>
 #include "MultiLineCommentConsumer.h"
 #include "../RegexMatcher.h"
 
-MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *listener, MultiLineCommentConsumer *inReplyTo ) :
+MultiLineCommentConsumer::MultiLineCommentConsumer ( CommentStateListener *listener, MultiLineCommentConsumer *inReplyTo, TagExtractor *tagExtractor ) :
     listener ( listener ),
-    inReplyTo ( inReplyTo ) {}
+    inReplyTo ( inReplyTo ),
+    tagExtractor ( DependentOn<TagExtractor> ( tagExtractor ) ) {}
 
 void MultiLineCommentConsumer::consume ( const string &line )
 {
@@ -11,36 +13,54 @@ void MultiLineCommentConsumer::consume ( const string &line )
     if ( phantomLine.isMatching ( line ) ) {
         listener->newPhantomLine();
     }
-    static regex foreignCommentRegex ( R"(^\+\s*/?\*\s*~.*~.*)" );
-    if ( regex_match ( line, foreignCommentRegex ) ) {
-        extractId ( line );
-        foreignComment = true;
+
+    vector<Tag> tagsOfLine = tagExtractor->extractTagsIn ( line );
+    for ( const auto &tag : tagsOfLine ) {
+        if ( tag.name == "id" && tag.value.has_value() ) {
+            id = atol ( tag.value.value().c_str() );
+            continue;
+        }
+        if ( tag.name == "inReplyTo" && tag.value.has_value() ) {
+            inReplyToId = atol ( tag.value.value().c_str() );
+            continue;
+        }
+        if ( tag.name == "author" && tag.value.has_value() ) {
+            author = tag.value;
+            continue;
+        }
+        if ( tag.name == "todo" && tag.value.has_value() ) {
+            todos.emplace_back ( ( Todo ) {
+                tag.value.value(), Todo::TODO
+            } );
+            continue;
+        }
+        if ( tag.name == "done" && tag.value.has_value() ) {
+            todos.emplace_back ( ( Todo ) {
+                tag.value.value(), Todo::DONE
+            } );
+            continue;
+        }
     }
-    if ( !comment.empty() ) {
-        comment += "\n";
+    string lineWithoutTags = tagExtractor->removeTagsFrom ( line );
+    static RegexMatcher commentOnly ( R"(^\+[\s*~/]*((?:[^\*]*|\*[^/])*)(?:\*/)?$)" );
+    const auto commentString = commentOnly.getSingleCaptureIn ( lineWithoutTags );
+    if ( commentString.has_value() && !commentString.value().empty() ) {
+        if ( !comment.empty() ) {
+            comment += "\n";
+        }
+        comment += commentString.value_or ( "" );
     }
-    static RegexMatcher commentOnly ( R"(^\+\s*(?:/\*~|\*)?\s*(?:@\w+\s*)?((?:[^\*]*|\*[^/])*)(?:\*/)?$)" );
-    const auto commentString = commentOnly.getSingleCaptureIn ( line );
-    comment += commentString.value_or ( "" );
 }
 
 void MultiLineCommentConsumer::finishScope()
 {
-    if ( !foreignComment && !comment.empty() ) {
-        optional<unsigned long >replyToId;
-        if ( inReplyTo != nullptr ) {
+    if ( !comment.empty() ) {
+        optional<unsigned long >replyToId = inReplyToId;
+        if ( !inReplyToId.has_value() && inReplyTo != nullptr ) {
             replyToId = inReplyTo->getId();
         }
-        listener->newComment ( "", comment, replyToId );
+        listener->newComment ( author.value_or ( "" ), comment, id, replyToId );
+        listener->withTodos ( todos );
     }
     comment = "";
-}
-
-void MultiLineCommentConsumer::extractId ( const string &line )
-{
-    static RegexMatcher commentId ( R"(^\+\s*/?\*\s*~[^@]*@(\d*)~.*)" );
-    const auto idString = commentId.getSingleCaptureIn ( line );
-    if ( idString.has_value() ) {
-        id = atol ( idString.value().c_str() );
-    }
 }

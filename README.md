@@ -24,6 +24,9 @@
            userName = yourUser
  Tip: If you have multiple repositories on your system that all share a bitbucket server and username, you can
  persist the settings for all repositories at once with git config --global.
+ ### mustard passwd
+ You can change your saved username and password using this command. Alternatively one may change it directly via libsecret,
+ for example using 'seahorse'.
  
  ### mustard info
  Searches for the pullrequest of the current checked out feature branch and displays basic information about it.

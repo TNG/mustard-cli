@@ -24,12 +24,13 @@ public:
         DELLINE,
         ENDOFFILE
     };
-    bool isLineOfType ( LineType lineType, const string &line );
 
     LineType classifyLine ( const string &line );
 
 private:
-    static map<LineType, regex> lineTypeRegexes;
+    static map<LineType, std::vector< regex>> lineTypeRegexes;
+
+    bool regexMatches ( const string &line, vector<regex> &regexList ) const ;
 };
 
 

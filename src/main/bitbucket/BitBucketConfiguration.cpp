@@ -87,6 +87,7 @@ Credentials BitBucketConfiguration::askUserForCredentials()
     cin >> username;
     cout << "password:";
     toggleConsoleEcho();
+    cout << "\n";
     cin.ignore();
     getline ( cin, password );
     toggleConsoleEcho();

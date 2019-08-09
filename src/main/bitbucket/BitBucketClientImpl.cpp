@@ -144,7 +144,11 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
 
         const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
         const string path = commentAnchor["path"].GetString();
-        commentsFromBitBucket[path].push_back ( {line, text, author, replies, id} );
+        LineComment lineComment = {line, text, author, id, replies};
+
+        addTodos ( lineComment, comment );
+
+        commentsFromBitBucket[path].push_back ( lineComment );
     }
     vector<FileComments> fileComments;
     for ( const auto &commentFromBitBucket : commentsFromBitBucket ) {
@@ -163,13 +167,15 @@ vector<LineComment> BitBucketClientImpl::extractReplies ( const Document::ValueT
         if ( !reply.HasMember ( "author" ) || !reply.HasMember ( "text" ) ) {
             continue;
         }
-        replies.emplace_back ( LineComment (
-                                   0,
-                                   reply["text"].GetString(),
-                                   reply["author"]["name"].GetString(),
-                                   extractReplies ( reply ),
-                                   reply["id"].GetInt64()
-                               ) );
+        LineComment lineComment ( 0,
+                                  reply["text"].GetString(),
+                                  reply["author"]["name"].GetString(),
+                                  reply["id"].GetInt64(),
+                                  extractReplies ( reply ) );
+
+        addTodos ( lineComment, reply );
+
+        replies.push_back ( lineComment );
     }
     return replies;
 }
@@ -197,5 +203,12 @@ void BitBucketClientImpl::approve ( const PullRequest &pullRequest, ReviewStatus
     const auto response = httpClient->put ( approvalUrl.str(), body.str() );
     if ( !response.successful ) {
         throw BitBucketClientException ( ( "Could not set approval status: " + response.body ).c_str() );
+    }
+}
+
+void BitBucketClientImpl::addTodos ( LineComment &comment, const Document::ValueType &bitBucketComment )
+{
+    for ( const auto &task : bitBucketComment["tasks"].GetArray() ) {
+        comment.addTodo ( {task["text"].GetString(), strcmp ( task["state"].GetString(), "OPEN" ) == 0 ? Todo::TODO : Todo::DONE} );
     }
 }
