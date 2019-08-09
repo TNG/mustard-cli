@@ -56,7 +56,7 @@ public:
         todos.push_back ( todo );
     }
 
-    const vector<Todo> &getTodos() {
+    const vector<Todo> &getTodos() const {
         return todos;
     }
 
