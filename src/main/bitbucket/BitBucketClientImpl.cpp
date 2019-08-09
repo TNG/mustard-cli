@@ -167,13 +167,15 @@ vector<LineComment> BitBucketClientImpl::extractReplies ( const Document::ValueT
         if ( !reply.HasMember ( "author" ) || !reply.HasMember ( "text" ) ) {
             continue;
         }
-        replies.emplace_back ( LineComment (
-                                   0,
-                                   reply["text"].GetString(),
-                                   reply["author"]["name"].GetString(),
-                                   reply["id"].GetInt64(),
-                                   extractReplies ( reply )
-                               ) );
+        LineComment lineComment ( 0,
+                                  reply["text"].GetString(),
+                                  reply["author"]["name"].GetString(),
+                                  reply["id"].GetInt64(),
+                                  extractReplies ( reply ) );
+
+        addTodos ( lineComment, reply );
+
+        replies.push_back ( lineComment );
     }
     return replies;
 }
