@@ -34,7 +34,7 @@ void MultiLineCommentConsumer::consume ( const string &line )
             } );
             continue;
         }
-        if ( tag.name == "resolve" && tag.value.has_value() ) {
+        if ( tag.name == "done" && tag.value.has_value() ) {
             todos.emplace_back ( ( Todo ) {
                 tag.value.value(), Todo::DONE
             } );

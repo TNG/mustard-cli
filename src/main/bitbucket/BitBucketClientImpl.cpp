@@ -144,7 +144,11 @@ Comments BitBucketClientImpl::extractCommentsFrom ( Document &document )
 
         const auto line = ( unsigned int ) commentAnchor["line"].GetInt();
         const string path = commentAnchor["path"].GetString();
-        commentsFromBitBucket[path].push_back ( {line, text, author, id, replies} );
+        LineComment lineComment = {line, text, author, id, replies};
+
+        addTodos ( lineComment, comment );
+
+        commentsFromBitBucket[path].push_back ( lineComment );
     }
     vector<FileComments> fileComments;
     for ( const auto &commentFromBitBucket : commentsFromBitBucket ) {
@@ -197,5 +201,12 @@ void BitBucketClientImpl::approve ( const PullRequest &pullRequest, ReviewStatus
     const auto response = httpClient->put ( approvalUrl.str(), body.str() );
     if ( !response.successful ) {
         throw BitBucketClientException ( ( "Could not set approval status: " + response.body ).c_str() );
+    }
+}
+
+void BitBucketClientImpl::addTodos ( LineComment &comment, const Document::ValueType &bitBucketComment )
+{
+    for ( const auto &task : bitBucketComment["tasks"].GetArray() ) {
+        comment.addTodo ( {task["text"].GetString(), strcmp ( task["state"].GetString(), "OPEN" ) == 0 ? Todo::TODO : Todo::DONE} );
     }
 }

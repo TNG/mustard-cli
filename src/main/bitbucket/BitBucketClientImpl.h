@@ -41,6 +41,8 @@ private:
     Document getDocument ( const HttpResponse &pullRequests );
 
     Comments extractCommentsFrom ( Document &document );
+
+    void addTodos ( LineComment &comment, const Document::ValueType &value );
 };
 
 
