@@ -42,8 +42,8 @@ void BitBucketCommentUploader::uploadComment ( const string &file, unsigned int 
     ++seen;
     const string postUrl = getCommentPostUrl();
     const string json = serializeComment ( file, line, comment, inReplyTo );
-    auto respone = httpClient->post ( postUrl, json );
-    if ( respone.successful ) {
+    auto response = httpClient->post ( postUrl, json );
+    if ( response.successful ) {
         ++uploaded;
     } else {
         printf ( "Could not upload comment '%s'\n", comment.c_str() );

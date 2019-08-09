@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <regex>
 #include "CommentAppender.h"
+#include "Todo.h"
 #include "../error/MustardException.h"
 
 void CommentAppender::consume ( const string &fileName, const LineComment &lineComment )
@@ -80,6 +81,10 @@ void CommentAppender::formatComment ( const LineComment &comment, stringstream &
         ss << " @inReplyTo(" << inReplyTo.value() << ")";
     }
     ss << "~" << replacedNewLines ;
+    for ( const auto &todo : comment.getTodos() ) {
+        const char *tagName = todo.status == Todo::TodoStatus::DONE ? "done" : "todo";
+        ss << endl << " * " << indentation << "@" << tagName << "(" << todo.text << ")";
+    }
     for ( const auto &reply : comment.getReplies() ) {
         ss << endl << " *";
         formatComment ( reply, ss, indentationLevel + 1, comment.getId() );

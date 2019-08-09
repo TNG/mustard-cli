@@ -136,3 +136,10 @@ LineComment *CommentExtractorImpl::findCommentWithIdIn ( LineComment &comment, u
     }
     return nullptr;
 }
+
+void CommentExtractorImpl::withTodos ( vector <Todo> &todos )
+{
+    for ( const auto &todo : todos ) {
+        currentLineComments.back().addTodo ( todo );
+    }
+}

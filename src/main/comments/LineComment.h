@@ -10,6 +10,7 @@
 #include <sstream>
 #include <optional>
 #include <functional>
+#include "Todo.h"
 
 using namespace std;
 
@@ -51,6 +52,14 @@ public:
         replies.push_back ( lineComment );
     }
 
+    void addTodo ( const Todo &todo ) {
+        todos.push_back ( todo );
+    }
+
+    const vector<Todo> &getTodos() const {
+        return todos;
+    }
+
     const optional<unsigned long> &getId() const {
         return id;
     }
@@ -75,6 +84,7 @@ private:
     const string comment;
     const string author;
     vector<LineComment> replies;
+    vector<Todo> todos;
     const optional<unsigned long> id;
 };
 

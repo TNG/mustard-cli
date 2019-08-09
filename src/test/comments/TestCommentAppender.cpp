@@ -290,3 +290,55 @@ TEST_F(CommentAppenderTest, Unit_AppendsCommentsBreaksLongLines) {
     commentAppender.finish();
     EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
 }
+
+TEST_F(CommentAppenderTest, Unit_AppendsTodos) {
+    testEnv.run("echo Zeile 1 >> datei");
+    testEnv.run("echo Zeile 2 >> datei");
+    testEnv.run("echo Zeile 3 >> datei");
+    testEnv.run("echo Zeile 4 >> datei");
+    testEnv.run("echo Zeile 5 >> datei");
+    const string datei(
+            R"(Zeile 1
+Zeile 2
+Zeile 3
+Zeile 4
+/*~@author(imgrundm)~
+ * Der Kommentar
+ * @todo(noch zu tun) */
+Zeile 5
+)");
+    LineComment lineComment = {4, "Der Kommentar", "imgrundm"};
+    lineComment.addTodo({"noch zu tun", Todo::TodoStatus::TODO});
+    Comments comments({{"datei", {
+                                        lineComment
+                                 }}});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
+}
+
+TEST_F(CommentAppenderTest, Unit_AppendsDones) {
+    testEnv.run("echo Zeile 1 >> datei");
+    testEnv.run("echo Zeile 2 >> datei");
+    testEnv.run("echo Zeile 3 >> datei");
+    testEnv.run("echo Zeile 4 >> datei");
+    testEnv.run("echo Zeile 5 >> datei");
+    const string datei(
+            R"(Zeile 1
+Zeile 2
+Zeile 3
+Zeile 4
+/*~@author(imgrundm)~
+ * Der Kommentar
+ * @done(Aufgabe) */
+Zeile 5
+)");
+    LineComment lineComment = {4, "Der Kommentar", "imgrundm"};
+    lineComment.addTodo({"Aufgabe", Todo::TodoStatus::DONE});
+    Comments comments({{"datei", {
+                                         lineComment
+                                 }}});
+    comments.accept(commentAppender);
+    commentAppender.finish();
+    EXPECT_STREQ(datei.c_str(), testEnv.run("cat datei").getOutput().c_str());
+}

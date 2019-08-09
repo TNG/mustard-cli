@@ -18,12 +18,27 @@ void MultiLineCommentConsumer::consume ( const string &line )
     for ( const auto &tag : tagsOfLine ) {
         if ( tag.name == "id" && tag.value.has_value() ) {
             id = atol ( tag.value.value().c_str() );
+            continue;
         }
         if ( tag.name == "inReplyTo" && tag.value.has_value() ) {
             inReplyToId = atol ( tag.value.value().c_str() );
+            continue;
         }
         if ( tag.name == "author" && tag.value.has_value() ) {
             author = tag.value;
+            continue;
+        }
+        if ( tag.name == "todo" && tag.value.has_value() ) {
+            todos.emplace_back ( ( Todo ) {
+                tag.value.value(), Todo::TODO
+            } );
+            continue;
+        }
+        if ( tag.name == "done" && tag.value.has_value() ) {
+            todos.emplace_back ( ( Todo ) {
+                tag.value.value(), Todo::DONE
+            } );
+            continue;
         }
     }
     string lineWithoutTags = tagExtractor->removeTagsFrom ( line );
@@ -45,6 +60,7 @@ void MultiLineCommentConsumer::finishScope()
             replyToId = inReplyTo->getId();
         }
         listener->newComment ( author.value_or ( "" ), comment, id, replyToId );
+        listener->withTodos ( todos );
     }
     comment = "";
 }

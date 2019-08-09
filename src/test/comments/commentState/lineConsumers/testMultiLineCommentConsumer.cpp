@@ -14,6 +14,7 @@ private:
         void newLine() override {}
         void newPhantomLine() override {}
         void newComment ( const string &author, const string &comment, optional<unsigned long> id, optional<unsigned long> replyToId ) override {}
+        void withTodos ( std::vector<Todo> &todos ) {}
         void setLine ( int i ) override {}
     };
     TestCommentListener testListener;
