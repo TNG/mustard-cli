@@ -4,6 +4,7 @@
 #include "StopReviewWorkflow.h"
 #include "InfoWorkflow.h"
 #include "AutoconfWorkflow.h"
+#include "PasswdWorkflow.h"
 
 map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors = {
     {
@@ -22,6 +23,10 @@ map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors =
     }, {"autoconf", []()
         {
             return new AutoconfWorkflow();
+        }
+    }, {"passwd", []()
+        {
+            return new PasswdWorkflow();
         }
     }
 };

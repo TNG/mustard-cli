@@ -109,6 +109,8 @@ set(SOURCES
         src/main/workflow/AutoconfWorkflow.h
         src/main/workflow/InfoWorkflow.cpp
         src/main/workflow/InfoWorkflow.h
+        src/main/workflow/PasswdWorkflow.cpp
+        src/main/workflow/PasswdWorkflow.h
         src/main/workflow/StartReviewWorkflow.cpp
         src/main/workflow/StartReviewWorkflow.h
         src/main/workflow/StopReviewWorkflow.cpp

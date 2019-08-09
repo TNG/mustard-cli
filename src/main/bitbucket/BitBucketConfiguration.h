@@ -11,6 +11,7 @@ public:
     BitBucketConfiguration ( GitClient *gitClient = nullptr, CredentialProvider *credentialProvider = nullptr );
     virtual const string getPullRequestEndpoint();
     virtual Credentials getCredentials();
+    Credentials askPersistAndReturnNewCredentials();
 
 private:
 
@@ -21,8 +22,6 @@ private:
     string getBitbucketUrl() const;
 
     string buildBitBucketUrl() const;
-
-    Credentials askPersistAndReturnNewCredentials();
 
     void toggleConsoleEcho();
 
