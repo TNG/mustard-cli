@@ -101,4 +101,5 @@ void BitBucketConfiguration::toggleConsoleEcho()
     termios newTerminalSettings = oldTerminalSettings;
     newTerminalSettings.c_lflag &= ~ECHO;
     tcsetattr ( STDIN_FILENO, TCSANOW, &newTerminalSettings );
+    tcdrain ( STDIN_FILENO );
 }
