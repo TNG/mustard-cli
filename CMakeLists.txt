@@ -108,6 +108,8 @@ set(SOURCES
         src/main/system/UserConfirmation.h
         src/main/workflow/AutoconfWorkflow.cpp
         src/main/workflow/AutoconfWorkflow.h
+        src/main/workflow/CommandlineConfiguration.cpp
+        src/main/workflow/CommandlineConfiguration.h
         src/main/workflow/InfoWorkflow.cpp
         src/main/workflow/InfoWorkflow.h
         src/main/workflow/PasswdWorkflow.cpp
