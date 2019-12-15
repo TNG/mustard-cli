@@ -2,6 +2,7 @@
 #include <regex>
 #include <Provide.h>
 #include "BitBucketConfigGuesser.h"
+#include "../comments/commentState/RegexMatcher.h"
 
 ProvideDependency<BitBucketConfigGuesser> BitBucketConfigGuesserDependency;
 
@@ -11,10 +12,10 @@ BitBucketConfigGuesser::BitBucketConfigGuesser ( GitClient *gitClient ) :
 void BitBucketConfigGuesser::guess()
 {
     string cloneUrl = gitClient->getConfigValue ( "remote.origin.url" );
-    static regex server ( "^.*(?:://|@)([^/@:]*)(?::\\d*)?/.*$" );
+    RegexMatcher server ( "^(?:https?|ssh)://(?:[^@]*@)?(.*)(?::\\d+|/scm)(?:/[^/]*){2}$" );
     static regex projectKey ( "^.*/([^/]*)/[^/]*\\.git$" );
     static regex repoSlug ( "^.*/([^/]*)\\.git$" );
-    this->server = getSingleCaptureIn ( cloneUrl, server );
+    this->server = server.getSingleCaptureIn ( cloneUrl ).value();
     this->repositorySlug = getSingleCaptureIn ( cloneUrl, repoSlug );
     this->projectKey = getSingleCaptureIn ( cloneUrl, projectKey );
 }
