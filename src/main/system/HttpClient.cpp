@@ -2,6 +2,7 @@
 #include <Provide.h>
 #include <iostream>
 #include "HttpClient.h"
+#include "../error/MustardException.h"
 
 ProvideDependency<HttpClient> httpClientDependency;
 
@@ -26,8 +27,14 @@ HttpResponse HttpClient::get ( const string &url )
     HttpResponse res =  {
         response.text,
         response.status_code,
-        response.error.code == cpr::ErrorCode::OK
+        response.status_code >= 200 && response.status_code <= 202
     };
+
+    if ( !res.successful ) {
+        stringstream ss;
+        ss << "HTTP Communication error: " << response.error.message;
+        throw MustardException ( ss.str() );
+    }
     log ( res );
     return ( res );
 }
