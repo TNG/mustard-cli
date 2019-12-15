@@ -1,6 +1,7 @@
 #include <Depend.h>
 
 #include <Provide.h>
+#include <iostream>
 #include "BitBucketClientImpl.h"
 #include "BitBucketConfiguration.h"
 
@@ -58,8 +59,14 @@ vector<Reviewer> BitBucketClientImpl::extractReviewersFrom ( const Document::Val
 rapidjson::Document BitBucketClientImpl::getPullRequestDocumentFor ( const Commitish &basic_string )
 {
     const HttpResponse pullRequests = httpClient->get ( pullRequestEndpoint );
-    if ( !pullRequests.successful ) {
-        throw BitBucketClientException ( "Could not determine pull requests" );
+    if ( pullRequests.httpStatus != 200 ) {
+        if ( pullRequests.httpStatus == 404 ) {
+            std::cerr << "Received a 'not found' from bitbucket server - maybe server URL is wrong?" << endl;
+        }
+        stringstream ss;
+        ss << "Could not determine pull requests: Status " << pullRequests.httpStatus << endl
+           << "Response: " << pullRequests.body << endl;
+        throw BitBucketClientException ( ss.str() );
     }
     return getDocument ( pullRequests );
 }

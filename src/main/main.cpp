@@ -1,8 +1,10 @@
 #include <iostream>
+#include <Depend.h>
 #include "workflow/StartReviewWorkflow.h"
 #include "error/MustardException.h"
 #include "workflow/WorkflowFactory.h"
 #include "workflow/WorkflowException.h"
+#include "workflow/CommandlineConfiguration.h"
 
 using namespace std;
 
@@ -10,6 +12,9 @@ void printUsage ( WorkflowFactory &factory );
 
 int main ( const int argc, const char **argv )
 {
+    CommandlineConfiguration *commandlineConfiguration = DependentOn<CommandlineConfiguration>();
+    commandlineConfiguration->parse ( argc, argv );
+
     WorkflowFactory workflowFactory;
     try {
         Workflow &workflow = workflowFactory.getWorkflowFor ( argc, argv );

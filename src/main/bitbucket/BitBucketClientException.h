@@ -12,6 +12,7 @@ class BitBucketClientException : public MustardException
 {
 public:
     BitBucketClientException ( const char *reason ) : MustardException ( reason ) {}
+    BitBucketClientException ( const string &reason ) : MustardException ( reason ) {}
 };
 
 #endif //MUSTARD_BITBUCKETCLIENTEXCEPTION_H

@@ -10,6 +10,7 @@ class MustardException : public exception
 {
 public:
     MustardException ( const char *what ) : reason ( what ) {}
+    MustardException ( const string &what ) : reason ( what ) {}
     const char *what() const noexcept {
         return reason.c_str();
     }
