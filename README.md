@@ -58,6 +58,10 @@
    - post the comments to BitBucket
    - mark the PR as approved, needs work, or just quit
    
+   ### debug option
+   If a problem occurs you may add --debug to the commandline to output a debug log including the requests and responses
+   sent to the SCM server .
+   
 ## Known Bugs & issues
 - SSL Certificate of BitBucket server is not being checked
 - mustard cannot cope with a BitBucket server that is not on 'origin'

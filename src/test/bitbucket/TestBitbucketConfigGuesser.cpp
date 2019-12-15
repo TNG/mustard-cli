@@ -69,3 +69,21 @@ TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_RepositorySlug )
     guesser.guess();
     EXPECT_STREQ ( "poormansdi", guesser.getRepositorySlug().c_str() );
 }
+
+TEST_F ( TestBitbucketConfigGuesser, Unit_Http_ServerName_withSubdir )
+{
+    EXPECT_CALL ( gitClient, getConfigValue ( StrEq ( "remote.origin.url" ) ) ).WillOnce (
+        Return ( "https://imgrundm@bitbucket.int.tngtech.com/bitbucket/scm/~imgrundm/poormansdi.git" ) );
+
+    guesser.guess();
+    EXPECT_STREQ ( "bitbucket.int.tngtech.com/bitbucket", guesser.getServer().c_str() );
+}
+
+TEST_F ( TestBitbucketConfigGuesser, Unit_Http_ServerName_withLongSubdir )
+{
+    EXPECT_CALL ( gitClient, getConfigValue ( StrEq ( "remote.origin.url" ) ) ).WillOnce (
+        Return ( "http://hugecorporation.example.com/developers/bitbucket/scm/someProject/someRepo.git" ) );
+
+    guesser.guess();
+    EXPECT_STREQ ( "hugecorporation.example.com/developers/bitbucket", guesser.getServer().c_str() );
+}
