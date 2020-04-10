@@ -12,6 +12,7 @@
 #include "../comments/Comments.h"
 
 using namespace rapidjson;
+using namespace std;
 
 class BitBucketClientImpl : public BitBucketClient
 {
@@ -19,11 +20,13 @@ public:
     BitBucketClientImpl ( HttpClient *httpClient = nullptr, BitBucketConfiguration *bitBucketConfiguration = nullptr );
     Commitish getPullRequestTargetFor ( const Commitish &featureCommittish ) override;
     PullRequest getPullRequestFor ( const Commitish &featureCommittish ) override;
+    vector<PullRequest> getPullRequests () override;
     Comments getCommentsFor ( const PullRequest &pullRequest ) override;
     void approve ( const PullRequest &pullRequest, ReviewStatus reviewStatus ) override;
 private:
     HttpClient *httpClient;
     string pullRequestEndpoint;
+    string apiEndpoint;
     string userSlug;
 
     const string determinePullRequestEndpoint ( BitBucketConfiguration *config );
@@ -43,6 +46,10 @@ private:
     Comments extractCommentsFrom ( Document &document );
 
     void addTodos ( LineComment &comment, const Document::ValueType &value );
+
+    PullRequest mapToPullRequest ( const Document::ValueType &pullRequestDocument );
+
+    optional<const Document::ValueType *> tryToAccessMember ( const Document::ValueType &value, const vector<string > &path );
 };
 
 

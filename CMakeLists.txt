@@ -104,12 +104,16 @@ set(SOURCES
         src/main/system/HttpResponse.h
         src/main/system/LinuxCommandRunner.cpp
         src/main/system/LinuxCommandRunner.h
+        src/main/system/TextTable.cpp
+        src/main/system/TextTable.h
         src/main/system/UserChoice.h
         src/main/system/UserConfirmation.h
         src/main/workflow/AutoconfWorkflow.cpp
         src/main/workflow/AutoconfWorkflow.h
         src/main/workflow/CommandlineConfiguration.cpp
         src/main/workflow/CommandlineConfiguration.h
+        src/main/workflow/InboxWorkflow.cpp
+        src/main/workflow/InboxWorkflow.h
         src/main/workflow/InfoWorkflow.cpp
         src/main/workflow/InfoWorkflow.h
         src/main/workflow/PasswdWorkflow.cpp
@@ -146,7 +150,7 @@ set(TEST_SOURCES
         src/test/git/TestGitClientImpl.cpp
         src/test/system/HttpClientForTest.h
         src/test/system/TestLinuxCommandRunner.cpp
-        )
+        src/main/workflow/InboxWorkflow.cpp src/main/workflow/InboxWorkflow.h src/main/system/TextTable.cpp src/main/system/TextTable.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
 target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})

@@ -14,6 +14,7 @@ BitBucketClientImpl::BitBucketClientImpl ( HttpClient *httpClient, BitBucketConf
 {
     BitBucketConfiguration *configuration = DependentOn<BitBucketConfiguration> ( bitBucketConfiguration );
     pullRequestEndpoint = determinePullRequestEndpoint ( configuration );
+    apiEndpoint = configuration->getApiUrl();
     userSlug = configuration->getCredentials().username;
 }
 
@@ -29,18 +30,36 @@ PullRequest BitBucketClientImpl::getPullRequestFor ( const Commitish &featureCom
 {
     Document pullRequestsDocument = getPullRequestDocumentFor ( featureCommittish );
     auto &pullRequestDocument = extractPullRequestDocument ( pullRequestsDocument, featureCommittish );
+    return mapToPullRequest ( pullRequestDocument );
+}
+
+PullRequest BitBucketClientImpl::mapToPullRequest ( const Document::ValueType &pullRequestDocument )
+{
     const string href ( pullRequestDocument["links"]["self"][0]["href"].GetString() );
     const unsigned int id = pullRequestDocument["id"].GetInt();
     const string title ( pullRequestDocument["title"].GetString() );
     const string description ( pullRequestDocument.HasMember ( "description" )
                                ? pullRequestDocument["description"].GetString()
                                : "" );
-    return {href,
-            id,
-            title,
-            description,
-            User::from ( pullRequestDocument["author"]["user"] ),
-            extractReviewersFrom ( pullRequestDocument["reviewers"] )
+
+    auto projectKey = tryToAccessMember ( pullRequestDocument, {"fromRef", "repository", "project", "key"} );
+    const string project = projectKey.has_value() ? projectKey.value()->GetString() : "" ;
+
+    auto repoSlugAccess = tryToAccessMember ( pullRequestDocument, {"fromRef", "repository", "slug"} );
+    const string repoSlug = repoSlugAccess.has_value() ? repoSlugAccess.value()->GetString() : "" ;
+
+    auto fromBranch = tryToAccessMember ( pullRequestDocument, {"fromRef", "displayId"} );
+    auto toBranch = tryToAccessMember ( pullRequestDocument, {"toRef", "displayId"} );
+    return {.url = href,
+            .id = id,
+            .title = title,
+            .description = description,
+            .author = User::from ( pullRequestDocument["author"]["user"] ),
+            .reviewers = extractReviewersFrom ( pullRequestDocument["reviewers"] ),
+            .project = project,
+            .repoSlug = repoSlug,
+            .fromBranch = fromBranch.has_value() ? fromBranch.value()->GetString() : "",
+            .toBranch = toBranch.has_value() ? toBranch.value()->GetString() : ""
            };
 }
 
@@ -218,4 +237,37 @@ void BitBucketClientImpl::addTodos ( LineComment &comment, const Document::Value
     for ( const auto &task : bitBucketComment["tasks"].GetArray() ) {
         comment.addTodo ( {task["text"].GetString(), strcmp ( task["state"].GetString(), "OPEN" ) == 0 ? Todo::TODO : Todo::DONE} );
     }
+}
+
+vector<PullRequest> BitBucketClientImpl::getPullRequests()
+{
+    stringstream pullRequestsUrl;
+
+    pullRequestsUrl << apiEndpoint << "/inbox/pull-requests";
+
+    const auto response = httpClient->get ( pullRequestsUrl.str() );
+    if ( !response.successful ) {
+        throw BitBucketClientException ( ( "Could not retrieve inbox: " + response.body ).c_str() );
+    }
+
+    auto pullRequestDocument = getDocument ( response );
+
+    vector<PullRequest> mappedPullRequests;
+    for ( const auto &pullRequest : pullRequestDocument["values"].GetArray() ) {
+        mappedPullRequests.emplace_back ( mapToPullRequest ( pullRequest ) );
+    }
+    return mappedPullRequests;
+}
+
+optional<const Document::ValueType *>
+BitBucketClientImpl::tryToAccessMember ( const Document::ValueType &value, const vector<string > &path )
+{
+    const Document::ValueType *currentValue = &value;
+    for ( auto field : path ) {
+        if ( !currentValue->HasMember ( field.c_str() ) ) {
+            return {};
+        }
+        currentValue = & ( ( *currentValue ) [field.c_str()] );
+    }
+    return {currentValue};
 }
