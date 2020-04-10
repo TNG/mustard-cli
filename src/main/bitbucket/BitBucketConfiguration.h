@@ -12,7 +12,7 @@ public:
     virtual const string getPullRequestEndpoint();
     virtual Credentials getCredentials();
     Credentials askPersistAndReturnNewCredentials();
-    string getApiUrl() const;
+    virtual string getApiUrl() const;
 
 private:
     GitClient *gitClient;

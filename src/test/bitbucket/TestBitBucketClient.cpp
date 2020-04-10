@@ -19,6 +19,10 @@ public:
         return "testUrl";
     }
 
+    string getApiUrl() const override {
+        return "testApiUrl";
+    }
+
     virtual ~BitBucketConfigurationForTest() {}
 };
 
