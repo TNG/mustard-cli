@@ -28,6 +28,9 @@
  You can change your saved username and password using this command. Alternatively one may change it directly via libsecret,
  for example using 'seahorse'.
  
+ ### mustard inbox
+ Displays all pull requests with a quick status that are on your bitbucket inbox.
+ 
  ### mustard info
  Searches for the pullrequest of the current checked out feature branch and displays basic information about it.
  ### mustard start

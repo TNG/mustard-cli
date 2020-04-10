@@ -24,19 +24,7 @@ HttpResponse HttpClient::get ( const string &url )
     authentication,
     cpr::VerifySsl{false} );
 
-    HttpResponse res =  {
-        response.text,
-        response.status_code,
-        response.status_code >= 200 && response.status_code <= 202
-    };
-
-    if ( !res.successful ) {
-        stringstream ss;
-        ss << "HTTP Communication error: " << response.error.message;
-        throw MustardException ( ss.str() );
-    }
-    log ( res );
-    return ( res );
+    return ( ( logAndConvertToHttpResponse ( response ) ) );
 }
 
 HttpResponse HttpClient::post ( const string &url, const string &body )
@@ -51,13 +39,8 @@ HttpResponse HttpClient::post ( const string &url, const string &body )
     authentication,
     cpr::Body ( body ),
     cpr::VerifySsl{false} );
-    HttpResponse res = {
-        response.text,
-        response.status_code,
-        response.error.code == cpr::ErrorCode::OK
-    };
-    log ( res );
-    return res;
+
+    return logAndConvertToHttpResponse ( response );
 }
 
 HttpResponse HttpClient::put ( const string &url, const string &body )
@@ -72,13 +55,8 @@ HttpResponse HttpClient::put ( const string &url, const string &body )
     authentication,
     cpr::Body ( body ),
     cpr::VerifySsl{false} );
-    HttpResponse res = {
-        response.text,
-        response.status_code,
-        response.error.code == cpr::ErrorCode::OK
-    };
-    log ( res );
-    return res;
+
+    return logAndConvertToHttpResponse ( response );
 }
 
 void HttpClient::log ( const string &method, const string &url, const string &body )
@@ -89,6 +67,24 @@ void HttpClient::log ( const string &method, const string &url, const string &bo
     std::cerr << method << " -> " << url << endl
               << "Request Body: " << body << endl;
 
+}
+
+HttpResponse HttpClient::logAndConvertToHttpResponse ( const cpr::Response &response )
+{
+    HttpResponse res =  {
+        response.text,
+        response.status_code,
+        response.status_code >= 200 && response.status_code <= 202
+    };
+
+    log ( res );
+
+    if ( !res.successful  && !response.error.message.empty() ) {
+        stringstream ss;
+        ss << "HTTP Communication error: " << response.error.message;
+        throw MustardException ( ss.str() );
+    }
+    return res;
 }
 
 void HttpClient::log ( HttpResponse &response )

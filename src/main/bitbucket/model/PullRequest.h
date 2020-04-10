@@ -15,6 +15,10 @@ struct PullRequest {
     string description;
     User author;
     vector<Reviewer> reviewers;
+    string project = "";
+    string repoSlug = "";
+    string fromBranch = "";
+    string toBranch = "";
 };
 
 #endif //MUSTARD_PULLREQUEST_H

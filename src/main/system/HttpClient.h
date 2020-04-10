@@ -22,6 +22,8 @@ private:
     CommandlineConfiguration *commandlineConfiguration;
     void log ( const string &url, const string &body, const string &method );
     void log ( HttpResponse &response );
+
+    HttpResponse logAndConvertToHttpResponse ( const cpr::Response &response );
 };
 
 
