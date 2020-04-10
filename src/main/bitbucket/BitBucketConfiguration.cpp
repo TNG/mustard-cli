@@ -40,12 +40,19 @@ string BitBucketConfiguration::getBitbucketUrl() const
 
 string BitBucketConfiguration::buildBitBucketUrl() const
 {
-    string bitbucketUrl = getBitBucketServer();
     const string repositorySlug = gitClient->getConfigValue ( "mustard.repositorySlug" );
     const string projectKey = gitClient->getConfigValue ( "mustard.projectKey" );
 
     stringstream ss;
-    ss << "https://" << bitbucketUrl << "/rest/api/1.0/projects/" << projectKey << "/repos/" << repositorySlug;
+    ss << "https://" << getApiUrl() << "/projects/" << projectKey << "/repos/" << repositorySlug;
+    return ss.str();
+}
+
+string BitBucketConfiguration::getApiUrl() const
+{
+    string bitbucketUrl = getBitBucketServer();
+    stringstream ss;
+    ss << "https://" << bitbucketUrl << "/rest/api/1.0";
     return ss.str();
 }
 

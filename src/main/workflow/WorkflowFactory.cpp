@@ -5,6 +5,7 @@
 #include "InfoWorkflow.h"
 #include "AutoconfWorkflow.h"
 #include "PasswdWorkflow.h"
+#include "InboxWorkflow.h"
 
 map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors = {
     {
@@ -27,6 +28,10 @@ map<string, std::function<Workflow*() >> WorkflowFactory::workflowConstructors =
     }, {"passwd", []()
         {
             return new PasswdWorkflow();
+        }
+    }, {"inbox", []()
+        {
+            return new InboxWorkflow();
         }
     }
 };

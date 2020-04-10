@@ -1,10 +1,11 @@
 #include <sstream>
 #include "PullRequestFormatter.h"
+#include "../system/TextTable.h"
 
 string PullRequestFormatter::format ( const PullRequest &pullRequest )
 {
     stringstream ss;
-    ss << " *** " << formatBold << pullRequest.title << formatNormal << " *** " << endl;
+    ss << " *** " << pullRequest.project << "/" << pullRequest.repoSlug << " *** " << formatBold << pullRequest.title << formatNormal << " *** " << endl;
     ss << pullRequest.description << endl << endl;
     ss << "author:        " << formatUser ( pullRequest.author ) << endl;
     ss << "reviewers: ";
@@ -52,4 +53,20 @@ string PullRequestFormatter::formatUser ( const User &user )
     stringstream ss;
     ss << formatBold << user.displayName << formatNormal << " <" <<  user.eMail << ">";
     return ss.str();
+}
+
+string PullRequestFormatter::shortFormat ( const vector<PullRequest> &pullRequests, function<bool ( const PullRequest & ) > highlight )
+{
+    TextTable textTable ( 4 );
+    for ( const auto &pullRequest : pullRequests ) {
+        stringstream hooks, project, title, author;
+        for ( const auto &reviewer : pullRequest.reviewers ) {
+            hooks  << symbol ( reviewer.status );
+        }
+        project << ( highlight ( pullRequest ) ? formatBold : formatNormal ) << pullRequest.project << "/" << pullRequest.repoSlug << formatNormal;
+        title <<  pullRequest.title;
+        author << formatUser ( pullRequest.author );
+        textTable.addRow ( {hooks.str(), project.str(), title.str(), author.str() } );
+    }
+    return textTable.getTable();
 }
