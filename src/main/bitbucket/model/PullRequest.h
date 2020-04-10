@@ -17,6 +17,8 @@ struct PullRequest {
     vector<Reviewer> reviewers;
     string project = "";
     string repoSlug = "";
+    string fromBranch = "";
+    string toBranch = "";
 };
 
 #endif //MUSTARD_PULLREQUEST_H

@@ -47,6 +47,9 @@ PullRequest BitBucketClientImpl::mapToPullRequest ( const Document::ValueType &p
 
     auto repoSlugAccess = tryToAccessMember ( pullRequestDocument, {"fromRef", "repository", "slug"} );
     const string repoSlug = repoSlugAccess.has_value() ? repoSlugAccess.value()->GetString() : "" ;
+
+    auto fromBranch = tryToAccessMember ( pullRequestDocument, {"fromRef", "displayId"} );
+    auto toBranch = tryToAccessMember ( pullRequestDocument, {"toRef", "displayId"} );
     return {.url = href,
             .id = id,
             .title = title,
@@ -54,7 +57,9 @@ PullRequest BitBucketClientImpl::mapToPullRequest ( const Document::ValueType &p
             .author = User::from ( pullRequestDocument["author"]["user"] ),
             .reviewers = extractReviewersFrom ( pullRequestDocument["reviewers"] ),
             .project = project,
-            .repoSlug = repoSlug
+            .repoSlug = repoSlug,
+            .fromBranch = fromBranch.has_value() ? fromBranch.value()->GetString() : "",
+            .toBranch = toBranch.has_value() ? toBranch.value()->GetString() : ""
            };
 }
 
