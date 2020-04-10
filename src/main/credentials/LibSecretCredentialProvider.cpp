@@ -15,7 +15,7 @@ ProvideDependency<CredentialProvider> credentialProvider;
 ProvideImplementationForDependency<LibSecretCredentialProvider, CredentialProvider> keyringCredentialProvider;
 
 const SecretSchema LibSecretCredentialProvider::secretSchema = {
-    "mustard.BitbucketPassword", SECRET_SCHEMA_NONE,
+    "mustard.BitbucketPassword", SECRET_SCHEMA_DONT_MATCH_NAME,
     {
         {"server", SECRET_SCHEMA_ATTRIBUTE_STRING},
         {"user", SECRET_SCHEMA_ATTRIBUTE_STRING},
