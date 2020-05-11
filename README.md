@@ -1,16 +1,22 @@
 [![Build Status](https://travis-ci.org/TNG/mustard-cli.svg?branch=release)](https://travis-ci.org/TNG/mustard-cli)
 # Mustard - A Bitbucket CLI
+## What is it?
+Mustard is a command line interface for bitbucket that facilitates reviewing and commenting pull requests. It loads the designated changes of the PR as if they would have been made locally on the target branch.
+
+![](doc/mustard.gif)
 ## Installation
 ### Requirements
 - RapidJson >= 1.1.0
 - libCurl
 - Libsecret if you want to persist your credentials to your session keyring
+
 ### Build steps
     git submodule update --init --recursive
     mkdir build
     cd build
     cmake ..
     make -j4
+
 ## Usage
  Invoke mustard with no arguments to get current set of commands.
  ### mustard autoconf
