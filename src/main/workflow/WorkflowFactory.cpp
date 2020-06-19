@@ -1,3 +1,6 @@
+#include <vector>
+#include <string>
+
 #include "WorkflowFactory.h"
 #include "WorkflowException.h"
 #include "StartReviewWorkflow.h"

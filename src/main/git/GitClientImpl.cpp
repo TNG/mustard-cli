@@ -59,7 +59,7 @@ string GitClientImpl::getDiff()
 Commitish GitClientImpl::getFeatureBranchOnOrigin()
 {
     CommandResult commandResult = commandRunner->run (
-                                      R"(git rev-parse $(git branch -vv|grep \*|sed -r 's/[^[]*\[([^] :]*).*/\1/'))" );
+                                      R"(git rev-parse $(git branch -vv|grep -e '^\*'|sed -r 's/[^[]*\[([^] :]*).*/\1/'))" );
     if ( commandResult.getReturnCode() != 0 ) {
         throw GitClientException ( "Could not determine feature branch head - maybe you are on a non tracking branch?" );
     }
