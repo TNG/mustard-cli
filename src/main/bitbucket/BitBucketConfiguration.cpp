@@ -7,6 +7,8 @@
 #include <iostream>
 #include "BitBucketConfiguration.h"
 #include "../git/GitClientException.h"
+#include "../system/UserChoice.h"
+#include "../system/UserConfirmation.h"
 
 using namespace std;
 
@@ -89,9 +91,19 @@ Credentials BitBucketConfiguration::askPersistAndReturnNewCredentials()
 
 Credentials BitBucketConfiguration::askUserForCredentials()
 {
+    bool userPresent = userHasSetVariable ( "mustard.userName" );
     string username, password;
-    cout << "user:";
-    cin >> username;
+
+    if ( userPresent ) {
+        UserConfirmation confirm ( "Also change user name?" );
+        userPresent = confirm.askUser() != YES;
+    }
+
+    if ( !userPresent ) {
+        cout << "user:";
+        cin >> username;
+    }
+
     cout << "password:";
     toggleConsoleEcho();
     cout << "\n";
@@ -109,4 +121,14 @@ void BitBucketConfiguration::toggleConsoleEcho()
     newTerminalSettings.c_lflag ^= ECHO;
     tcsetattr ( STDIN_FILENO, TCSANOW, &newTerminalSettings );
     tcdrain ( STDIN_FILENO );
+}
+
+bool BitBucketConfiguration::userHasSetVariable ( string variable )
+{
+    try {
+        gitClient->getConfigValue ( variable );
+        return true;
+    } catch ( GitClientException e ) {
+        return false;
+    }
 }

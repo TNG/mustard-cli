@@ -17,7 +17,6 @@ public:
 private:
     GitClient *gitClient;
 
-
     CredentialProvider *credentialProvider;
 
     string getBitbucketUrl() const;
@@ -29,6 +28,8 @@ private:
     Credentials askUserForCredentials();
 
     string getBitBucketServer() const;
+
+    bool userHasSetVariable ( string variable );
 };
 
 
