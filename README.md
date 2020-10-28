@@ -8,6 +8,7 @@ Mustard is a command line interface for bitbucket that facilitates reviewing and
 ### Requirements
 - RapidJson >= 1.1.0
 - libCurl
+- PkgConfig
 - Libsecret if you want to persist your credentials to your session keyring
 
 ### Build steps
