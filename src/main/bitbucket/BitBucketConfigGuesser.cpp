@@ -13,17 +13,22 @@ void BitBucketConfigGuesser::guess()
 {
     string cloneUrl = gitClient->getConfigValue ( "remote.origin.url" );
     RegexMatcher server ( "^(?:https?|ssh)://(?:[^@]*@)?(.*)(?::\\d+|/scm)(?:/[^/]*){2}$" );
-    static regex projectKey ( "^.*/([^/]*)/[^/]*\\.git$" );
+    static regex projectKey ( "^.*/([^/]*)/[^/]*(\\.git)?$" );
+
     static regex repoSlug ( "^.*/([^/]*)\\.git$" );
+    static regex repoSlugWithoutGit ( "^.*/([^/]*)$" );
     this->server = server.getSingleCaptureIn ( cloneUrl ).value();
-    this->repositorySlug = getSingleCaptureIn ( cloneUrl, repoSlug );
+    const string repoSlugWithGitExtracted = getSingleCaptureIn ( cloneUrl, repoSlug );
+    this->repositorySlug = repoSlugWithGitExtracted.empty()
+                           ? getSingleCaptureIn ( cloneUrl, repoSlugWithoutGit )
+                           : repoSlugWithGitExtracted;
     this->projectKey = getSingleCaptureIn ( cloneUrl, projectKey );
 }
 string BitBucketConfigGuesser::getSingleCaptureIn ( const string &text, const regex &extractor ) const
 {
     smatch matches;
     regex_match ( text, matches, extractor );
-    if ( matches.size() != 2 ) {
+    if ( matches.size() < 2 ) {
         return "";
     }
     return matches[1];
