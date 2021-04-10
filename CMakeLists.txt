@@ -5,11 +5,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_options("-std=c++17")
-set(CMAKE_BUILD_TYPE DEBUG)
+set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(lib/googletest)
 
-option(BUILD_CPR_TESTS "" OFF)
+set(CPR_BUILD_TESTS false)
 option(USE_SYSTEM_CURL "" ON)
 add_subdirectory(lib/cpr)
 
