@@ -4,7 +4,6 @@ project(mustard)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_options("-std=c++17")
 set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(lib/googletest)

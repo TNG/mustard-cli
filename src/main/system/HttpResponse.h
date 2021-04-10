@@ -7,7 +7,7 @@ using namespace std;
 
 struct HttpResponse {
     string body;
-    int httpStatus;
+    long httpStatus;
     bool successful;
 };
 
