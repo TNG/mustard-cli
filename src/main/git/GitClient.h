@@ -15,6 +15,7 @@ public:
     virtual string getConfigValue ( const string &name ) = 0;
     virtual void setConfigValue ( const string &name, const string &value ) = 0;
     virtual string getDiff() = 0;
+    virtual void changeToRootDir() = 0;
     virtual ~GitClient() {}
 };
 
