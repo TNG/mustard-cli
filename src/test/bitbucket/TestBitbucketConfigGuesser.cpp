@@ -70,6 +70,17 @@ TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_RepositorySlug )
     EXPECT_STREQ ( "poormansdi", guesser.getRepositorySlug().c_str() );
 }
 
+TEST_F ( TestBitbucketConfigGuesser, Unit_Ssh_RepositorySlug_WithoutPrefix )
+{
+    EXPECT_CALL ( gitClient, getConfigValue ( StrEq ( "remote.origin.url" ) ) ).WillOnce (
+        Return ( "ssh://git@git.whatever.net:1234/PROJECT/repo-slug" ) );
+
+    guesser.guess();
+    EXPECT_STREQ ( "repo-slug", guesser.getRepositorySlug().c_str() );
+    EXPECT_STREQ ( "PROJECT", guesser.getProjectKey().c_str() );
+    EXPECT_STREQ ( "git.whatever.net", guesser.getServer().c_str() );
+}
+
 TEST_F ( TestBitbucketConfigGuesser, Unit_Http_ServerName_withSubdir )
 {
     EXPECT_CALL ( gitClient, getConfigValue ( StrEq ( "remote.origin.url" ) ) ).WillOnce (

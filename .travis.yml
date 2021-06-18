@@ -2,20 +2,25 @@ language: cpp
 compiler: clang
 
 os: linux
-dist: xenial
+dist: focal
 
-env: COMPILER=clang++-6.0 BUILD_TYPE=Debug GSL_CXX_STANDARD=17
+env: BUILD_TYPE=Debug GSL_CXX_STANDARD=17
 
 addons:
   apt:
     update: true
     sources:
       - ubuntu-toolchain-r-test
-    packages:
-      - g++-7
 before_install:
   - wget "https://launchpad.net/ubuntu/+source/rapidjson/1.1.0+dfsg2-3/+build/14513429/+files/rapidjson-dev_1.1.0+dfsg2-3_all.deb"
   - sudo dpkg -i rapidjson*.deb
+  - CMAKE_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir ${CMAKE_DIR} && cd ${CMAKE_DIR}
+  - wget https://github.com/Kitware/CMake/releases/download/v3.20.1/cmake-3.20.1-linux-x86_64.tar.gz
+  - tar -xvf cmake-3.20.1-linux-x86_64.tar.gz > /dev/null
+  - mv cmake-3.20.1-linux-x86_64 cmake-install
+  - PATH=${CMAKE_DIR}/cmake-install:${CMAKE_DIR}/cmake-install/bin:$PATH
+  - cd ${TRAVIS_BUILD_DIR}
 script:
   - mkdir build
   - cd build

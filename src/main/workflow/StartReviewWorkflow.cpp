@@ -27,6 +27,8 @@ int StartReviewWorkflow::run ( int argc, const char **argv )
 
     const Comments comments = bitBucketClient->getCommentsFor ( pullRequest );
 
+    gitClient->changeToRootDir();
+
     CommentAppender commentAppender;
     comments.accept ( commentAppender );
     commentAppender.finish();

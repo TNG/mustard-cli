@@ -1,4 +1,5 @@
 #include <Depend.h>
+#include <filesystem>
 #include "GitClientImpl.h"
 #include "GitClientException.h"
 
@@ -70,4 +71,11 @@ bool GitClientImpl::merge ( const Commitish &branch )
 {
     const auto result = commandRunner->run ( "git merge --no-commit " + branch );
     return result.getReturnCode() == 0;
+}
+
+void GitClientImpl::changeToRootDir()
+{
+    const auto result = commandRunner->run ( "git rev-parse --show-toplevel" );
+    const auto projectBaseDir = result.getOutputStripNewline();
+    std::filesystem::current_path ( projectBaseDir );
 }

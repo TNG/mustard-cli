@@ -18,6 +18,7 @@ public:
     string getConfigValue ( const string &name ) override ;
     void setConfigValue ( const string &name, const string &value ) override ;
     string getDiff() override;
+    void changeToRootDir() override;
 
     GitClientImpl ( CommandRunner *commandRunner = nullptr );
 private:
