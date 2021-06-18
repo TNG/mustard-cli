@@ -18,6 +18,9 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
 {
     const Commitish originFeatureHead = gitClient->getFeatureBranchOnOrigin();
     gitClient->reset ( originFeatureHead );
+
+    gitClient->changeToRootDir();
+
     const Comments comments = commentExtractor->extract();
     handleCommentUpload ( originFeatureHead, comments );
 

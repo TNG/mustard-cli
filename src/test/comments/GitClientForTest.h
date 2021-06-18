@@ -16,6 +16,7 @@ public:
     MOCK_METHOD1 ( getConfigValue, string ( const string & ) );
     MOCK_METHOD2 ( setConfigValue, void ( const string &, const string & ) );
     MOCK_METHOD0 ( getDiff, string() );
+    MOCK_METHOD0 ( changeToRootDir, void() );
     virtual ~GitClientForTest() {}
 
 };
