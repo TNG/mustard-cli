@@ -8,3 +8,13 @@ cmake-build-debug/*
 *.iml
 out
 gen
+CMakeCache.txt
+CMakeFiles/
+Makefile
+Testing/
+_deps/
+cmake_install.cmake
+lib/*.a
+lib/*.so*
+mustard*
+

@@ -13,5 +13,4 @@ struct Tag {
     const string name;
     const optional<string> value;
 };
-
 #endif //MUSTARD_TAG_H

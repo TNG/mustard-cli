@@ -6,11 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_BUILD_TYPE Debug)
 
-add_subdirectory(lib/googletest)
+include(FetchContent)
+FetchContent_Declare(googletest GIT_REPOSITORY https://github.com/google/googletest.git
+GIT_TAG release-1.11.0)
+FetchContent_MakeAvailable(googletest)
 
-set(CPR_BUILD_TESTS false)
-option(USE_SYSTEM_CURL "" ON)
-add_subdirectory(lib/cpr)
+FetchContent_Declare(cpr GIT_REPOSITORY https://github.com/libcpr/cpr.git
+        GIT_TAG 1.7.2)
+FetchContent_MakeAvailable(cpr)
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 find_package(LibSecret)
@@ -128,7 +131,7 @@ set(SOURCES
         )
 
 add_executable(mustard lib/poorMansDi/src/DependencyContainer.cpp ${SOURCES} src/main/main.cpp)
-target_link_libraries(mustard cpr ${LIBSECRET_LIBRARIES})
+target_link_libraries(mustard cpr::cpr ${LIBSECRET_LIBRARIES})
 target_compile_features(mustard PUBLIC cxx_std_17)
 
 set(TEST_SOURCES
@@ -152,5 +155,5 @@ set(TEST_SOURCES
         src/main/workflow/InboxWorkflow.cpp src/main/workflow/InboxWorkflow.h src/main/system/TextTable.cpp src/main/system/TextTable.h)
 
 add_executable(mustard_tests lib/poorMansDi/src/DependencyContainer.cpp ${TEST_SOURCES} src/test/main.cpp)
-target_link_libraries(mustard_tests ${CPR_LIBRARIES} gtest gmock ${LIBSECRET_LIBRARIES})
+target_link_libraries(mustard_tests cpr::cpr gtest gmock ${LIBSECRET_LIBRARIES})
 target_compile_features(mustard_tests PUBLIC cxx_std_17)
