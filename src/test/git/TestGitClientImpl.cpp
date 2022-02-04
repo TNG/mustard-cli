@@ -35,13 +35,14 @@ TEST_F ( TestGitClientImpl, Unit_FindMergeBase )
     GitTestEnvironment testEnv;
     testEnv.createFileAndCommit ( "test" );
     const Commitish expectedMergeBase = gitClient.getHeadCommit();
+    testEnv.run ( "git checkout -q -b main" );
     testEnv.run ( "git checkout -q -b feature" );
     testEnv.createFileAndCommit ( "featureFile" );
-    testEnv.run ( "git checkout -q master" );
-    testEnv.createFileAndCommit ( "masterDevelopment" );
+    testEnv.run ( "git checkout -q main" );
+    testEnv.createFileAndCommit ( "mainDevelopment" );
     EXPECT_STRNE ( expectedMergeBase.c_str(), gitClient.getHeadCommit().c_str() );
 
-    const Commitish mergeBase = gitClient.getMergeBase ( "feature", "master" );
+    const Commitish mergeBase = gitClient.getMergeBase ( "feature", "main" );
 
     EXPECT_STREQ ( expectedMergeBase.c_str(), mergeBase.c_str() );
 }

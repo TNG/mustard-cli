@@ -68,12 +68,14 @@ Mustard is a command line interface for bitbucket that facilitates reviewing and
    - post the comments to BitBucket
    - mark the PR as approved, needs work, or just quit
    
-   ### debug option
+   ### Debug option
    If a problem occurs you may add --debug to the commandline to output a debug log including the requests and responses
    sent to the SCM server .
+
+   ### Do not verify ssl
+If you set the option `git config --add mustard.connectInsecure true `, mustard will not check the ssl certificate when communicating to bitbucket. Enable this option only if you know what you are doing.
    
 ## Known Bugs & issues
-- SSL Certificate of BitBucket server is not being checked
 - mustard cannot cope with a BitBucket server that is not on 'origin'
 - comments on whole files are not working
 - on PRs with conflicts, comments on files with conflicts are not properly displayed/added
