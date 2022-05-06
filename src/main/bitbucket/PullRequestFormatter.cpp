@@ -47,6 +47,7 @@ string PullRequestFormatter::symbol ( ReviewStatus status )
     case NEEDS_WORK:
         return "[\033[0;31m✗\033[0m]";
     }
+    return "";
 }
 
 string PullRequestFormatter::formatUser ( const User &user )
@@ -59,12 +60,19 @@ string PullRequestFormatter::formatUser ( const User &user )
 string PullRequestFormatter::shortFormat ( const vector<PullRequest> &pullRequests, function<bool ( const PullRequest & ) > highlight )
 {
     TextTable textTable ( 5 );
+    int applicablePr = 1;
     for ( const auto &pullRequest : pullRequests ) {
         stringstream hooks, project, title, author, fromTo;
         for ( const auto &reviewer : pullRequest.reviewers ) {
             hooks  << symbol ( reviewer.status );
         }
-        project << ( highlight ( pullRequest ) ? formatBold : formatNormal ) << pullRequest.project << "/" << pullRequest.repoSlug << formatNormal;
+        if (highlight(pullRequest)) {
+            project << formatBold << "[" << applicablePr++ << "] ";
+        } else {
+            project << formatNormal;
+        }
+
+        project << pullRequest.project << "/" << pullRequest.repoSlug << formatNormal;
         fromTo << pullRequest.fromBranch << " → " << pullRequest.toBranch;
         title <<  pullRequest.title;
         author << formatUser ( pullRequest.author );

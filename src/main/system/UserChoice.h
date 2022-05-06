@@ -10,11 +10,11 @@ template <typename T>
 class UserChoice
 {
 public:
-    UserChoice ( const string &message, map<char, T> choices ) :
+    UserChoice ( const string &message, map<string, T> choices ) :
         choices ( choices ), message ( message ) {};
     T askUser();
 private:
-    map<char, T> choices;
+    map<string , T> choices;
     string message;
 };
 
@@ -33,7 +33,7 @@ T UserChoice<T>::askUser()
         cout << choice.first;
     }
     cout << "]";
-    char userChoice;
+    string userChoice;
     cin >> userChoice;
     auto findChoice = choices.find ( userChoice );
     if ( findChoice != choices.end() ) {

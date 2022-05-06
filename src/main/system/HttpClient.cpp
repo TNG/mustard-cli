@@ -3,13 +3,16 @@
 #include <iostream>
 #include "HttpClient.h"
 #include "../error/MustardException.h"
+#include "../git/GitClientException.h"
 
 ProvideDependency<HttpClient> httpClientDependency;
 
 HttpClient::HttpClient ( AuthenticationProvider *authenticationProvider,
-                         CommandlineConfiguration *commandlineConfiguration ) :
+                         CommandlineConfiguration *commandlineConfiguration,
+                         GitClient *gitClient ) :
     authenticationProvider ( DependentOn<AuthenticationProvider> ( authenticationProvider ) ),
-    commandlineConfiguration ( DependentOn<CommandlineConfiguration> ( commandlineConfiguration ) )
+    commandlineConfiguration ( DependentOn<CommandlineConfiguration> ( commandlineConfiguration ) ),
+    verifySsl ( shouldVerifySsl ( DependentOn<GitClient> ( gitClient ) ) )
 {
 
 }
@@ -22,7 +25,7 @@ HttpResponse HttpClient::get ( const string &url )
                         cpr::Url ( url ),
     cpr::Header{{"accept", "application/json"}},
     authentication,
-    cpr::VerifySsl{false} );
+    cpr::VerifySsl{verifySsl} );
 
     return ( ( logAndConvertToHttpResponse ( response ) ) );
 }
@@ -38,7 +41,7 @@ HttpResponse HttpClient::post ( const string &url, const string &body )
         {"X-Atlassian-Token", "no-check"}},
     authentication,
     cpr::Body ( body ),
-    cpr::VerifySsl{false} );
+    cpr::VerifySsl{verifySsl} );
 
     return logAndConvertToHttpResponse ( response );
 }
@@ -54,7 +57,7 @@ HttpResponse HttpClient::put ( const string &url, const string &body )
         {"X-Atlassian-Token", "no-check"}},
     authentication,
     cpr::Body ( body ),
-    cpr::VerifySsl{false} );
+    cpr::VerifySsl{verifySsl} );
 
     return logAndConvertToHttpResponse ( response );
 }
@@ -95,4 +98,14 @@ void HttpClient::log ( HttpResponse &response )
     std::cerr << "Response:" << endl
               << "Status: " << response.httpStatus << endl
               << "Body: " << response.body << endl << endl;
+}
+
+bool HttpClient::shouldVerifySsl ( GitClient *gitClient )
+{
+    try {
+        auto connectInsecure = gitClient->getConfigValue ( "mustard.connectInsecure" );
+        return ! ( "true" == connectInsecure );
+    } catch ( GitClientException &e ) {
+        return true;
+    }
 }

@@ -3,6 +3,9 @@
 #include "InboxWorkflow.h"
 #include "../git/GitClient.h"
 #include "../bitbucket/PullRequestFormatter.h"
+#include "../system/UserChoice.h"
+#include "../system/UserConfirmation.h"
+#include "StartReviewWorkflow.h"
 
 InboxWorkflow::InboxWorkflow ( BitBucketClient *bitBucketClient, GitClient *gitClient ) :
     bitbucketClient ( DependentOn<BitBucketClient> ( bitBucketClient ) ),
@@ -17,7 +20,35 @@ int InboxWorkflow::run ( int argc, const char **argv )
         return equalsCaseInsensitive ( p.repoSlug, repositorySlug ) &&
                equalsCaseInsensitive ( p.project, projectKey );
     };
-    std::cout << PullRequestFormatter::shortFormat ( pullRequests, highlight );
+
+    if(pullRequests.empty()){
+        std::cout << "You have nothing in your inbox that needs work." << endl;
+        return 0;
+    }
+
+    std::map<string, PullRequest *> pullrequestsInThisProject;
+    pullrequestsInThisProject["0"] = nullptr;
+
+    std::cout << PullRequestFormatter::shortFormat ( pullRequests, highlight);
+
+    int checkoutablePullRequestsFound = 0;
+    std::for_each(pullRequests.begin(), pullRequests.end(), [highlight,&pullrequestsInThisProject,&checkoutablePullRequestsFound](auto &pr) {
+        if (highlight(pr)){
+            pullrequestsInThisProject[to_string(++checkoutablePullRequestsFound)] = &pr;
+        }
+    });
+    if(pullrequestsInThisProject.size() > 1){
+        PullRequest *prToCheckout = UserChoice("Type number of pr to git-checkout, 0 to quit.",
+                                               pullrequestsInThisProject).askUser();
+        if (prToCheckout != nullptr){
+            gitClient->fetchAndCheckout(prToCheckout->fromBranch);
+            if (UserConfirmation("Do you want to start reviewing?").askUser() == YES) {
+                StartReviewWorkflow startReviewWorkflow;
+                startReviewWorkflow.run(argc, argv);
+            }
+        }
+    }
+
     return 0;
 }
 

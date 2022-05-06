@@ -2,6 +2,7 @@
 #define MUSTARD_REGEXMATCHER_H
 
 #include <regex>
+#include <optional>
 
 using namespace std;
 
