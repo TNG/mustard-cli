@@ -79,3 +79,15 @@ void GitClientImpl::changeToRootDir()
     const auto projectBaseDir = result.getOutputStripNewline();
     std::filesystem::current_path ( projectBaseDir );
 }
+
+void GitClientImpl::fetchAndCheckout(const string &branch) {
+    const auto result = commandRunner->run("git fetch origin " + branch);
+    if (result.getReturnCode() != 0){
+        throw GitClientException("Could not fetch branch to checkout");
+    }
+
+    const auto checkoutResult =  commandRunner->run("git checkout " + branch);
+    if (checkoutResult.getReturnCode() != 0) {
+        throw GitClientException(checkoutResult.getOutput().c_str());
+    }
+}

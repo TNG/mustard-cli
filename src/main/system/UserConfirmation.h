@@ -14,8 +14,8 @@ public:
     UserConfirmation ( const string &message ) :
         UserChoice<Confirmed> (
             message, {
-        {'y', YES},
-        {'n', NO}
+        {"y", YES},
+        {"n", NO}
     }
     ) {}
 };
