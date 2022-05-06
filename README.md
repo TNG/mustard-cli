@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TNG/mustard-cli.svg?branch=release)](https://travis-ci.org/TNG/mustard-cli)
+[![Build Status](https://app.travis-ci.com/TNG/mustard-cli.svg?branch=release)](https://travis-ci.com/github/TNG/mustard-cli)
 # Mustard - A Bitbucket CLI
 ## What is it?
 Mustard is a command line interface for bitbucket that facilitates reviewing and commenting pull requests. It loads the designated changes of the PR as if they would have been made locally on the target branch.
