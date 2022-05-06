@@ -15,6 +15,7 @@ public:
     Commitish getMergeBase ( const Commitish &fromBranch, const Commitish &toBranch ) override;
     Commitish getFeatureBranchOnOrigin() override;
     void reset ( const Commitish &resetTo, bool hard = false ) override;
+    void fetchAndCheckout (const string &branch ) override;
     string getConfigValue ( const string &name ) override ;
     void setConfigValue ( const string &name, const string &value ) override ;
     string getDiff() override;

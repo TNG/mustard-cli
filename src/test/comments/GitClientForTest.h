@@ -11,6 +11,7 @@ public:
     MOCK_METHOD0 ( workingDirectoryIsClean, bool() );
     MOCK_METHOD0 ( getFeatureBranchOnOrigin, Commitish() );
     MOCK_METHOD1 ( merge, bool ( const Commitish & ) );
+    MOCK_METHOD1 ( fetchAndCheckout, void ( const string & ) );
     MOCK_METHOD2 ( getMergeBase, Commitish ( const Commitish &, const Commitish & ) );
     MOCK_METHOD2 ( reset, void ( const Commitish &, bool ) );
     MOCK_METHOD1 ( getConfigValue, string ( const string & ) );

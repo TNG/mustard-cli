@@ -36,7 +36,9 @@ Mustard is a command line interface for bitbucket that facilitates reviewing and
  for example using 'seahorse'.
  
  ### mustard inbox
- Displays all pull requests with a quick status that are on your bitbucket inbox.
+ Displays all pull requests with a quick status that are on your bitbucket inbox. If mustard detects that a PR is for
+ the currently checked out repo, it is being assigned a number. Mustard then will ask if you want to fetch and check out
+one of the PRs in the current repo and whether to start reviewing it.
  
  ### mustard info
  Searches for the pullrequest of the current checked out feature branch and displays basic information about it.

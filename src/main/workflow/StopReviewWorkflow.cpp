@@ -31,9 +31,9 @@ int StopReviewWorkflow::run ( int argc, const char **argv )
 
     UserChoice<ReviewStatus> reviewStatusChoice (
     "Should I [a]pprove the pullrequest, does it [n]eed work, or just [q]uit", {
-        {'a', APPROVED},
-        {'q', UNAPPROVED},
-        {'n', NEEDS_WORK},
+        {"a", APPROVED},
+        {"q", UNAPPROVED},
+        {"n", NEEDS_WORK},
     } );
 
     const ReviewStatus userChoice = reviewStatusChoice.askUser();
