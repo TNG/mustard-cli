@@ -1,0 +1,51 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - master
+      - release
+      - updates
+  pull_request:
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: ~/rapidjson.deb
+          key: deps-rapidjson-1.1.0
+
+      - name: Install rapidjson
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          wget "https://launchpad.net/ubuntu/+source/rapidjson/1.1.0+dfsg2-3/+build/14513429/+files/rapidjson-dev_1.1.0+dfsg2-3_all.deb" -O rapidjson.deb
+          sudo dpkg -i rapidjson.deb
+
+      - name: Install toolchain
+        run: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+
+      - name: Setup git user
+        run: |
+          git config user.name Tester
+          git config user.email tester@localhost
+
+      - name: Test
+        run: |
+          mkdir build && cd build
+          cmake .. -DRAPIDJSON_BUILD_CXX11=OFF
+          make
+          ./mustard_tests
+        env:
+          BUILD_TYPE: Debug
+          GSL_CXX_STANDARD: 17
+          CMAKE_DIR: "${{ env.GITHUB_WORKSPACE }}/deps"
