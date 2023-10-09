@@ -38,10 +38,10 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           wget "https://launchpad.net/ubuntu/+source/rapidjson/1.1.0+dfsg2-3/+build/14513429/+files/rapidjson-dev_1.1.0+dfsg2-3_all.deb" -O rapidjson.deb
-          sudo dpkg -i rapidjson.deb
 
       - name: Install toolchain
         run: |
+          sudo dpkg -i rapidjson.deb
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test
           sudo apt-get update
 
