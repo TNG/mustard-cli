@@ -3,6 +3,8 @@
 ## What is it?
 Mustard is a command line interface for bitbucket that facilitates reviewing and commenting pull requests. It loads the designated changes of the PR as if they would have been made locally on the target branch.
 
+Important: This repository is by now unmaintained and archived.
+
 ![](doc/mustard.gif)
 ## Installation
 ### Requirements
